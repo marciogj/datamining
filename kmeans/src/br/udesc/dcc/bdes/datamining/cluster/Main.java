@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.udesc.dcc.bdes.datamining.cluster.element.Element;
-import br.udesc.dcc.bdes.datamining.cluster.element.NumberElement;
+import br.udesc.dcc.bdes.datamining.cluster.element.Number;
 
 public class Main {
 	
@@ -30,7 +30,7 @@ public class Main {
 		Element element = null;
 		String strElements = "";
 		for(int i=1; i < 5000; i++) {
-			element = new NumberElement(i);
+			element = new Number(i);
 			data.add(element);
 			strElements +=  i == 1 ? element : ", " + element;
 		}
