@@ -10,8 +10,7 @@ public class Number implements Element {
 	
 	@Override
 	public double distance(Element another) {
-		double result = value - ( (Number) another).value; 
-		return result < 0 ? result * (-1) : result;
+		return Math.abs(value - ( (Number) another).value);
 	}
 
 	@Override

@@ -74,5 +74,9 @@ public class Cluster {
 	public List<Element> getElements() {
 		return elements;
 	}
+
+	public int size() {
+		return elements.size();
+	}
 	
 }

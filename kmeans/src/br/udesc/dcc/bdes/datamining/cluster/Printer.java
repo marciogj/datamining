@@ -17,7 +17,7 @@ public class Printer {
 	}
 
 	public static String clusterToString(Cluster cluster) {
-		String str = cluster.getName() + "(" + cluster.getCentroid() + ")";
+		String str = cluster.getName() + " Mean: " + cluster.getCentroid() + "";
 		String strElements = "";
 		for (Element element : cluster.getElements()) {
 			strElements += strElements.length() == 0 ? element : ", " + element;
