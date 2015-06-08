@@ -7,7 +7,7 @@ import java.util.Set;
 import br.udesc.dcc.bdes.datamining.cluster.element.Element;
 
 public class ClusterSet {
-	private Map<Cluster, Integer> clusters;
+	private Map<Cluster, Double> clusters;
 	private int k;
 
 	public static ClusterSet createNamedClusterSet(int k) {
@@ -27,7 +27,7 @@ public class ClusterSet {
 
 	public ClusterSet(int k) {
 		this.k = k;
-		this.clusters = new HashMap<Cluster, Integer>(k);
+		this.clusters = new HashMap<Cluster, Double>(k);
 	}
 
 	public Set<Cluster> getClusters() {
@@ -39,7 +39,7 @@ public class ClusterSet {
 			throw new RuntimeException("cluster cannot be bigger than " + k);
 		}
 		k++;
-		clusters.put(cluster, new Integer(0));
+		clusters.put(cluster, new Double(0.0));
 	}
 
 	public boolean containsCentroid(Element element) {
@@ -51,21 +51,21 @@ public class ClusterSet {
 		return false;
 	}
 
-	public int getSquareResidualDistance(Cluster cluster) {
-		return clusters.get(cluster).intValue();
+	public double getSquareResidualDistance(Cluster cluster) {
+		return clusters.get(cluster).doubleValue();
 	}
 
 	public void calculateSquareResidualDistance() {
 		for (Cluster cluster : clusters.keySet()) {
-			Integer residualDistance = new Integer(cluster.squareResidualSum());
+			Double residualDistance = new Double(cluster.squareResidualSum());
 			clusters.put(cluster, residualDistance);
 		}
 	}
 	
-	public int getSquareResidualDistance() {
-		int total = 0;
+	public double getAllSquareResidualDistance() {
+		double total = 0;
 		for (Cluster cluster : clusters.keySet()) {
-			total += clusters.get(cluster).intValue();
+			total += clusters.get(cluster).doubleValue();
 		}
 		return total;
 	}

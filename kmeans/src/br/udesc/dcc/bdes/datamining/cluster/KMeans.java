@@ -25,7 +25,7 @@ public class KMeans {
 			newCluster.calculateSquareResidualDistance();
 			//System.out.println(Printer.clusterSetToString(newCluster));
 
-			if (lastCluster.getSquareResidualDistance() == newCluster.getSquareResidualDistance()) {
+			if (lastCluster.getAllSquareResidualDistance() == newCluster.getAllSquareResidualDistance()) {
 				return newCluster;
 			}
 			lastCluster = newCluster;
@@ -39,6 +39,7 @@ public class KMeans {
 		List<Element> centroids = pickRandomCentroids(k, data);
 		ClusterSet initialCluster = ClusterSet.createNamedClusterSet(k);
 		for (Cluster cluster : initialCluster.getClusters()) {
+			System.out.println("Centroid selected " + centroids.get(0));
 			cluster.setCentroid(centroids.remove(0));
 		}
 		return initialCluster;

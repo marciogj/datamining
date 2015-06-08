@@ -21,7 +21,7 @@ public class KMeansCoordinateTest {
 		System.out.println("=========================");
 		long startTime = System.nanoTime();
 		KMeans kmeans = new KMeans();
-		int maxIterations = 100;
+		int maxIterations = 1000;
 		
 		int k = 3;
 		int dataSize = 5000;
@@ -48,12 +48,14 @@ public class KMeansCoordinateTest {
 		return difference <= acceptedError;
 	}
 	
-	
+	/**
+	 * Created real GPS data from http://www.geomidpoint.com/random/
+	 */
 	private static List<Element> createCoordinateData(int numberOfElements, int k) {
 		List<Element> data = new ArrayList<Element>();
 		int dataDivision = numberOfElements/k;
 		int remaingData = numberOfElements;
-		double motion = 0.0001;
+		double motion = 0.00001;
 		
 		Coordinate indaial = new Coordinate(-26.8997445, -49.235898099999986);
 		data.addAll( createCoordinates(indaial, dataDivision, motion));
@@ -75,6 +77,7 @@ public class KMeansCoordinateTest {
 		double latitude = initialPlace.getLatitude();
 		double longitude = initialPlace.getLongitude();
 		List<Element> data = new ArrayList<Element>();
+		
 		for(int i=1; i <= numberOfCoordinates; i++) {
 			data.add(new Coordinate(latitude, longitude));
 			latitude += motion;

@@ -20,7 +20,7 @@ public class Number implements Element {
 	}
 
 	@Override
-	public Element divide(int dividend) {
+	public Element divide(double dividend) {
 		double result = this.value / dividend;
 		return new Number(result);
 	}

@@ -16,7 +16,7 @@ public class Cluster {
 	}
 	
 	public Element meanCentroid() {
-		int total = elements.size();
+		double total = elements.size();
 		if (total == 0) return centroid;
 		Element sum = centroid.zero(); 
 		for (Element element : elements) {
@@ -28,7 +28,7 @@ public class Cluster {
 	
 	//http://www.decom.cefetmg.br/docentes/flavio_cardeal/Teaching/mnc/aula_ajuste.pdf
 	//http://en.wikipedia.org/wiki/Residual_sum_of_squares
-	public int squareResidualSum() {
+	public double squareResidualSum() {
 		int sum = 0;
 		for (Element element : elements) {
 			sum += Math.sqrt(centroid.distance(element)); 

@@ -6,13 +6,13 @@ public class Printer {
 	private static final String lineBreak = System.getProperty("line.separator");
 
 	public static String clusterSetToString(ClusterSet clusterSet) {
-		int distance = 0;
+		double distance = 0;
 		String str = "";
 		for (Cluster cluster : clusterSet.getClusters()) {
 			distance = clusterSet.getSquareResidualDistance(cluster);
 			str += "{RD" + ": " + distance + ", Cluster: " + clusterToString(cluster) + "}"+lineBreak;
 		}
-		str += "ClusterSet Residual Sum " + clusterSet.getSquareResidualDistance();
+		str += "ClusterSet Residual Sum " + clusterSet.getAllSquareResidualDistance();
 		return str;
 	}
 
