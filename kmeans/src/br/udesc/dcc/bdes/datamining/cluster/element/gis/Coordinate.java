@@ -1,4 +1,6 @@
-package br.udesc.dcc.bdes.datamining.cluster.element;
+package br.udesc.dcc.bdes.datamining.cluster.element.gis;
+
+import br.udesc.dcc.bdes.datamining.cluster.element.Element;
 
 public class Coordinate implements Element {
 	protected double latitute;
@@ -54,8 +56,8 @@ public class Coordinate implements Element {
 	}
 
 	@Override
-	public Element divide(double size) {
-		return new Coordinate(latitute/size, longitude/size);
+	public Element divide(double dividend) {
+		return new Coordinate(latitute/dividend, longitude/dividend);
 	}
 
 	@Override

@@ -1,9 +1,9 @@
 package br.udesc.dcc.bdes.datamining.cluster.junit;
 
 import org.junit.Test;
-import static org.junit.Assert.assertTrue;
 
-import br.udesc.dcc.bdes.datamining.cluster.element.Coordinate;
+import static org.junit.Assert.assertTrue;
+import br.udesc.dcc.bdes.datamining.cluster.element.gis.Coordinate;
 
 public class CoordinateTest {
 	

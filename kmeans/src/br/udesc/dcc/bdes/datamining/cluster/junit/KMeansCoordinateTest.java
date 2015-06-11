@@ -11,8 +11,8 @@ import br.udesc.dcc.bdes.datamining.cluster.Cluster;
 import br.udesc.dcc.bdes.datamining.cluster.ClusterSet;
 import br.udesc.dcc.bdes.datamining.cluster.KMeans;
 import br.udesc.dcc.bdes.datamining.cluster.Printer;
-import br.udesc.dcc.bdes.datamining.cluster.element.Coordinate;
 import br.udesc.dcc.bdes.datamining.cluster.element.Element;
+import br.udesc.dcc.bdes.datamining.cluster.element.gis.Coordinate;
 
 public class KMeansCoordinateTest {
 
@@ -37,7 +37,6 @@ public class KMeansCoordinateTest {
 		for (Cluster cluster : solution.getClusters()) {
 			assertTrue( isBalanced(expectedSize,cluster.size(), percentageError) );
 		}
-		assertTrue(true);
 		System.out.println("=========================");
 	}
 	

@@ -6,7 +6,7 @@ public interface Element {
 
 	public Element plus(Element element);
 
-	public Element divide(double size);
+	public Element divide(double dividend);
 
 	public Element zero();
 	
