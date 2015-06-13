@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.datamining.cluster;
+package br.udesc.dcc.bdes.datamining.cluster.kmeans;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class Cluster {
 	public double squareResidualSum() {
 		int sum = 0;
 		for (Element element : elements) {
-			sum += Math.sqrt(centroid.distance(element)); 
+			sum += Math.pow(centroid.distance(element), 2); 
 		}
 		return sum;
 	}

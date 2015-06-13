@@ -7,12 +7,12 @@ import java.util.List;
 
 import org.junit.Test;
 
-import br.udesc.dcc.bdes.datamining.cluster.Cluster;
-import br.udesc.dcc.bdes.datamining.cluster.ClusterSet;
-import br.udesc.dcc.bdes.datamining.cluster.KMeans;
-import br.udesc.dcc.bdes.datamining.cluster.Printer;
 import br.udesc.dcc.bdes.datamining.cluster.element.Element;
 import br.udesc.dcc.bdes.datamining.cluster.element.gis.Coordinate;
+import br.udesc.dcc.bdes.datamining.cluster.kmeans.Cluster;
+import br.udesc.dcc.bdes.datamining.cluster.kmeans.ClusterSet;
+import br.udesc.dcc.bdes.datamining.cluster.kmeans.KMeans;
+import br.udesc.dcc.bdes.datamining.cluster.kmeans.Printer;
 
 public class KMeansCoordinateTest {
 

@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.datamining.cluster;
+package br.udesc.dcc.bdes.datamining.cluster.kmeans;
 
 import java.util.ArrayList;
 import java.util.List;
