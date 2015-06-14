@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import br.udesc.dcc.bdes.datamining.cluster.ClusterSet;
@@ -12,35 +13,55 @@ import br.udesc.dcc.bdes.datamining.cluster.Printer;
 import br.udesc.dcc.bdes.datamining.cluster.element.Element;
 import br.udesc.dcc.bdes.datamining.cluster.element.gis.Coordinate;
 import br.udesc.dcc.bdes.datamining.cluster.element.gis.Trajectory;
+import br.udesc.dcc.bdes.datamining.cluster.fuzzy.FuzzyCMeans;
 import br.udesc.dcc.bdes.datamining.cluster.kmeans.KMeans;
 
-public class KMeansTrajectoryTest {
-
+public class TrajectoryClusteringTest {
+	List<Element> data;
+	int k;
+	int maxIterations;
+	
+	@Before
+	public void setup() {
+		data = createSampleData();
+		maxIterations = 100;
+		k = 12;
+	}
+	
 	/**
 	 * Check details for straight line here:
 	 * http://www.gpsvisualizer.com/map?format=google&units=metric&lat1=-26.8997445&lon1=-49.2358981&lat2=-27.5953778&lon2=-48.5480499&name1=-26.8997445%2C+-49.235898099999986&name2=-27.5953778%2C+-48.548049900000024&desc1=-26.8997445%2C+-49.2358981&desc2=-27.5953778%2C+-48.5480499&convert_format=&gc_segments=&gc_altitude=&tickmark_interval=&show_wpt=3&add_elevation=&trk_colorize=
 	 */
 	@Test
-	public void distanceTest() {
-		System.out.println("=== "+this.getClass().getName()+" ===");
-		List<Element> data = createSampleData();
-		long startTime = System.nanoTime();
-		KMeans kmeans = new KMeans();
-		int maxIterations = 1000;
-		
-		int k = 12;
-		//int dataSize = data.size();
+	public void kMeansTrajectoryTest() {
+		System.out.println("=== KMeans ===");
 		System.out.println("Solution for k=" + k);
 		
+		long startTime = System.nanoTime();
+		KMeans kmeans = new KMeans();
 		ClusterSet solution = kmeans.findClusterDistribuition(k, data, maxIterations);
-		System.out.println(Printer.clusterSetToString(solution));
 		long elapsed = System.nanoTime() - startTime;
-		//int percentageError = 3; // Lets start testing with 3% of error
-		//int expectedSize = dataSize/3; //a perfect distribution would be like this
+		
+		System.out.println(Printer.clusterSetToString(solution));
 		System.out.println("Elapsed Time: " + elapsed + " nano seconds");
-		//for (Cluster cluster : solution.getClusters()) {
-		//	assertTrue( isBalanced(expectedSize,cluster.size(), percentageError) );
-		//}
+				
+		assertTrue(true);
+		System.out.println("=========================");
+	}
+	
+	@Test
+	public void fuzzyCMeansTrajectoryTest() {
+		System.out.println("=== FuzzyCMeans ===");
+		System.out.println("Solution for k=" + k);
+		
+		long startTime = System.nanoTime();
+		FuzzyCMeans fuzzyCMeans = new FuzzyCMeans();
+		ClusterSet solution = fuzzyCMeans.findClusterDistribuition(k, data, maxIterations);
+		long elapsed = System.nanoTime() - startTime;
+		
+		System.out.println(Printer.clusterSetToString(solution));
+		System.out.println("Elapsed Time: " + elapsed + " nano seconds");
+				
 		assertTrue(true);
 		System.out.println("=========================");
 	}

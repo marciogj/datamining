@@ -84,6 +84,9 @@ public class Coordinate implements Element {
 
 	@Override
 	public double euclideanDistance(Element another){
-		throw new RuntimeException("Not implemented");
+		double euclideanDistance = this.distance(another);
+		euclideanDistance = euclideanDistance * euclideanDistance;
+		return Math.sqrt(euclideanDistance);
+		
 	}
 }

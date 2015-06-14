@@ -86,7 +86,13 @@ public class Trajectory implements Element {
 	
 	@Override
 	public double euclideanDistance(Element another){
-		throw new RuntimeException("Not implemented");
+		Trajectory otherTrajectory = (Trajectory) another;
+		List<Coordinate> otherTrack = otherTrajectory.track;
+		double sum = 0;
+		for (int i=0; i < track.size();i++) {
+			sum += track.get(i).euclideanDistance(otherTrack.get(i)); 
+		}
+		return sum;
 	}
 
 }
