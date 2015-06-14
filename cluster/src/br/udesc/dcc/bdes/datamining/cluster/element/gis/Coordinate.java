@@ -59,6 +59,11 @@ public class Coordinate implements Element {
 	public Element divide(double dividend) {
 		return new Coordinate(latitute/dividend, longitude/dividend);
 	}
+	
+	@Override
+	public Element multiply(double value) {
+		return new Coordinate(latitute*value, longitude*value);
+	}
 
 	@Override
 	public Element zero() {
@@ -77,4 +82,8 @@ public class Coordinate implements Element {
 		return "(lat:" + latitute + ", lon: " + longitude + ")";
 	}
 
+	@Override
+	public double euclideanDistance(Element another){
+		throw new RuntimeException("Not implemented");
+	}
 }

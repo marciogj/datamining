@@ -60,6 +60,15 @@ public class Trajectory implements Element {
 		}
 		return divided;
 	}
+	
+	@Override
+	public Element multiply(double value) {
+		Trajectory divided = new Trajectory();
+		for (Coordinate coordinate : track) {
+			divided.add((Coordinate)coordinate.multiply(value));
+		}
+		return divided;
+	}
 
 	@Override
 	public Element zero() {
@@ -73,6 +82,11 @@ public class Trajectory implements Element {
 			strData = strData == null ? coordinate.toString() : strData + ", " + coordinate;
 		}
 		return "{ size: " + track.size() + ", data: [" + strData + "]}";
+	}
+	
+	@Override
+	public double euclideanDistance(Element another){
+		throw new RuntimeException("Not implemented");
 	}
 
 }

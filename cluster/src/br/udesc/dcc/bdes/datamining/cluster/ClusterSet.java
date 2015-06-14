@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.datamining.cluster.kmeans;
+package br.udesc.dcc.bdes.datamining.cluster;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +10,24 @@ public class ClusterSet {
 	private Map<Cluster, Double> clusters;
 	private int k;
 
+
+	public static ClusterSet createNamedClusterSet(Element[] centroids) {
+		ClusterSet clusterSet = new ClusterSet(centroids.length);
+		int i = 0;
+		for(Element centroid : centroids) {
+			char clusterLetter = (char) ('A' + i++);
+			StringBuilder clusterName = new StringBuilder();
+			clusterName.append(clusterLetter);
+
+			Cluster newCluster = new Cluster(clusterName.toString());
+			newCluster.setCentroid(centroid);
+			clusterSet.add(newCluster);
+		}
+
+		return clusterSet;
+
+	}
+	
 	public static ClusterSet createNamedClusterSet(int k) {
 		ClusterSet clusterSet = new ClusterSet(k);
 		for(int i=0; i < k; i++) {
@@ -38,7 +56,6 @@ public class ClusterSet {
 		if (clusters.keySet().size() == k) {
 			throw new RuntimeException("cluster cannot be bigger than " + k);
 		}
-		k++;
 		clusters.put(cluster, new Double(0.0));
 	}
 
@@ -49,6 +66,15 @@ public class ClusterSet {
 			}
 		}
 		return false;
+	}
+	
+	public Cluster getClusterByCentroid(Element centroid) {
+		for (Cluster cluster : clusters.keySet()) {
+			if (cluster.isCentroid(centroid) ){
+				return cluster;
+			}
+		}
+		return null;
 	}
 
 	public double getSquareResidualDistance(Cluster cluster) {
@@ -83,5 +109,18 @@ public class ClusterSet {
 
 		return newClusterSet;
 	}
+	
+	public int size() {
+		return k;
+	}
 
+	public Element[] getCentroids() {
+		Element[] centroids = new Element[clusters.size()];
+		int i = 0;
+		for (Cluster cluster : clusters.keySet()) {
+			centroids[i++] = cluster.getCentroid(); 
+		}
+		return centroids;
+	}
+	
 }

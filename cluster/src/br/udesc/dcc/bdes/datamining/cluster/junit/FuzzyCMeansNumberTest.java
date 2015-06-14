@@ -1,6 +1,6 @@
 package br.udesc.dcc.bdes.datamining.cluster.junit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,23 +12,24 @@ import br.udesc.dcc.bdes.datamining.cluster.ClusterSet;
 import br.udesc.dcc.bdes.datamining.cluster.Printer;
 import br.udesc.dcc.bdes.datamining.cluster.element.Element;
 import br.udesc.dcc.bdes.datamining.cluster.element.Number;
-import br.udesc.dcc.bdes.datamining.cluster.kmeans.KMeans;
+import br.udesc.dcc.bdes.datamining.cluster.fuzzy.FuzzyCMeans;
 
-public class KMeansNumberTest {
+public class FuzzyCMeansNumberTest {
 
 	@Test
-	public void kMeansNumberDistribuitionTest() {
+	public void fuzzyCMeansNumberDistribuitionTest() {
 		System.out.println("=========================");
 		long startTime = System.nanoTime();
-		KMeans kmeans = new KMeans();
+		FuzzyCMeans fuzzyCMeans = new FuzzyCMeans();
 		int maxIterations = 100;
 		
 		int k = 3;
-		int dataSize = 5000;
+		//int dataSize = 5000;
+		int dataSize = 30;
 		System.out.println("Solution for k=" + k);
 		List<Element> data = createNumberList(dataSize);
 		
-		ClusterSet solution = kmeans.findClusterDistribuition(k, data, maxIterations);
+		ClusterSet solution = fuzzyCMeans.findClusterDistribuition(k, data, maxIterations);
 		System.out.println(Printer.clusterSetToString(solution));
 		long elapsed = System.nanoTime() - startTime;
 		int percentageError = 3; // Lets start testing with 3% of error

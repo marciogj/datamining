@@ -24,6 +24,12 @@ public class Number implements Element {
 		double result = this.value / dividend;
 		return new Number(result);
 	}
+	
+	@Override
+	public Element multiply(double value) {
+		double result = this.value * value;
+		return new Number(result);
+	}
 
 	@Override
 	public Element zero() {
@@ -33,6 +39,12 @@ public class Number implements Element {
 	@Override
 	public String toString() {
 		return "" + value;
+	}
+	
+	@Override
+	public double euclideanDistance(Element another){
+		double difference = value - ( (Number) another).value;
+		return Math.sqrt(difference * difference);
 	}
 
 }

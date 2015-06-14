@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.datamining.cluster.kmeans;
+package br.udesc.dcc.bdes.datamining.cluster;
 
 import br.udesc.dcc.bdes.datamining.cluster.element.Element;
 
@@ -23,6 +23,28 @@ public class Printer {
 			strElements += strElements.length() == 0 ? element : ", " + element;
 		}
 		return str + " - ["+ strElements +"]";
+	}
+	
+	public static String elementsToString(Element[] elements) {
+		String str = "";
+		for (Element element : elements) {
+			str += element + " |\t";
+		}
+		return str;
+	}
+	
+	public static String matrixToString(double[][] matrix) {
+		String strMatrix = "";
+		String strRow = "";
+		
+		for (int row = 0; row < matrix.length; row++) {
+			strRow = "";
+			for (int column = 0; column < matrix[0].length; column++) {
+				strRow += matrix[row][column] + " |\t";
+			}
+			strMatrix += strRow + System.getProperty("line.separator");
+		}
+		return strMatrix;
 	}
 
 }

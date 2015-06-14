@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import br.udesc.dcc.bdes.datamining.cluster.Cluster;
+import br.udesc.dcc.bdes.datamining.cluster.ClusterSet;
 import br.udesc.dcc.bdes.datamining.cluster.element.Element;
 
 public class KMeans {
