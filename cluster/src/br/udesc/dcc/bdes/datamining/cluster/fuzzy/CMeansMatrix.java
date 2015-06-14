@@ -4,7 +4,6 @@ import java.util.List;
 
 import br.udesc.dcc.bdes.datamining.cluster.Cluster;
 import br.udesc.dcc.bdes.datamining.cluster.ClusterSet;
-import br.udesc.dcc.bdes.datamining.cluster.Printer;
 import br.udesc.dcc.bdes.datamining.cluster.element.Element;
 
 public class CMeansMatrix {
@@ -54,8 +53,6 @@ public class CMeansMatrix {
 			}
 			row++;
 		}
-		
-		//printtable();
 	}
 	
 	public void updateCentroids() {
@@ -84,13 +81,10 @@ public class CMeansMatrix {
 		
 		double higherIndex = 0;
 		Element nearestCentroid = null;
-				
-		System.out.println("### INDEX RESULT ###");
 		for (int row = 0; row < membershipIndex.length; row++) {
 			higherIndex = 0;
 			for (int column = 0; column < membershipIndex[0].length; column++) {
 				double index = membershipIndex[row][column];
-				System.out.print(index + "|\t");
 				if (index >= higherIndex) {
 					nearestCentroid = centroids[column];
 					higherIndex = index;
@@ -98,20 +92,9 @@ public class CMeansMatrix {
 			}
 			Cluster cluster = clusterSet.getClusterByCentroid(nearestCentroid);
 			cluster.add(elements.get(row));
-			System.out.println("");	
 		}
 		clusterSet.calculateSquareResidualDistance();
 		return clusterSet;
-	}
-	
-	private void printtable() {
-		System.out.println("----- Means ----");
-		System.out.println(Printer.elementsToString(centroids));
-		System.out.println("");
-		
-		System.out.println("----- INDEX TABLE ----");
-		System.out.println(Printer.matrixToString(membershipIndex));
-		System.out.println("-----------------");
 	}
 	
 }

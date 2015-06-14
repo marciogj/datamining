@@ -22,8 +22,8 @@ public class KMeansTrajectoryTest {
 	 */
 	@Test
 	public void distanceTest() {
+		System.out.println("=== "+this.getClass().getName()+" ===");
 		List<Element> data = createSampleData();
-		System.out.println("=========================");
 		long startTime = System.nanoTime();
 		KMeans kmeans = new KMeans();
 		int maxIterations = 1000;

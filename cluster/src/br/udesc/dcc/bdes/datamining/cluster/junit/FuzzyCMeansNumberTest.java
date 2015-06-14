@@ -18,14 +18,14 @@ public class FuzzyCMeansNumberTest {
 
 	@Test
 	public void fuzzyCMeansNumberDistribuitionTest() {
-		System.out.println("=========================");
+		System.out.println("=== "+this.getClass().getName()+" ===");
 		long startTime = System.nanoTime();
 		FuzzyCMeans fuzzyCMeans = new FuzzyCMeans();
 		int maxIterations = 100;
 		
 		int k = 3;
-		//int dataSize = 5000;
-		int dataSize = 30;
+		int dataSize = 5000;
+		
 		System.out.println("Solution for k=" + k);
 		List<Element> data = createNumberList(dataSize);
 		
@@ -36,19 +36,11 @@ public class FuzzyCMeansNumberTest {
 		int expectedSize = dataSize/3; //a perfect distribution would be like this
 		System.out.println("Elapsed Time: " + elapsed + " nano seconds");
 		for (Cluster cluster : solution.getClusters()) {
-			assertTrue( isBalanced(expectedSize,cluster.size(), percentageError) );
+			assertTrue( TestUtils.isBalanced(expectedSize,cluster.size(), percentageError) );
 		}
 		assertTrue(true);
 		System.out.println("=========================");
 	}
-	
-	private boolean isBalanced(int expectedSize, int actualSize, int acceptedPercentageError) {
-		double acceptedError = (expectedSize * acceptedPercentageError)/100.0;
-		int difference = Math.abs(actualSize - expectedSize);
-		
-		return difference <= acceptedError;
-	}
-	
 	
 	private static List<Element> createNumberList(int numberOfElements) {
 		List<Element> data = new ArrayList<Element>();

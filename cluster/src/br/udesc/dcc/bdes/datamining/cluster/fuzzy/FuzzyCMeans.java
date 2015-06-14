@@ -35,6 +35,7 @@ public class FuzzyCMeans {
 			System.out.println("Centroid selected " + centroids.get(0));
 			cluster.setCentroid(centroids.remove(0));
 		}
+		
 		return initialCluster;
 	}
 	

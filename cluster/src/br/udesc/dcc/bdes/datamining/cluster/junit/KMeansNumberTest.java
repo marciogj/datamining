@@ -18,7 +18,7 @@ public class KMeansNumberTest {
 
 	@Test
 	public void kMeansNumberDistribuitionTest() {
-		System.out.println("=========================");
+		System.out.println("=== "+this.getClass().getName()+" ===");
 		long startTime = System.nanoTime();
 		KMeans kmeans = new KMeans();
 		int maxIterations = 100;
@@ -35,19 +35,11 @@ public class KMeansNumberTest {
 		int expectedSize = dataSize/3; //a perfect distribution would be like this
 		System.out.println("Elapsed Time: " + elapsed + " nano seconds");
 		for (Cluster cluster : solution.getClusters()) {
-			assertTrue( isBalanced(expectedSize,cluster.size(), percentageError) );
+			assertTrue( TestUtils.isBalanced(expectedSize,cluster.size(), percentageError) );
 		}
 		assertTrue(true);
 		System.out.println("=========================");
-	}
-	
-	private boolean isBalanced(int expectedSize, int actualSize, int acceptedPercentageError) {
-		double acceptedError = (expectedSize * acceptedPercentageError)/100.0;
-		int difference = Math.abs(actualSize - expectedSize);
-		
-		return difference <= acceptedError;
-	}
-	
+	}	
 	
 	private static List<Element> createNumberList(int numberOfElements) {
 		List<Element> data = new ArrayList<Element>();

@@ -18,7 +18,7 @@ public class KMeansCoordinateTest {
 
 	@Test
 	public void kMeansCoordinateDistribuitionTest() {
-		System.out.println("=========================");
+		System.out.println("=== "+this.getClass().getName()+" ===");
 		long startTime = System.nanoTime();
 		KMeans kmeans = new KMeans();
 		int maxIterations = 1000;
@@ -35,16 +35,9 @@ public class KMeansCoordinateTest {
 		int expectedSize = dataSize/3; //a perfect distribution would be like this
 		System.out.println("Elapsed Time: " + elapsed + " nano seconds");
 		for (Cluster cluster : solution.getClusters()) {
-			assertTrue( isBalanced(expectedSize,cluster.size(), percentageError) );
+			assertTrue( TestUtils.isBalanced(expectedSize,cluster.size(), percentageError) );
 		}
 		System.out.println("=========================");
-	}
-	
-	private boolean isBalanced(int expectedSize, int actualSize, int acceptedPercentageError) {
-		double acceptedError = (expectedSize * acceptedPercentageError)/100.0;
-		int difference = Math.abs(actualSize - expectedSize);
-		
-		return difference <= acceptedError;
 	}
 	
 	/**
