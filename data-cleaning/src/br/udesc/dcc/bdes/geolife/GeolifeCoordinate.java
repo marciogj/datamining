@@ -2,6 +2,8 @@ package br.udesc.dcc.bdes.geolife;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 
 public class GeolifeCoordinate {
@@ -46,6 +48,11 @@ public class GeolifeCoordinate {
 		this.altitude = altitude;
 	}
 
+	public long getTimeInMillis() {
+		ZonedDateTime zdt = dateTime.atZone(ZoneId.systemDefault());
+		return zdt.toInstant().toEpochMilli();
+	}
+	
 	public LocalDateTime getDateTime() {
 		return dateTime;
 	}

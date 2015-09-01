@@ -10,9 +10,8 @@ import java.time.format.DateTimeFormatter;
 public class PltFileReader {
 	public static int HEADER_SIZE = 6;
 	
-	public static GeolifeTrajectory read() {
+	public static GeolifeTrajectory read(String path) {
 		GeolifeTrajectory trajectory = new GeolifeTrajectory();
-		String path = "20081023025304.plt";
 		File file = new File(path);
 		try ( BufferedReader reader = new BufferedReader(new FileReader(file))) {			
 			String line = null;  
@@ -23,12 +22,11 @@ public class PltFileReader {
 				System.out.println(line);
 				headerCount++;
 			}
-			System.out.println("=======");
+			System.out.println("=== HEADER DONE ====");
 			line = reader.readLine();
 			while( line != null ) {
 				GeolifeCoordinate coordinate = parse(line);
 				trajectory.add(coordinate);
-				System.out.println(line + " ---> " + coordinate);
 				line = reader.readLine();
 			}
 			
@@ -39,7 +37,7 @@ public class PltFileReader {
 		}
 		
 		System.out.println("---------");
-		System.out.println(trajectory.coordinates.size());
+		System.out.println("Coordinates: " + trajectory.coordinates.size());
 		
 		return trajectory;
 	}

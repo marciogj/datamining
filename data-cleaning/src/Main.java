@@ -1,7 +1,3 @@
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
-import br.udesc.dcc.bdes.geolife.GeolifeCoordinate;
 import br.udesc.dcc.bdes.geolife.GeolifeTrajectory;
 import br.udesc.dcc.bdes.geolife.PltFileReader;
 
@@ -9,35 +5,17 @@ import br.udesc.dcc.bdes.geolife.PltFileReader;
 public class Main {
 
 	public static void main(String[] args) {
-		GeolifeTrajectory trajectory = PltFileReader.read();
-		GeolifeCoordinate previousCoordinate = null;
-		for (GeolifeCoordinate coordinate : trajectory.getCoordinates()) {
-			if (previousCoordinate != null) {
-				double distance = coordinate.distanceInMeters(previousCoordinate);
-				ZonedDateTime zdt = coordinate.getDateTime().atZone(ZoneId.systemDefault());
-				long coordinateNanoTime = zdt.toInstant().toEpochMilli();;
-				zdt = previousCoordinate.getDateTime().atZone(ZoneId.systemDefault());
-				long previousCoordinateNanoTime = zdt.toInstant().toEpochMilli();;
-				double secondsPassed = (coordinateNanoTime - previousCoordinateNanoTime)/1000.0;
-				
-				//System.out.println(coordinate.getDateTime() + " - " + previousCoordinate.getDateTime());
-				//System.out.println(coordinateNanoTime + " - " + previousCoordinateNanoTime);
-				
-				System.out.println(distance + "m  " + secondsPassed + " s");
-				double ms = distance/secondsPassed;
-				double kmh = ms * 3.6;
-				System.out.println("V = " + ms + " m/s");
-				System.out.println("V = " + kmh + " km/h");
-				System.out.println("---");
-			}
-			previousCoordinate = coordinate;
-			
-		}
+		GeolifeTrajectory trajectory = PltFileReader.read("20081023055305.plt");
 		
+		System.out.println("Distance: " + trajectory.getDistanceMeters() + " m");
+		System.out.println("Distance: " + trajectory.getDistanceMeters()/1000.0 + " Km");
+		System.out.println("Time: " + trajectory.getTotalTimeSeconds() + " s");
+		System.out.println("Time: " + trajectory.getTotalTimeSeconds()/3600 + " h");
+		System.out.println("Max Speed: " + trajectory.getMaxSpeedInMetersPerSecond() + " m/s");
+		System.out.println("Max Speed: " + trajectory.getMaxSpeedInMetersPerSecond() * 3.6 + " km/h");
+		System.out.println("Avg Speed: " + trajectory.getAvgSpeedInMetersPerSecond()  + " m/s");
+		System.out.println("Avg Speed: " + trajectory.getAvgSpeedInMetersPerSecond() * 3.6 + " km/h");
 		
 	}
-	
-	
-	
 	
 }
