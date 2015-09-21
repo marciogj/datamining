@@ -15,14 +15,15 @@ public class PltFileReader {
 		File file = new File(path);
 		try ( BufferedReader reader = new BufferedReader(new FileReader(file))) {			
 			String line = null;  
-			
+			System.out.println("=== HEADER ====");
 			int headerCount = 0;
 			while (headerCount < HEADER_SIZE) {
 				line = reader.readLine();
 				System.out.println(line);
 				headerCount++;
 			}
-			System.out.println("=== HEADER DONE ====");
+			
+			System.out.println("=== DATA ====");
 			line = reader.readLine();
 			while( line != null ) {
 				GeolifeCoordinate coordinate = parse(line);
@@ -36,9 +37,8 @@ public class PltFileReader {
 			e.printStackTrace();
 		}
 		
-		System.out.println("---------");
 		System.out.println("Coordinates: " + trajectory.coordinates.size());
-		
+		System.out.println("---------");
 		return trajectory;
 	}
 	
