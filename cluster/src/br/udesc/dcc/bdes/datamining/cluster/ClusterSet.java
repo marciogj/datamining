@@ -42,6 +42,11 @@ public class ClusterSet {
 		return clusterSet;
 
 	}
+	
+	public ClusterSet() {
+		this.k = -1; //non know yet
+		this.clusters = new HashMap<Cluster, Double>();
+	}
 
 	public ClusterSet(int k) {
 		this.k = k;
@@ -62,6 +67,15 @@ public class ClusterSet {
 	public boolean containsCentroid(Element element) {
 		for (Cluster cluster : clusters.keySet()) {
 			if (cluster.isCentroid(element) ){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean contains(Element element) {
+		for (Cluster cluster : clusters.keySet()) {
+			if (cluster.contains(element) ){
 				return true;
 			}
 		}

@@ -1,7 +1,9 @@
 package br.udesc.dcc.bdes.datamining.cluster.element;
 
+import org.apache.commons.math3.ml.clustering.Clusterable;
 
-public class Number implements Element {
+
+public class Number implements Element, Clusterable {
 	protected double value;
 
 	public Number(double value) {
@@ -45,6 +47,11 @@ public class Number implements Element {
 	public double euclideanDistance(Element another){
 		double difference = value - ( (Number) another).value;
 		return Math.sqrt(difference * difference);
+	}
+
+	@Override
+	public double[] getPoint() {
+		return new double[] {value};
 	}
 
 }

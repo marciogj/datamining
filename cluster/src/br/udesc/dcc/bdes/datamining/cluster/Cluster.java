@@ -78,5 +78,14 @@ public class Cluster {
 	public int size() {
 		return elements.size();
 	}
+
+	public boolean contains(Element element) {
+		for (Element clusterElement : elements) {
+			if(clusterElement.equals(element)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 }
