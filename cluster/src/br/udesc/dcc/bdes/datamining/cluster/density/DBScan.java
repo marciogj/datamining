@@ -22,7 +22,7 @@ public class DBScan {
 	 * Formally, Neps(p) = { distance(p,q) <= Eps} where both p and q are in the set of evaluated points.
 	 * 
 	 */	
-	public ClusterSet dbscan(Collection<? extends Element> data, double eps, int minPts) {
+	public DBScanResult dbscan(Collection<? extends Element> data, double eps, int minPts) {
 		ClusterSet clusters = new ClusterSet();
 		ElementTable table = new ElementTable();
 
@@ -38,7 +38,7 @@ public class DBScan {
 			if(classifiedElement.type == ElementType.UNKNOWN) {
 				classifiedElement.type = ElementType.NOISE;
 				noises.add(classifiedElement.element);
-				System.out.println("Discarding " + classifiedElement.element + " as NOISE");
+				//System.out.println("Discarding " + classifiedElement.element + " as NOISE - " + classifiedElement.isVisited);
 			}
 		}
 		
@@ -52,8 +52,7 @@ public class DBScan {
 			}
 		}
 		
-
-		return clusters;
+		return new DBScanResult(clusters, noises);
 	}
 	
 	private void fillCluster(Cluster cluster, CoreElement core) {
@@ -96,10 +95,11 @@ public class DBScan {
 	 * @return
 	 */
 	private List<Element> regionQuery(Collection<? extends Element> data, Element element, double eps) {
-		List<Element> neighbors = new ArrayList<>();
-
+		List<Element> neighbors = new ArrayList<>();	
+		
 		for (Element neighborCandidate : data) {
 			double distance = element.distance(neighborCandidate);
+			
 			if (distance <= eps && !neighborCandidate.equals(element)) {
 				neighbors.add(neighborCandidate);
 			}

@@ -14,6 +14,7 @@ import br.udesc.dcc.bdes.datamining.cluster.Cluster;
 import br.udesc.dcc.bdes.datamining.cluster.ClusterSet;
 import br.udesc.dcc.bdes.datamining.cluster.Printer;
 import br.udesc.dcc.bdes.datamining.cluster.density.DBScan;
+import br.udesc.dcc.bdes.datamining.cluster.density.DBScanResult;
 import br.udesc.dcc.bdes.datamining.cluster.element.Element;
 import br.udesc.dcc.bdes.datamining.cluster.element.Number;
 import br.udesc.dcc.bdes.datamining.cluster.fuzzy.FuzzyCMeans;
@@ -88,8 +89,8 @@ public class NumberClusteringTest {
 		d1.add(new Number(2000));
 		
 		DBScan dbscan = new DBScan();
-		ClusterSet solution = dbscan.dbscan(d1, 15, 5);
-		System.out.println(Printer.clusterSetToString(solution));
+		DBScanResult solution = dbscan.dbscan(d1, 15, 5);
+		System.out.println(Printer.clusterSetToString(solution.getClusterSet()));
 		assertTrue(true);
 	}
 	
@@ -144,10 +145,10 @@ public class NumberClusteringTest {
 		
 		
 		System.out.println("=== My ===");
-		ClusterSet solution = dbscan.dbscan(d1, eps, minPts);;
+		DBScanResult solution = dbscan.dbscan(d1, eps, minPts);;
 		long elapsed = System.nanoTime() - startTime;
 		System.out.println("Elapsed Time: " + elapsed + " nano seconds");
-		System.out.println(Printer.clusterSetToString(solution));
+		System.out.println(Printer.clusterSetToString(solution.getClusterSet()));
 		
 		//evaluateSolution(solution);
 		
