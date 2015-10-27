@@ -1,5 +1,6 @@
 package br.udesc.dcc.bdes.analysis;
 
+import java.util.Collection;
 import java.util.List;
 
 import br.udesc.dcc.bdes.gis.Coordinate;
@@ -23,7 +24,7 @@ public class TrajectoryEvaluator {
 		double maxSpeed = 0, avgSpeed = 0, totalDistance = 0, maxSlowdown = 0, maxSpeedUp = 0;
 		long totalTime = 0, speedUpDownOscilations = 0;
 		
-		List<Coordinate> coordinates = trajectory.getCoordinates();
+		Collection<Coordinate> coordinates = trajectory.getCoordinates();
 		Coordinate previous = null, first = null, accelerationStart = null;
 		for (Coordinate coordinate : coordinates) {
 			if (previous == null) {
@@ -38,7 +39,7 @@ public class TrajectoryEvaluator {
 			
 			if(coordinate.getSpeed() > maxSpeed) {
 				maxSpeed = coordinate.getSpeed();
-				System.out.println(coordinate);
+				//System.out.println(coordinate);
 			}
 			
 			if (isAccelerationInverted(coordinate.getAcceleration(), previous.getAcceleration())) {

@@ -1,10 +1,11 @@
 package br.udesc.dcc.bdes.gis;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Trajectory {
-	protected List<Coordinate> coordinates = new ArrayList<>();
+	protected Collection<Coordinate> coordinates = new ArrayList<>();
 	protected String sourceProvider; //Geolife, UDESC
 	protected String id; //taxi id, user
 	
@@ -16,7 +17,7 @@ public class Trajectory {
 		}
 	}
 
-	public List<Coordinate> getCoordinates() {
+	public Collection<Coordinate> getCoordinates() {
 		return coordinates;
 	}
 

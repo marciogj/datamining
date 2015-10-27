@@ -1,52 +1,71 @@
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+
 import br.udesc.dcc.bdes.analysis.EvaluatedTrajectory;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.cleaning.ClusterizableCoordinate;
 import br.udesc.dcc.bdes.cleaning.TrajectoryCleaner;
+import br.udesc.dcc.bdes.datamining.cluster.density.DBScanResult;
+import br.udesc.dcc.bdes.datamining.cluster.element.Element;
+import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.PltFileReader;
+import br.udesc.dcc.bdes.io.TrajectoryCSVFileWriter;
 
 
 public class Main {
 
 	public static void main(String[] args) {
-		Trajectory trajectory = PltFileReader.read("cleaned-eps5.plt");
+		//Trajectory trajectory = PltFileReader.read("cleaned-eps5.plt");
+		Trajectory trajectory = PltFileReader.read("20081023055305.plt");
+		
+		
 		EvaluatedTrajectory evaluatedTracjectory = TrajectoryEvaluator.evaluate(trajectory);
 		print(evaluatedTracjectory);
 		
-		
-		Trajectory newTrajectory = TrajectoryCleaner.removeNoise(trajectory);
+		/*
+		Trajectory newTrajectory = TrajectoryCleaner.removeNoiseBySpeedWithApacheDBScan(trajectory);
 		EvaluatedTrajectory evaluatedTracjectoryWithoutNoise = TrajectoryEvaluator.evaluate(newTrajectory);
 		print(evaluatedTracjectoryWithoutNoise);
 		
-		//noise from noise
-		newTrajectory = TrajectoryCleaner.removeNoise(newTrajectory);
-		evaluatedTracjectoryWithoutNoise = TrajectoryEvaluator.evaluate(newTrajectory);
-		print(evaluatedTracjectoryWithoutNoise);
+		System.out.println("###############################");
 		
-		//noise from noise
-		newTrajectory = TrajectoryCleaner.removeNoise(newTrajectory);
-		evaluatedTracjectoryWithoutNoise = TrajectoryEvaluator.evaluate(newTrajectory);
-		print(evaluatedTracjectoryWithoutNoise);
+		Trajectory newTrajectory2 = TrajectoryCleaner.removeNoiseFromSpeed(trajectory);
+		EvaluatedTrajectory evaluatedTracjectoryWithoutNoise2 = TrajectoryEvaluator.evaluate(newTrajectory2);
+		print(evaluatedTracjectoryWithoutNoise2);
 		
-		
-		//noise from noise
-		newTrajectory = TrajectoryCleaner.removeNoise(newTrajectory);
-		evaluatedTracjectoryWithoutNoise = TrajectoryEvaluator.evaluate(newTrajectory);
-		print(evaluatedTracjectoryWithoutNoise);
-		
-		//
-		newTrajectory = TrajectoryCleaner.removeNoise(newTrajectory);
-		evaluatedTracjectoryWithoutNoise = TrajectoryEvaluator.evaluate(newTrajectory);
-		print(evaluatedTracjectoryWithoutNoise);
-		
-		
-		/*GeolifeTrajectorySummary summary = GeolifeTrajectoryEvaluator.evaluate(trajectory, 55, 5);
-		
-		System.out.println("Distance: " + summary.getTotalDistanceInMeters()/1000.0 + " Km");
-		System.out.println("Time: " + summary.getTotalTimeInSeconds() + " s | " + summary.getTotalTimeInSeconds()/3600 + " h");
-		System.out.println("Max Speed: " + summary.getMaxSpeedInMetersPerSecond()  + " m/s | " + summary.getMaxSpeedInMetersPerSecond() * 3.6 + " km/h");
-		System.out.println("Avg Speed: " + summary.getAvgSpeedInMetersPerSecond()  + " m/s | " + summary.getAvgSpeedInMetersPerSecond() * 3.6 + " km/h");
-		System.out.println("Max Acc: " + summary.getMaxAccelerationInMetersPerSecond()  + " m/s | " + summary.getMaxAccelerationInMetersPerSecond() * 3.6 + " km/h");
+		System.out.println("###############################");
 		*/
+		
+		DBScanResult result = TrajectoryCleaner.clusterByCoordinate(trajectory);
+		Trajectory newTrajectory3 = TrajectoryCleaner.createTrajectoryFromClusterizableCoordinate(result.getClusterSet());
+		
+		EvaluatedTrajectory evaluatedTracjectoryWithoutNoise3 = TrajectoryEvaluator.evaluate(newTrajectory3);
+		print(evaluatedTracjectoryWithoutNoise3);
+		
+		
+		String datetime = new SimpleDateFormat("yyyy.MM.dd_HHmmss").format(new Date());
+		
+		try {
+			TrajectoryCSVFileWriter.write(evaluatedTracjectoryWithoutNoise3, "dbscan_data_"+datetime+".csv");
+			
+			TrajectoryCSVFileWriter.write(convert(result.getNoise()), "dbscan_noise_"+datetime+".csv");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private static Collection<Coordinate> convert(Collection<Element> elements) {
+		Collection<Coordinate> coordinates = new ArrayList<>();
+		for (Element e : elements) {
+			coordinates.add(((ClusterizableCoordinate) e).getCoordinate());
+			
+		}
+		return coordinates;
 	}
 	
 	private static void print(EvaluatedTrajectory trajectory) {
