@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.datamining.cluster.element;
+package br.udesc.dcc.bdes.datamining.cluster.centroid.element;
 
 public interface Element {
 	

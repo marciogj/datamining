@@ -1,17 +1,15 @@
-package br.udesc.dcc.bdes.datamining.cluster.density.fn;
+package br.udesc.dcc.bdes.datamining.cluster.density;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class Cluster<T> {
 	private String name;
-	private List<T> elements = new ArrayList<>();
+	private Collection<T> elements = new ArrayList<>();
 	
 	public Cluster(String name) {
 		this.name = name;
 	}
-	
 	
 	public void add(T element) {
 		elements.add(element);

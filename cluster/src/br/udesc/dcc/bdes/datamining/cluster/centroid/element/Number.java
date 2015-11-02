@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.datamining.cluster.element;
+package br.udesc.dcc.bdes.datamining.cluster.centroid.element;
 
 import org.apache.commons.math3.ml.clustering.Clusterable;
 

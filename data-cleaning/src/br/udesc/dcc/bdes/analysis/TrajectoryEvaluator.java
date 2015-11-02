@@ -1,7 +1,6 @@
 package br.udesc.dcc.bdes.analysis;
 
 import java.util.Collection;
-import java.util.List;
 
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;

@@ -1,10 +1,10 @@
-package br.udesc.dcc.bdes.datamining.cluster.fuzzy;
+package br.udesc.dcc.bdes.datamining.cluster.centroid.fuzzy;
 
 import java.util.List;
 
-import br.udesc.dcc.bdes.datamining.cluster.Cluster;
-import br.udesc.dcc.bdes.datamining.cluster.ClusterSet;
-import br.udesc.dcc.bdes.datamining.cluster.element.Element;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.Cluster;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.ClusterSet;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.element.Element;
 
 public class CMeansMatrix {
 	private Element[] centroids;

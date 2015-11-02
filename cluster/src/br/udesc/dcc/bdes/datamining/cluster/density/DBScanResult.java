@@ -1,26 +1,38 @@
 package br.udesc.dcc.bdes.datamining.cluster.density;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import br.udesc.dcc.bdes.datamining.cluster.ClusterSet;
-import br.udesc.dcc.bdes.datamining.cluster.element.Element;
-
-public class DBScanResult {
-	protected ClusterSet solution;
-	protected Collection<Element> noise;
+public class DBScanResult<T> {
+	Collection<Cluster<T>> clusters = new ArrayList<>();
+	Collection<T> noises = new ArrayList<>();
 	
-	public DBScanResult(ClusterSet clusters, List<Element> noises) {
-		this.solution = clusters;
-		this.noise = noises;
-	}
-
-	public ClusterSet getClusterSet() {
-		return solution;
-	}
-
-	public Collection<Element> getNoise() {
-		return noise;
+	public void addNoise(T noise) {
+		noises.add(noise);
 	}
 	
+	public void addCluster(Cluster<T> cluster) {
+		clusters.add(cluster);
+	}
+	
+	public boolean contains(T element) {
+		for (Cluster<T> cluster : clusters) {
+			if (cluster.contains(element) ){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public Collection<Cluster<T>> getClusters() {
+		return clusters;
+	}
+
+	public Collection<T> getNoises() {
+		return noises;
+	}
+	
+	
+
 }
+

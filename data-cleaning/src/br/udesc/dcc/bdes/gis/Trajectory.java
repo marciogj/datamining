@@ -29,4 +29,8 @@ public class Trajectory {
 		return coordinates.size();
 	}
 
+	public void addAll(Collection<Coordinate> elements) {
+		coordinates.addAll(elements);
+	}
+
 }

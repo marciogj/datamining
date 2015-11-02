@@ -124,4 +124,8 @@ public class Coordinate {
 		return (Math.round(1000 * 1 * dist) / 1);
 	}
 	
+	public static double distance(Coordinate coordinate, Coordinate another) {
+		return coordinate.distanceInMeters(another);
+	}
+	
 }

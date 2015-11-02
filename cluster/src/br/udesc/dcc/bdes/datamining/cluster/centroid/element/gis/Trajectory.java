@@ -1,9 +1,9 @@
-package br.udesc.dcc.bdes.datamining.cluster.element.gis;
+package br.udesc.dcc.bdes.datamining.cluster.centroid.element.gis;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import br.udesc.dcc.bdes.datamining.cluster.element.Element;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.element.Element;
 
 public class Trajectory implements Element {
 	protected List<Coordinate> track;

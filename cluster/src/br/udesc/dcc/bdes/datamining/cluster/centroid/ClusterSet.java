@@ -1,10 +1,10 @@
-package br.udesc.dcc.bdes.datamining.cluster;
+package br.udesc.dcc.bdes.datamining.cluster.centroid;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import br.udesc.dcc.bdes.datamining.cluster.element.Element;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.element.Element;
 
 public class ClusterSet {
 	private Map<Cluster, Double> clusters;

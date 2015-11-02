@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.datamining.cluster.junit;
+package br.udesc.dcc.bdes.datamining.cluster.centroid.junit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,13 +6,13 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import br.udesc.dcc.bdes.datamining.cluster.Cluster;
-import br.udesc.dcc.bdes.datamining.cluster.ClusterSet;
-import br.udesc.dcc.bdes.datamining.cluster.Printer;
-import br.udesc.dcc.bdes.datamining.cluster.element.Element;
-import br.udesc.dcc.bdes.datamining.cluster.element.gis.Coordinate;
-import br.udesc.dcc.bdes.datamining.cluster.fuzzy.FuzzyCMeans;
-import br.udesc.dcc.bdes.datamining.cluster.kmeans.KMeans;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.Cluster;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.ClusterSet;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.Printer;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.element.Element;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.element.gis.Coordinate;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.fuzzy.FuzzyCMeans;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.kmeans.KMeans;
 
 public class CoordinateClusteringTest {
 	int dataSize;

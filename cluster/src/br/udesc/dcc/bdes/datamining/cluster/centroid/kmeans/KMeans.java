@@ -1,12 +1,12 @@
-package br.udesc.dcc.bdes.datamining.cluster.kmeans;
+package br.udesc.dcc.bdes.datamining.cluster.centroid.kmeans;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import br.udesc.dcc.bdes.datamining.cluster.Cluster;
-import br.udesc.dcc.bdes.datamining.cluster.ClusterSet;
-import br.udesc.dcc.bdes.datamining.cluster.element.Element;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.Cluster;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.ClusterSet;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.element.Element;
 
 public class KMeans {
 

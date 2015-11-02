@@ -1,6 +1,6 @@
-package br.udesc.dcc.bdes.datamining.cluster;
+package br.udesc.dcc.bdes.datamining.cluster.centroid;
 
-import br.udesc.dcc.bdes.datamining.cluster.element.Element;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.element.Element;
 
 public class Printer {
 	private static final String lineBreak = System.getProperty("line.separator");

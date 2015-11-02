@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.datamining.cluster.junit;
+package br.udesc.dcc.bdes.datamining.cluster.centroid.junit;
 
 public class TestUtils {
 	

@@ -1,9 +1,9 @@
-package br.udesc.dcc.bdes.datamining.cluster;
+package br.udesc.dcc.bdes.datamining.cluster.centroid;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import br.udesc.dcc.bdes.datamining.cluster.element.Element;
+import br.udesc.dcc.bdes.datamining.cluster.centroid.element.Element;
 
 public class Cluster {
 	private String name;
