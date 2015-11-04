@@ -18,12 +18,13 @@ public class TrajectoryEvaluator {
 		
 	public static EvaluatedTrajectory evaluate(Trajectory trajectory) {
 		EvaluatedTrajectory evaluated = new EvaluatedTrajectory(trajectory);
-		
+		Collection<Coordinate> coordinates = trajectory.getCoordinates();
+		if (coordinates.isEmpty()) {
+			return evaluated;
+		}
 		
 		double maxSpeed = 0, avgSpeed = 0, totalDistance = 0, maxSlowdown = 0, maxSpeedUp = 0;
 		long totalTime = 0, speedUpDownOscilations = 0;
-		
-		Collection<Coordinate> coordinates = trajectory.getCoordinates();
 		Coordinate previous = null, first = null, accelerationStart = null;
 		for (Coordinate coordinate : coordinates) {
 			if (previous == null) {
@@ -60,7 +61,7 @@ public class TrajectoryEvaluator {
 		}
 		
 		avgSpeed = avgSpeed / trajectory.size();
-		totalTime = (previous.getTimeInMillis() - first.getTimeInMillis())/1000;
+		totalTime = (previous.getDateTimeInMillis() - first.getDateTimeInMillis())/1000;
 		
 		//Speed
 		evaluated.setMaxSpeed(maxSpeed);
@@ -80,7 +81,7 @@ public class TrajectoryEvaluator {
 	}
 	
 	private static double acceleration(Coordinate start, Coordinate end) {
-		double deltaTSeconds = (end.getTimeInMillis() - start.getTimeInMillis())/1000;
+		double deltaTSeconds = (end.getDateTimeInMillis() - start.getDateTimeInMillis())/1000;
 		double deltaV = end.getSpeed() - (start.getSpeed());
 		double acceleration = deltaV/deltaTSeconds;
 		
@@ -97,8 +98,8 @@ public class TrajectoryEvaluator {
 	}
 		
 	private static void updateMomentum(Coordinate previousCoordinate, Coordinate currentCoordinate) {
-		long coordinateTime = currentCoordinate.getTimeInMillis()/1000;
-		long previousCoordinateTime = previousCoordinate.getTimeInMillis()/1000;
+		long coordinateTime = currentCoordinate.getDateTimeInMillis()/1000;
+		long previousCoordinateTime = previousCoordinate.getDateTimeInMillis()/1000;
 		double deltaTSeconds = coordinateTime - previousCoordinateTime;
 		
 		double distance = currentCoordinate.distanceInMeters(previousCoordinate);

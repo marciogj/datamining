@@ -53,7 +53,7 @@ public class Coordinate {
 		this.altitude = altitude;
 	}
 
-	public long getTimeInMillis() {
+	public long getDateTimeInMillis() {
 		ZonedDateTime zdt = dateTime.atZone(ZoneId.systemDefault());
 		return zdt.toInstant().toEpochMilli();
 	}
@@ -61,7 +61,7 @@ public class Coordinate {
 	public LocalDateTime getDateTime() {
 		return dateTime;
 	}
-
+	
 	public void setDateTime(LocalDateTime dateTime) {
 		this.dateTime = dateTime;
 	}

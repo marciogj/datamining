@@ -12,8 +12,6 @@ import java.util.function.BiFunction;
 
 public class EsterDBScanHeuristic {
 
-	//TODO: se não souber o que fazer para calcular o eps automaticamente,
-	//pelo menos plota e bloga!
 	public static <T> List<Map.Entry<T, Double>> kdistance(Collection<T> data, int k, BiFunction<T, T, Double> distanceFn) {
 		List<Map.Entry<T, Double>> kdistancies = new LinkedList<Map.Entry<T,Double>>();
 		for (T point : data) {
