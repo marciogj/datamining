@@ -11,6 +11,10 @@ public class Trajectory {
 	
 	public Trajectory() {}
 
+	public Trajectory(Collection<Coordinate> elements) {
+		coordinates.addAll(elements);
+	}
+
 	public void add(Coordinate coordinate) {
 		if (coordinate != null) {
 			coordinates.add(coordinate);

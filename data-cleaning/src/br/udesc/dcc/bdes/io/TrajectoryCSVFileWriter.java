@@ -33,7 +33,6 @@ public class TrajectoryCSVFileWriter {
 	private static String format(final double value) {
 		String strValue = ""+value;
 		strValue = strValue.contains(".") ? strValue : strValue + ".0";
-		//System.err.println(strValue);
 		while (strValue.split("\\.")[1].length() < 8) {
 			strValue += "0";
 		}
