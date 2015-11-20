@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
 
-import br.udesc.dcc.bdes.geolife.GeolifeCoordinateFields;
+import br.udesc.dcc.bdes.analysis.TrajectoryCleaner;
 import br.udesc.dcc.bdes.geolife.GeolifeLabelFields;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
@@ -18,7 +18,9 @@ import br.udesc.dcc.bdes.gis.Trajectory;
 public class Geolife2Weka {
 	
 	public static void main(String[] args) {
-		String geolifeDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\geolife-5-years\\Data";
+		
+		//String geolifeDir = "C:\\Users\\marcio.jasinski\\tmp\\2015.11.20";
+		String geolifeDir = "C:\\Users\\marcio.jasinski\\OneDrive\\GPS_DATA\\geolife-5-years\\Data";
 		File geolife = new File(geolifeDir);
 		if (!geolife.exists()) {
 			System.out.println("Geolife dir does not exists: " + geolifeDir);
@@ -28,13 +30,39 @@ public class Geolife2Weka {
 			System.out.println("Input must be a directory...");
 		}
 		
+		
 		for(File file : geolife.listFiles() ) {
 			if (file.isDirectory()) {
+				System.out.println("Label File: " + file.getAbsolutePath());
 				Collection<Trajectory> trajectoriesLabels = processLabeledData(file);
 				File[] trajectoriesFiles = loadTrajectories(file);
 				for(File trajectoryFile : trajectoriesFiles) {
-					//TODO: merge trajectory with labeled one
-					//TODO: write the output to weka format
+					System.out.println("Trajectory File: " + trajectoryFile.getAbsolutePath());
+					Trajectory trajectory = PltFileReader.read(trajectoryFile);
+					trajectory = TrajectoryCleaner.removeNoiseCoordinates(trajectory);
+					for(Coordinate coordinate : trajectory.getCoordinates()) {
+						LocalDateTime coordDateTime = coordinate.getDateTime();
+						for(Trajectory label : trajectoriesLabels) {
+							if (coordDateTime.isAfter(label.getStart()) && coordDateTime.isBefore(label.getEnd())) {
+								label.setId(trajectoryFile.getName());
+								label.add(coordinate);
+								System.out.println("\t>> " + coordinate + " is " + label.getTransportMean());
+								break; //get out from label for since it found his place
+							}
+						}
+					}
+				}
+				
+				try {
+					Collection<Trajectory> trajectories = new LinkedList<>();
+					for(Trajectory trajectory : trajectoriesLabels) {
+						if (trajectory.getId() == null ) continue;
+						trajectories.add(trajectory);
+					}
+					
+					TrajectoryWekaFileWriter.write(trajectories, "geolife-trajectories.arff");
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				
 			}
@@ -59,7 +87,9 @@ public class Geolife2Weka {
 			
 			while( line != null ) {
 				line = reader.readLine();
-				trajectories.add(parse(line));
+				if (line != null && line.trim().length() != 0) {
+					trajectories.add(parse(line));
+				}
 			}
 			
 			reader.close();
@@ -71,7 +101,7 @@ public class Geolife2Weka {
 	}
 
 	private static Trajectory parse(String line) {
-		String[] parts = line.split(" +");
+		String[] parts = line.split(" +|\t+");
 		LocalDateTime start = convertDateTime(parts[GeolifeLabelFields.START_DATE.getIndex()], parts[GeolifeLabelFields.START_TIME.getIndex()]);
 		LocalDateTime end = convertDateTime(parts[GeolifeLabelFields.END_DATE.getIndex()], parts[GeolifeLabelFields.END_TIME.getIndex()]);
 		
@@ -79,6 +109,7 @@ public class Geolife2Weka {
 		trajectory.setStart(start);
 		trajectory.setEnd(end);
 		trajectory.setTransportMean(parts[GeolifeLabelFields.TRANSPORT_MODE.getIndex()]);
+		
 		return trajectory;
 	}
 	

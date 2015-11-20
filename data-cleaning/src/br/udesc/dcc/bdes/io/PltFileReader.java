@@ -14,9 +14,12 @@ public class PltFileReader {
 	public static int HEADER_SIZE = 6;
 	
 	public static Trajectory read(String path) {
-		System.out.println(path );
-		Trajectory trajectory = new Trajectory();
 		File file = new File(path);
+		return read(file);
+	}
+	
+	public static Trajectory read(File file) {
+		Trajectory trajectory = new Trajectory();
 		try ( BufferedReader reader = new BufferedReader(new FileReader(file))) {			
 			String line = null;  
 			int headerCount = 0;

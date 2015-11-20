@@ -6,11 +6,16 @@ import java.util.Collection;
 
 import br.udesc.dcc.bdes.analysis.EvaluatedTrajectory;
 import br.udesc.dcc.bdes.gis.Coordinate;
+import br.udesc.dcc.bdes.gis.Trajectory;
 
 public class TrajectoryCSVFileWriter {
 
 	public static void write(EvaluatedTrajectory evaluatedTrajectory, String filename) throws Exception {
 		write(evaluatedTrajectory.getTrajectory().getCoordinates(), filename);
+	}
+	
+	public static void write(Trajectory trajectory, String filename) throws Exception {
+		write(trajectory.getCoordinates(), filename);
 	}
 
 	public static void write(Collection<Coordinate> coordinates, String filename) throws Exception {
@@ -18,25 +23,16 @@ public class TrajectoryCSVFileWriter {
 			for (Coordinate coordinate : coordinates) {
 				writer.println(
 						coordinate.getDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE) + ", " +
-								format(coordinate.getLongitude()) + ", " + 
-								format(coordinate.getLatitude()) + ", " + 
-								format(coordinate.getAltitude()) + ", " + 
-								format(coordinate.getSpeed()) + ", " + 
-								format(coordinate.getAcceleration())
+								DataFormatter.format(coordinate.getLongitude()) + ", " + 
+								DataFormatter.format(coordinate.getLatitude()) + ", " + 
+								DataFormatter.format(coordinate.getAltitude()) + ", " + 
+								DataFormatter.format(coordinate.getSpeed()) + ", " + 
+								DataFormatter.format(coordinate.getAcceleration())
 						);
 
 			}
 			writer.close();
 		}
-	}
-
-	private static String format(final double value) {
-		String strValue = ""+value;
-		strValue = strValue.contains(".") ? strValue : strValue + ".0";
-		while (strValue.split("\\.")[1].length() < 8) {
-			strValue += "0";
-		}
-		return strValue;
 	}
 
 }
