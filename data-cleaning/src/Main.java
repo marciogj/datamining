@@ -1,5 +1,6 @@
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -11,6 +12,7 @@ import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.datamining.cluster.density.Cluster;
 import br.udesc.dcc.bdes.datamining.cluster.density.DBScan;
 import br.udesc.dcc.bdes.datamining.cluster.density.DBScanResult;
+import br.udesc.dcc.bdes.datamining.cluster.density.EsterDBScan;
 import br.udesc.dcc.bdes.datamining.cluster.density.EsterDBScanHeuristic;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
@@ -21,7 +23,7 @@ import br.udesc.dcc.bdes.io.TrajectoryCSVFileWriter;
 public class Main {
 
 	public static void main(String[] args) {
-		timeDBScan();		
+		distanceEsterDBScan();
 	}
 	
 	public static void timeDBScan() {
@@ -95,9 +97,6 @@ public class Main {
 			//DBScanResult<Coordinate> dbscanSpeed = dbscan.evaluate(cleanedTrajectory.getCoordinates(), 1.14, 4, distanceInSpeed);
 			//System.out.println(dbscanSpeed.getClusters().size());
 			
-			
-			
-			
 			System.out.println();
 			
 			System.out.println("----------------------");
@@ -126,14 +125,46 @@ public class Main {
 	}
 	
 	
+	public static void distanceEsterDBScan() {
+		double eps = 25.0;
+		int minPts = 4;		
+		Trajectory trajectory = PltFileReader.read("20081023055305.plt");			
+		print(TrajectoryEvaluator.evaluate(trajectory));
+		
+		//List<Map.Entry<Coordinate, Double>> kdistance = EsterDBScanHeuristic.kdistance(trajectory.getCoordinates(), minPts, Coordinate::distance);
+		//kdistance.forEach( e -> System.out.print(e.getValue() +","));
+		
+		System.out.println();
+		System.out.println("----");
+		
+		EsterDBScan<Coordinate> dbscan = new EsterDBScan<>();
+		Collection<Coordinate> data = trajectory.getCoordinates();
+		
+		DBScanResult<Coordinate> result = dbscan.evaluate(data, eps, minPts, Coordinate::distance);
+		
+		List<Coordinate> coordinates = new ArrayList<>();
+		result.getClusters().forEach( cluster -> {
+			coordinates.addAll(cluster.getElements());
+		});
+		coordinates.sort( (c1, c2) -> (int) (c1.getDateTimeInMillis() - c2.getDateTimeInMillis()) );
+		
+		Trajectory cleanedTrajectory = new Trajectory();
+		cleanedTrajectory.addAll(coordinates);
+		
+		
+		print(TrajectoryEvaluator.evaluate(cleanedTrajectory));
+	}
+	
+	
+	
 	public static void distanceDBScan() {
 		double eps = 25.0;
 		int minPts = 4;		
 		Trajectory trajectory = PltFileReader.read("20081023055305.plt");			
 		print(TrajectoryEvaluator.evaluate(trajectory));
 		
-		List<Map.Entry<Coordinate, Double>> kdistance = EsterDBScanHeuristic.kdistance(trajectory.getCoordinates(), minPts, Coordinate::distance);
-		kdistance.forEach( e -> System.out.print(e.getValue() +","));
+		//List<Map.Entry<Coordinate, Double>> kdistance = EsterDBScanHeuristic.kdistance(trajectory.getCoordinates(), minPts, Coordinate::distance);
+		//kdistance.forEach( e -> System.out.print(e.getValue() +","));
 		
 		System.out.println();
 		System.out.println("----");
@@ -142,10 +173,15 @@ public class Main {
 		Collection<Coordinate> data = trajectory.getCoordinates();
 		
 		DBScanResult<Coordinate> result = dbscan.evaluate(data, eps, minPts, Coordinate::distance);
-		Trajectory cleanedTrajectory = new Trajectory();
+		
+		List<Coordinate> coordinates = new ArrayList<>();
 		result.getClusters().forEach( cluster -> {
-			cleanedTrajectory.addAll(cluster.getElements());
+			coordinates.addAll(cluster.getElements());
 		});
+		coordinates.sort( (c1, c2) -> (int) (c1.getDateTimeInMillis() - c2.getDateTimeInMillis()) );
+		
+		Trajectory cleanedTrajectory = new Trajectory();
+		cleanedTrajectory.addAll(coordinates);
 		
 		print(TrajectoryEvaluator.evaluate(cleanedTrajectory));
 	}

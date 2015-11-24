@@ -2,8 +2,8 @@ package br.udesc.dcc.bdes.analysis;
 
 import java.util.Collection;
 
-import br.udesc.dcc.bdes.datamining.cluster.density.DBScan;
 import br.udesc.dcc.bdes.datamining.cluster.density.DBScanResult;
+import br.udesc.dcc.bdes.datamining.cluster.density.EsterDBScan;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 
@@ -24,7 +24,7 @@ public class TrajectoryCleaner {
 	
 	
 	public static DBScanResult<Coordinate> distanceDBScan(Trajectory trajectory, double eps, int minPts) {
-		DBScan<Coordinate> dbscan = new DBScan<>();
+		EsterDBScan<Coordinate> dbscan = new EsterDBScan<>();
 		Collection<Coordinate> data = trajectory.getCoordinates();
 		return dbscan.evaluate(data, eps, minPts, Coordinate::distance);
 	}

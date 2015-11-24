@@ -32,8 +32,10 @@ public class TrajectoryEvaluator {
 				previous = coordinate;
 				accelerationStart = coordinate;
 				continue;
-			} 
+			}
+			
 			updateMomentum(previous, coordinate);
+			
 			totalDistance += coordinate.distanceInMeters(previous);
 			avgSpeed += coordinate.getSpeed();
 			
@@ -103,7 +105,7 @@ public class TrajectoryEvaluator {
 		double deltaTSeconds = coordinateTime - previousCoordinateTime;
 		
 		double distance = currentCoordinate.distanceInMeters(previousCoordinate);
-		double speed = distance/deltaTSeconds;
+		double speed = deltaTSeconds != 0 ?  distance/deltaTSeconds : distance;
 		
 		double deltaV = speed - (previousCoordinate.getSpeed());
 		double acceleration = deltaV/deltaTSeconds;
