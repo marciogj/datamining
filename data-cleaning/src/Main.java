@@ -146,7 +146,7 @@ public class Main {
 		result.getClusters().forEach( cluster -> {
 			coordinates.addAll(cluster.getElements());
 		});
-		coordinates.sort( (c1, c2) -> (int) (c1.getDateTimeInMillis() - c2.getDateTimeInMillis()) );
+		coordinates.sort( (c1, c2) -> (int) (c1.getDateTimeInMillis() - c2.getDateTimeInMillis()));
 		
 		Trajectory cleanedTrajectory = new Trajectory();
 		cleanedTrajectory.addAll(coordinates);

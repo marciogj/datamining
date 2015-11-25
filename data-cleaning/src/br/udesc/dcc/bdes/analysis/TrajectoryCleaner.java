@@ -18,7 +18,6 @@ public class TrajectoryCleaner {
 		dbScanDistance.getClusters().forEach( c -> {
 			cleanedTrajectory.addAll(c.getElements());
 		});
-		
 		return cleanedTrajectory;
 	}
 	

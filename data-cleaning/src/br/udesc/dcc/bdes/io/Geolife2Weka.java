@@ -5,9 +5,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryCleaner;
@@ -16,10 +18,13 @@ import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 
 public class Geolife2Weka {
-
+	
 	public static void main(String[] args) {
-		//String geolifeDir = "C:\\Users\\marcio.jasinski\\tmp\\2015.11.20";
-		String geolifeDir = "C:\\Users\\marcio.jasinski\\OneDrive\\GPS_DATA\\geolife-5-years\\Data";
+		int ignoredCoordinates = 0;
+		int matched = 0;
+		
+		String geolifeDir = "C:\\Users\\marcio.jasinski\\tmp\\2015.11.20";
+		//String geolifeDir = "C:\\Users\\marcio.jasinski\\OneDrive\\GPS_DATA\\geolife-5-years\\Data";
 		File geolife = new File(geolifeDir);
 		if (!geolife.exists()) {
 			System.out.println("Geolife dir does not exists: " + geolifeDir);
@@ -32,29 +37,45 @@ public class Geolife2Weka {
 
 		for(File dir : geolife.listFiles() ) {
 			System.out.println("Dir: " + dir.getAbsolutePath());
-			Collection<Trajectory> trajectoriesLabels = processLabeledData(dir);
+			List<Trajectory> trajectoriesLabels = processLabeledData(dir);
 			if (trajectoriesLabels.isEmpty()) {
 				System.out.println("\tNo label info on dir " + dir.getName());
 				continue;
 			}
 			
+			//Sort trajectories to allow binary search later on
+			trajectoriesLabels.sort( (t1, t2) -> {
+				long t1Start = t1.getStart().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+				long t2Start = t2.getStart().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+				return (int) (t1Start - t2Start);
+			});
+			
+			
 			File[] trajectoriesFiles = loadTrajectories(dir);
 			for(File trajectoryFile : trajectoriesFiles) {
 				System.out.println("\tFile: " + trajectoryFile.getAbsolutePath());
 				Trajectory trajectory = PltFileReader.read(trajectoryFile);
+				
+				int rawCoordinates = trajectory.size();
+				System.out.println("\t\tRemoving noise from  " + rawCoordinates + " coordinates");
 				trajectory = TrajectoryCleaner.removeNoiseCoordinates(trajectory);
-
-				for(Coordinate coordinate : trajectory.getCoordinates()) {
-					LocalDateTime coordDateTime = coordinate.getDateTime();
-					for(Trajectory label : trajectoriesLabels) {
-						if (coordDateTime.isAfter(label.getStart()) && coordDateTime.isBefore(label.getEnd())) {
-							label.setId(trajectoryFile.getName());
-							label.add(coordinate);
-							System.out.println("\t>> " + coordinate + " is " + label.getTransportMean());
-							break; //get out from label for since it found his place
-						}
+				System.out.println("\t\tNoise count:   " + (rawCoordinates - trajectory.size()));
+				
+				for(Coordinate coordinate : trajectory.getCoordinates()) {	
+					Optional<Trajectory> optTrajectory = binarySearch(trajectoriesLabels, coordinate);
+					if (optTrajectory.isPresent()) {
+						Trajectory labeledTrajectory = optTrajectory.get();
+						String id = trajectory.getId() == null ? trajectoryFile.getName() : trajectory.getId() + "_" + trajectoryFile.getName(); 
+						labeledTrajectory.setId(id);
+						labeledTrajectory.add(coordinate);
+						System.out.println("\t\t>> " + coordinate + " is " + labeledTrajectory.getTransportMean());
+						matched++;
+					} else {
+						ignoredCoordinates++;
 					}
 				}
+				
+				System.out.println("\t\tIgnored: " + ignoredCoordinates + " - Matched: " + matched);
 			}
 
 			try {
@@ -64,7 +85,7 @@ public class Geolife2Weka {
 					trajectories.add(trajectory);
 				}
 
-				TrajectoryWekaFileWriter.write(trajectories, "geolife-trajectories.arff");
+				TrajectoryWekaFileWriter.write(trajectories, "geolife-trajectories-cleaned.arff");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -74,9 +95,43 @@ public class Geolife2Weka {
 
 	}
 
-	private static Collection<Trajectory> processLabeledData(File dir) {
+	public static Optional<Trajectory> binarySearch(List<Trajectory> trajectories, Coordinate coordinate) {
+		LocalDateTime coordDateTime = coordinate.getDateTime();
+		
+		Trajectory trajectory = null;
+		int index = trajectories.size()/2;
+		int trajectoriesSize = trajectories.size();
+		int maxIndex = trajectoriesSize;
+		int minIndex = 0; 
+		boolean isTrajectoryCoordinate = false;
+		boolean isLastIndexReached = false;
+		while(!isLastIndexReached) {
+			trajectory = trajectories.get(index);
+			isTrajectoryCoordinate = coordDateTime.isAfter(trajectory.getStart()) && coordDateTime.isBefore(trajectory.getEnd());
+			if (isTrajectoryCoordinate) {
+				return Optional.of(trajectory);
+			}
+			isLastIndexReached = (index == 0 || index == trajectoriesSize) || (maxIndex - minIndex <= 1);
+			
+			if (coordDateTime.isAfter(trajectory.getStart())) {
+				minIndex = index;
+				index += (maxIndex - index)/2;
+				index = index >= trajectories.size() ? trajectoriesSize - 1 : index;
+			} else {
+				maxIndex = index;
+				index -= (index - minIndex)/2;
+				index = maxIndex == 1 ? 0 : index;
+			}
+		}
+		return Optional.empty();		
+	}
+	
+	//isUnder(date)
+	// vai no meio
+
+	private static List<Trajectory> processLabeledData(File dir) {
 		Optional<File> label = loadLabel(dir);
-		Collection<Trajectory> trajectories = new LinkedList<>();
+		List<Trajectory> trajectories = new LinkedList<>();
 		if (label.isPresent()) {
 			trajectories = loadLabelsTrajectories(label.get());
 		}
@@ -84,8 +139,8 @@ public class Geolife2Weka {
 		return trajectories;
 	}
 
-	private static Collection<Trajectory> loadLabelsTrajectories(File file) {
-		Collection<Trajectory> trajectories = new LinkedList<>();
+	private static List<Trajectory> loadLabelsTrajectories(File file) {
+		List<Trajectory> trajectories = new LinkedList<>();
 		try ( BufferedReader reader = new BufferedReader(new FileReader(file))) {			
 			String line = reader.readLine(); //first line is the header
 
