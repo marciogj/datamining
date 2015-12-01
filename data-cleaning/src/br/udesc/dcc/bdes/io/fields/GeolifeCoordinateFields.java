@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.geolife;
+package br.udesc.dcc.bdes.io.fields;
 
 public enum GeolifeCoordinateFields {
 
