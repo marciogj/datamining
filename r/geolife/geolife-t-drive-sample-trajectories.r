@@ -1,6 +1,11 @@
 library(ggmap)
 library(ggplot2)
 
+install_dependencies <- {
+  install.packages("ggmap", depen=TRUE);
+  install.packages("ggplot2", depen=TRUE);
+}
+
 
 #
 #taxi id, date time, longitude, latitude
@@ -154,7 +159,6 @@ plot_plt_geolife <- function(filePath, zoom = 4) {
       fill=FALSE, alpha=FALSE, size=FALSE, colour = FALSE
     )
 }
-
 
 plot_csv_processed <- function(filePath, zoom = 10) {
   gpsData <- read.csv(filePath)
