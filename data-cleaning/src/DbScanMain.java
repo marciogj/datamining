@@ -16,7 +16,7 @@ import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.PltFileReader;
 
 
-public class Main {
+public class DbScanMain {
 
 	public static void main(String[] args) {
 		distanceEsterDBScan();

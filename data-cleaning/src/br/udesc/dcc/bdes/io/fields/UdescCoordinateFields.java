@@ -15,4 +15,8 @@ public enum UdescCoordinateFields {
 	public int getIndex() { 
 		return index; 
 	}
+	
+	public void setIndex(int newIndex) { 
+		index = newIndex; 
+	}
 }

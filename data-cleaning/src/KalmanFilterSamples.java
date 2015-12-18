@@ -28,12 +28,34 @@ import br.udesc.dcc.bdes.io.PltFileReader;
 
 public class KalmanFilterSamples {
 
-	public static void main(String[] args) {	
+	public static void main(String[] args) {
+		double measurementNoise = 0.1d;
+		double processNoise = 1d;
+		// A = [ 1 ]
+		RealMatrix A = new Array2DRowRealMatrix(new double[] { 1d });
+		// B = null
+		RealMatrix B = new Array2DRowRealMatrix(new double[] { 1d });
+		// H = [ 1 ]
+		RealMatrix H = new Array2DRowRealMatrix(new double[] { 1d });
+		// x = [ 10 ]
+		RealVector x = new ArrayRealVector(new double[] { 0d });
+		// Q = [ 1e-5 ]
+		RealMatrix Q = new Array2DRowRealMatrix(new double[] { processNoise });
+		// P = [ 1 ]
+		RealMatrix P0 = new Array2DRowRealMatrix(new double[] { 1d });
+		// R = [ 0.1 ]
+		RealMatrix R = new Array2DRowRealMatrix(new double[] { measurementNoise });
+
+		ProcessModel pm = new DefaultProcessModel(A, B, Q, x, P0);
+		MeasurementModel mm = new DefaultMeasurementModel(H, R);
+		KalmanFilter filter = new KalmanFilter(pm, mm);  
+
+
 		StringBuffer strXValues = new StringBuffer();
 		StringBuffer strPValues = new StringBuffer();
 		StringBuffer strKValues = new StringBuffer();
-		
-		
+
+
 		String beaconPath = "C:\\Users\\marcio.jasinski\\tmp\\2015.12.16\\medicoes\\2 min\\motog\\beacon_A_2.000_350.000.log";
 		File beaconFile = new File(beaconPath);
 		List<Double> zks = new LinkedList<>();
@@ -45,14 +67,75 @@ public class KalmanFilterSamples {
 				String[] parts = line.split(",");
 				double signal = Double.parseDouble(parts[2].trim());
 				zks.add(signal);
-				
+
 			}
-			
+
 			reader.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		
+		RealVector pNoise = new ArrayRealVector(1);
+		RealVector mNoise = new ArrayRealVector(1);
+		RealVector z = new ArrayRealVector(1); 
+		
+		for (double zk : zks) {
+			filter.predict();
+			mNoise.setEntry(0,  zk - x.getEntry(0));
+			
+			z.setEntry(0, zk);
+
+			
+			
+			double signal = filter.getStateEstimation()[0];
+			filter.correct(z);
+
+			signal = filter.getStateEstimation()[0];
+			x.setEntry(0, signal);
+
+			strXValues.append(x.getEntry(0) + "  ");
+			strPValues.append(filter.getErrorCovarianceMatrix().getEntry(0, 0)+"  ");
+			
+			pNoise.setEntry(0, filter.getErrorCovarianceMatrix().getEntry(0, 0));
+		}
+		
+		
+		
+		
+		System.out.println("^x\t" + strXValues);
+		System.out.println("P\t" + strPValues);
+		System.out.println("K\t" + strKValues);		
+
+
+
+	}
+
+	public static void simpleKalmanFileFilter() {
+		StringBuffer strXValues = new StringBuffer();
+		StringBuffer strPValues = new StringBuffer();
+		StringBuffer strKValues = new StringBuffer();
+
+
+		String beaconPath = "C:\\Users\\marcio.jasinski\\tmp\\2015.12.16\\medicoes\\2 min\\motog\\beacon_A_2.000_350.000.log";
+		File beaconFile = new File(beaconPath);
+		List<Double> zks = new LinkedList<>();
+		try ( BufferedReader reader = new BufferedReader(new FileReader(beaconFile))) {			
+			String line = reader.readLine();
+			while( line != null ) {
+				line = reader.readLine();
+				if (line == null || line.length() == 0) continue; 
+				String[] parts = line.split(",");
+				double signal = Double.parseDouble(parts[2].trim());
+				zks.add(signal);
+
+			}
+
+			reader.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		double noiseDeviation = 0.1d;
 		SimpleKalmanFilter filter = new SimpleKalmanFilter(noiseDeviation, zks.get(0));
 		for (double zk : zks) {
@@ -65,6 +148,7 @@ public class KalmanFilterSamples {
 		System.out.println("P\t" + strPValues);
 		System.out.println("K\t" + strKValues);		
 	}
+
 
 	/**
 	 * Increasing Speed Vehicle Example
@@ -231,7 +315,7 @@ public class KalmanFilterSamples {
 
 	}
 
-	
+
 	public static void apacheKalmanFilterVoltage() {
 		//double constantVoltage = 0.5d;
 		double measurementNoise = 0.1d;
@@ -283,38 +367,38 @@ public class KalmanFilterSamples {
 			z.setEntry(0, zks[i]);
 
 			double voltage = filter.getStateEstimation()[0];
-			
+
 			strTable.append(i+"\t");
 			strTable.append(z+"\t");
-			
+
 			//System.out.println("Time Update");
 			strTable.append(x+"\t");
-			
+
 			//System.out.println("^-xk=" + x);
 			//System.out.println("-Pk="+pNoise);
 			strTable.append(pNoise+"\t");
 
 			filter.correct(z);
-			
-			
+
+
 			voltage = filter.getStateEstimation()[0];
 			x.setEntry(0, voltage);
-			
+
 			//System.out.println("Measurement Update");
 			//System.out.println("xk=" + voltage);
 			//System.out.println("Pk=" + filter.getErrorCovarianceMatrix().getEntry(0, 0));
 			//P0 = filter.getErrorCovarianceMatrix();
-			
+
 			strTable.append(voltage+"\t");
 			strTable.append(filter.getErrorCovarianceMatrix().getEntry(0, 0)+"\n");
-			
+
 			pNoise.setEntry(0, filter.getErrorCovarianceMatrix().getEntry(0, 0));
 		}
-		
+
 		System.out.println(strTable.toString());
 
 	}
-	
+
 
 	/**
 	 * Increasing Speed Vehicle Example
@@ -380,7 +464,7 @@ public class KalmanFilterSamples {
 		ProcessModel pm = new DefaultProcessModel(A, B, Q, x, P0);
 		MeasurementModel mm = new DefaultMeasurementModel(H, R);
 		KalmanFilter filter = new KalmanFilter(pm, mm);
-		
+
 		KalmanFilter filterLon = new KalmanFilter(pm, mm);
 
 		RandomGenerator rand = new JDKRandomGenerator();
@@ -398,22 +482,22 @@ public class KalmanFilterSamples {
 
 			// x = A * x + B * u + pNoise
 			x = A.operate(x).add(pNoise);
-			
-			
+
+
 
 			double vkLat = coordinate.getLatitude() - x.getEntry(0);
-			
-			
-			
+
+
+
 			// simulate the measurement
 			mNoise.setEntry(0, vkLat);
-			
+
 			// z = H * x + m_noise
 			RealVector z = H.operate(x).add(mNoise);
 
 			filter.correct(z);
-			
-			
+
+
 			xLon = A.operate(xLon).add(pNoise);
 			double vkLon = coordinate.getLongitude() - xLon.getEntry(0);
 			mNoise.setEntry(0, vkLon);
@@ -426,18 +510,18 @@ public class KalmanFilterSamples {
 			double velocity = filter.getStateEstimation()[1];
 			System.out.println(i + " n_postion: " + position  + " r_postion: " + coordinate.getLatitude()  + " speed " + velocity);
 			i++;
-			
-			
+
+
 			double lonPosition = coordinate.getLongitude();
 			System.out.println(i + " lon_postion: " + lonPosition  + " rlon_postion: " + coordinate.getLongitude());
 
 			cleanedTrajectory.add(new Coordinate(position, lonPosition, coordinate.getAltitude(), coordinate.getDateTime()));
 		}
 
-		
+
 
 		TrajectoryUtils.print(TrajectoryEvaluator.evaluate(cleanedTrajectory));
-		
+
 		//save("apache_lat_kalman", cleanedTrajectory.getCoordinates());
 	}
 
@@ -446,16 +530,16 @@ public class KalmanFilterSamples {
 		float q = 1.0f;
 		float accuracy = 150.0f;
 		br.udesc.dcc.bdes.filter.KalmanFilter kalman = new  br.udesc.dcc.bdes.filter.KalmanFilter(q);
-		
+
 		StringBuffer algorithmInfo = new StringBuffer("== Input ==");
 		algorithmInfo.append("\n" + kalman.getClass().getName());
 		algorithmInfo.append("\nQ: " + q + " m/s");
 		algorithmInfo.append("\nAccuracy: " + accuracy + " m");
-		
+
 		Trajectory rawTrajectory = PltFileReader.read("20081023055305.plt");
 		String rawEvaluation = "=== Raw Trajectory Evaluation ===\n";
 		rawEvaluation += TrajectoryUtils.evaluatedTrajectoryToString(TrajectoryEvaluator.evaluate(rawTrajectory));
-		
+
 		System.out.println(algorithmInfo);
 		System.out.println(rawEvaluation);
 
@@ -480,20 +564,20 @@ public class KalmanFilterSamples {
 			i++;
 		}
 
-		
+
 		String cleanedEvaluation = "=== Cleaned Trajectory Evaluation ===\n";
 		cleanedEvaluation += TrajectoryUtils.evaluatedTrajectoryToString(TrajectoryEvaluator.evaluate(cleanedTrajectory));
 		System.out.println(cleanedEvaluation);
-		
+
 		System.out.println(cleanedEvaluation);
-		
+
 		TrajectoryUtils.save("simple_kalman", cleanedTrajectory.getCoordinates());
 		String datetime = new SimpleDateFormat("yyyy.MM.dd_HHmmss").format(new Date());
 		InfoWriter.write("simple_kalman_"+datetime+".txt", algorithmInfo.toString(), rawEvaluation, cleanedEvaluation);
-		
+
 	}
 
 
-	
+
 
 }
