@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import br.udesc.dcc.bdes.analysis.TrajectoryCleaner;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.fields.GeolifeLabelFields;
@@ -23,8 +22,8 @@ public class Geolife2Weka {
 		int ignoredCoordinates = 0;
 		int matched = 0;
 		
-		String geolifeDir = "C:\\Users\\marcio.jasinski\\tmp\\2015.11.20";
-		//String geolifeDir = "C:\\Users\\marcio.jasinski\\OneDrive\\GPS_DATA\\geolife-5-years\\Data";
+		//String geolifeDir = "C:\\Users\\marcio.jasinski\\tmp\\2015.11.20";
+		String geolifeDir = "C:\\Users\\marcio.jasinski\\OneDrive\\GPS_DATA\\geolife-5-years\\Data";
 		File geolife = new File(geolifeDir);
 		if (!geolife.exists()) {
 			System.out.println("Geolife dir does not exists: " + geolifeDir);
@@ -56,10 +55,10 @@ public class Geolife2Weka {
 				System.out.println("\tFile: " + trajectoryFile.getAbsolutePath());
 				Trajectory trajectory = PltFileReader.read(trajectoryFile);
 				
-				int rawCoordinates = trajectory.size();
-				System.out.println("\t\tRemoving noise from  " + rawCoordinates + " coordinates");
-				trajectory = TrajectoryCleaner.removeNoiseCoordinates(trajectory);
-				System.out.println("\t\tNoise count:   " + (rawCoordinates - trajectory.size()));
+				//int rawCoordinates = trajectory.size();
+				//System.out.println("\t\tRemoving noise from  " + rawCoordinates + " coordinates");
+				//trajectory = TrajectoryCleaner.removeNoiseCoordinates(trajectory);
+				//System.out.println("\t\tNoise count:   " + (rawCoordinates - trajectory.size()));
 				
 				for(Coordinate coordinate : trajectory.getCoordinates()) {	
 					Optional<Trajectory> optTrajectory = binarySearch(trajectoriesLabels, coordinate);
@@ -85,7 +84,7 @@ public class Geolife2Weka {
 					trajectories.add(trajectory);
 				}
 
-				TrajectoryWekaFileWriter.write(trajectories, "geolife-trajectories-cleaned.arff");
+				TrajectoryWekaFileWriter.write(trajectories, "geolife-trajectories-raw.arff");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
