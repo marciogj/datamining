@@ -22,6 +22,8 @@ public class EvaluatedTrajectory {
 	protected double maxSlowdown;
 	protected double speedUpDownOscilations;
 	
+	public EvaluatedTrajectory() {}
+	
 	public EvaluatedTrajectory(Trajectory aTrajectory) {
 		trajectory = aTrajectory;
 	}
