@@ -1,5 +1,6 @@
 import java.io.File;
 
+
 import br.udesc.dcc.bdes.analysis.RealTimeTrajectoryEvaluator;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
@@ -49,11 +50,7 @@ public class MainGPSReplay {
 			}
 			
 		}
-		}
-		
-		
-		
-	
+	}
 
 }
 
