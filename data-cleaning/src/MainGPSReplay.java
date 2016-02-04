@@ -1,3 +1,5 @@
+import java.io.File;
+
 import br.udesc.dcc.bdes.analysis.RealTimeTrajectoryEvaluator;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
@@ -14,36 +16,43 @@ public class MainGPSReplay {
 		//Trajectory trajectory = UdescCSVFileReader.read(dirPath+"\\"+file);
 		
 		String dirPath = "C:\\Users\\marciogj\\SkyDrive\\gps-tracker-service\\";
-		String file = "marcio.jasinski_1447100515293_1.csv";
-		Trajectory trajectory = SeniorCSVFileReader.read(dirPath+"\\"+file);
 		
+		File dir = new File(dirPath);
 		RealTimeTrajectoryEvaluator evaluator = new RealTimeTrajectoryEvaluator(13.89, 6.95, -4.17);
-		
-		//TODO: Evaluate track changes 
-		//TODO: Evaluate important places like schools 
-		for (Coordinate coordinate : trajectory.getCoordinates()) {
-			System.out.println(coordinate);
+		for(String file : dir.list()) {
+			Trajectory trajectory = SeniorCSVFileReader.read(dirPath+"\\"+file);
 			
-			evaluator.evaluate(coordinate);
-			System.out.println("Time: " + evaluator.getTotalTime());
-			System.out.println("Distance: " + evaluator.getTotalDistance() + "m");
 			
-			System.out.println("AvgSpeed: " + evaluator.getAvgSpeed());
-			System.out.println("MaxSpeed: " + evaluator.getMaxSpeed());
 			
-			System.out.println("MaxAcc: " + evaluator.getMaxAccecelration());
-			System.out.println("MaxDec: " + evaluator.getMaxDeceleration());
-			System.out.println("AccCount: " + evaluator.getAccecelerationCount());
-			System.out.println("DecCount: " + evaluator.getDecelerationCount());
+			//TODO: Evaluate track changes 
+			//TODO: Evaluate important places like schools 
+			for (Coordinate coordinate : trajectory.getCoordinates()) {
+				System.out.println(coordinate);
+				
+				evaluator.evaluate(coordinate);
+				System.out.println("Time: " + evaluator.getTotalTime());
+				System.out.println("Distance: " + evaluator.getTotalDistance() + "m");
+				
+				System.out.println("AvgSpeed: " + evaluator.getAvgSpeed());
+				System.out.println("MaxSpeed: " + evaluator.getMaxSpeed());
+				
+				System.out.println("MaxAcc: " + evaluator.getMaxAccecelration());
+				System.out.println("MaxDec: " + evaluator.getMaxDeceleration());
+				System.out.println("AccCount: " + evaluator.getAccecelerationCount());
+				System.out.println("DecCount: " + evaluator.getDecelerationCount());
+				
+				System.out.println("OverMaxSpeed: " + evaluator.getOverMaxSpeedCount());
+				System.out.println("OverMaxAcc: " + evaluator.getOverMaxAccelerationCount());
+				System.out.println("OverMaxDec: " + evaluator.getOverMaxDecelerationCount());
+				
+				System.out.println("--");
+			}
 			
-			System.out.println("OverMaxSpeed: " + evaluator.getOverMaxSpeedCount());
-			System.out.println("OverMaxAcc: " + evaluator.getOverMaxAccelerationCount());
-			System.out.println("OverMaxDec: " + evaluator.getOverMaxDecelerationCount());
-			
-			System.out.println("--");
+		}
 		}
 		
-	}
+		
+		
 	
 
 }
