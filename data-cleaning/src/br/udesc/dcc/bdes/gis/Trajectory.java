@@ -9,6 +9,7 @@ public class Trajectory {
 	protected Collection<Coordinate> coordinates = new ArrayList<>();
 	protected String sourceProvider; //Geolife, UDESC
 	protected String id; //taxi id, user
+	protected String deviceId; 
 	protected String transportMean;
 	protected LocalDateTime start;
 	protected LocalDateTime end;
@@ -79,6 +80,14 @@ public class Trajectory {
 
 	public void setEnd(LocalDateTime end) {
 		this.end = end;
+	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
 	}
 
 }

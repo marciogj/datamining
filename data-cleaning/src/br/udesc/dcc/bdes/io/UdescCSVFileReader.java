@@ -15,12 +15,12 @@ public class UdescCSVFileReader {
 	private static int HEADER_SIZE = 8;
 
 	public static Trajectory read(String path) {
-		return CoordinateFileReader.read(new File(path), HEADER_SIZE, UdescCSVFileReader::parse);
+		return CoordinateFileReader.parse(new File(path), HEADER_SIZE, UdescCSVFileReader::parse);
 	}
 
 	public static Trajectory read(File file) {
 		updateHeaders(file);
-		return CoordinateFileReader.read(file, HEADER_SIZE, UdescCSVFileReader::parse);
+		return CoordinateFileReader.parse(file, HEADER_SIZE, UdescCSVFileReader::parse);
 	}
 
 	private static Optional<Coordinate> parse(String line) {

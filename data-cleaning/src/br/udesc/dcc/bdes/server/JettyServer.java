@@ -10,6 +10,7 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlets.gzip.GzipHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -93,15 +94,14 @@ public class JettyServer {
         ServletContextHandler restHandler = createRestHandler();
         ResourceHandler htmlHandler = createHTMLHandler();
         
-
-        //GzipHandler gzip = new GzipHandler();
-        //server.setHandler(gzip);
+        
         HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[] { htmlHandler, wsHandler, restHandler, new DefaultHandler() });
-        //gzip.setHandler(handlers);
- 
-        server.setHandler(handlers);
+        //server.setHandler(handlers); //Might be used instead of Gzip
         
+        GzipHandler gzip = new GzipHandler();
+        gzip.setHandler(handlers);
+        server.setHandler(gzip);
         
         try{
             server.start();

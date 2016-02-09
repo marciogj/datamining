@@ -18,7 +18,7 @@ public class PltFileReader {
 	}
 	
 	public static Trajectory read(File file) {
-		return CoordinateFileReader.read(file, HEADER_SIZE, PltFileReader::parse);
+		return CoordinateFileReader.parse(file, HEADER_SIZE, PltFileReader::parse);
 	}
 	
 	

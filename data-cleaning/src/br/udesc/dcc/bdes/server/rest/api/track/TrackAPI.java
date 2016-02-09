@@ -21,9 +21,9 @@ public class TrackAPI {
 	 */
 	@POST
     public void postTrack(TrackDTO trackDto) {
-		System.out.println(trackDto.deviceId);
-		System.out.println(trackDto.userId);
-		System.out.println(trackDto.coordinates.size());
+		System.out.println("DeviceId: " + trackDto.deviceId);
+		System.out.println("UserId: " + trackDto.userId);
+		System.out.println("Coordinates: " + trackDto.coordinates.size());
     }
 	
 } 

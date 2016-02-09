@@ -14,14 +14,14 @@ public class SeniorCSVFileReader {
 	private static int HEADER_SIZE = 2;
 
 	public static Trajectory read(String path) {
-		return CoordinateFileReader.read(new File(path), HEADER_SIZE, SeniorCSVFileReader::parse);
+		return CoordinateFileReader.parseWithHeader(new File(path), HEADER_SIZE, SeniorCSVFileReader::parseCoordinate, SeniorCSVFileReader::parseHeader);
 	}
 
 	public static Trajectory read(File file) {
-		return CoordinateFileReader.read(file, HEADER_SIZE, SeniorCSVFileReader::parse);
+		return CoordinateFileReader.parseWithHeader(file, HEADER_SIZE, SeniorCSVFileReader::parseCoordinate, SeniorCSVFileReader::parseHeader);
 	}
 
-	private static Optional<Coordinate> parse(String line) {
+	private static Optional<Coordinate> parseCoordinate(String line) {
 		String[] parts = line.split(",");
 		Coordinate coordinate = new Coordinate();
 		coordinate.setAltitude(Double.parseDouble(parts[SeniorCoordinateFields.ALTITUDE.getIndex()]));
@@ -31,6 +31,15 @@ public class SeniorCSVFileReader {
 		long timestamp = Long.parseLong(parts[SeniorCoordinateFields.TIMESTAMP.getIndex()]); 
 		coordinate.setDateTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()));
 		return Optional.of(coordinate);
+	}
+	
+	private static Trajectory parseHeader(String headerLine, Trajectory trajectory) {
+		if(headerLine.contains("@")) {
+			String[] parts = headerLine.split("@");
+			trajectory.setId(parts[0]);
+			trajectory.setDeviceId(parts[1]);
+		}
+		return trajectory;
 	}
 
 }

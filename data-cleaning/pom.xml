@@ -23,26 +23,14 @@
             <version>2.5</version>
         </dependency>
     
-        <!-- Legacy REST Client Dependency  
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>1.19</version>
-        </dependency>  
-        
-        -->
-        
-        
+		<!-- REST Client -->    
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
             <version>${jersey-version}</version>
         </dependency>
         
-        
-         
-        
-        <!-- REST SERVICES -->
+        <!-- REST Server -->
         <!-- Based on https://nikolaygrozev.wordpress.com/2014/10/16/rest-with-embedded-jetty-and-jersey-in-a-single-jar-step-by-step/ -->
 		  <dependency>
 		    <groupId>org.eclipse.jetty</groupId>
@@ -73,6 +61,11 @@
 		    <groupId>org.glassfish.jersey.media</groupId>
 		    <artifactId>jersey-media-moxy</artifactId>
 		    <version>${jersey-version}</version>
+		  </dependency>
+		  <dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-servlets</artifactId>
+		    <version>${jetty-version}</version>
 		  </dependency>
         
                             

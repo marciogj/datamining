@@ -1,8 +1,9 @@
 import java.io.File;
+import java.util.logging.Logger;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -11,17 +12,18 @@ import br.udesc.dcc.bdes.analysis.RealTimeTrajectoryEvaluator;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.SeniorCSVFileReader;
+import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;
+import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackMapper;
 
-import com.google.gson.Gson;
 
-
-public class MainGPSReplay {
+public class GPSReplay {
+	public static final String SERVER_URL = "http://localhost:9090";
+	private static final Logger logger = Logger.getLogger("GPSReplay");
 	
 	public static void main(String[] args) {
 		System.out.println("Simulating GPS coordinates from recorded files...");
 		String dirPath = "C:\\Users\\marciogj\\SkyDrive\\gps-tracker-service\\";
 		replayToService(dirPath);
-
 	}
 	
 	public static void replayToEvaluator(String dirPath) {
@@ -59,38 +61,36 @@ public class MainGPSReplay {
 	}
 	
 	public static void replayToService(String dirPath) {
-		/*File dir = new File(dirPath);
+		File dir = new File(dirPath);
 		
 		Client client = ClientBuilder.newClient();
-		WebTarget target = client.target("http://localhost:9090");
-		
-		
-		
-		
-		
-		System.out.println("Requesting a ping....");
-		Response response = target.path("track").path("ping").request(MediaType.TEXT_PLAIN_TYPE).get();
-		System.out.println("Response: " + response.getEntity());
-		
+		WebTarget target = client.target(SERVER_URL);
+		logger.info("Requesting ping to " + SERVER_URL);
+		Response response = target.path("services").path("server").path("ping").request(MediaType.TEXT_PLAIN_TYPE).get();
+		logger.info("Response: " + response.getStatus() + " - " + response.readEntity(String.class));
+		if (response.getStatus() != 200) {
+			logger.info("Server is down. Aborting.");
+			System.exit(0);
+		}
 		
 		for(String file : dir.list()) {
 			Trajectory trajectory = SeniorCSVFileReader.read(dirPath+"\\"+file);
 			
 			int batchLimit = 10;
 			int batchSize = 0;
-			GPSTrack track = new GPSTrack();
-			Gson gson = new Gson();
+			TrackDTO track = new TrackDTO();
+			track.deviceId = trajectory.getDeviceId();
+			track.userId = trajectory.getId();
 			for (Coordinate coordinate : trajectory.getCoordinates()) {
-				System.out.println(coordinate);
-				
-				if(batchSize > batchLimit) {
-					
-					target.path("track").request(MediaType.TEXT_PLAIN_TYPE).post(arg0)
-					//service.path("track").accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(gson.toJson(track));
-					track = new GPSTrack();					
+				if(batchSize >= batchLimit) {
+					response = target.path("services").path("track").request(MediaType.APPLICATION_JSON_TYPE).post(Entity.entity(track, MediaType.APPLICATION_JSON_TYPE));
+					logger.info("Response: " + response.getStatus());
+					track = new TrackDTO();
+					track.deviceId = trajectory.getDeviceId();
+					track.userId = trajectory.getId();
 					batchSize = 0;
 				} else {
-					track.add(coordinate);
+					track.coordinates.add(TrackMapper.toDto(coordinate));
 					batchSize++;
 				}
 				
@@ -98,11 +98,11 @@ public class MainGPSReplay {
 			
 			//remaining track (didn't reach a batch size)
 			if (batchSize > 0 ) {
-				//service.path("track").accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(gson.toJson(track));
+				response = target.path("services").path("track").request(MediaType.APPLICATION_JSON_TYPE).post(Entity.entity(track, MediaType.APPLICATION_JSON_TYPE));
+				logger.info("Response: " + response.getStatus());
 			}
 			
 		}
-		*/
 	}
 
 
