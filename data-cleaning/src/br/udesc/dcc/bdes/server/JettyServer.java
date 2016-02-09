@@ -1,5 +1,11 @@
 package br.udesc.dcc.bdes.server;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.eclipse.jetty.server.Handler;
@@ -11,6 +17,7 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.gzip.GzipHandler;
+import org.eclipse.jetty.websocket.api.Session;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -19,11 +26,13 @@ import br.udesc.dcc.bdes.server.ws.EventServlet;
 
 public class JettyServer {
 	public static final int HTTP_PORT = 9090;
-	private final Logger logger = Logger.getLogger("GPSSparkServer");
-	
 	private static final String SERVICES_CONTEXT = "/services";
 	private static final String WEBSOCKET_CONTEXT = "/ws";
-
+	
+	private final Logger logger = Logger.getLogger("GPSSparkServer");
+	private static final JettyServer server = new JettyServer();
+	private final Map<String, Session> wsSesseions = new HashMap<>();
+	
 	/**
 	 * Resource configuration performs an auto discovery over specified packages.
 	 * More details: https://jersey.java.net/nonav/documentation/2.0/deployment.html 
@@ -35,15 +44,36 @@ public class JettyServer {
 	    }
 	}
 	
-	
 	public static void main(String[] args) {
-		JettyServer server = new JettyServer();
 		server.startServer();
 	}
 	
-
 	public JettyServer() {}
-
+	
+	public static JettyServer get() {
+		return server;
+	}
+	
+	public String registerWSSession(Session session) {
+		String uuid = UUID.randomUUID().toString();
+		wsSesseions.put(uuid, session);
+		return uuid;
+		
+	}
+	
+	public void unregisterWSSession(String uuid) {
+		wsSesseions.remove(uuid);
+	}
+	
+	public void unregisterSession(Session session) {
+		wsSesseions.forEach( (k,v)-> { if(v.equals(session)) { wsSesseions.remove(k);} } );
+	}
+	
+	public List<Session> getRegisteredSessions() {
+		List<Session> sessions = new ArrayList<>(wsSesseions.size());
+		wsSesseions.forEach( (k,v)-> sessions.add(v) );
+		return sessions;
+	}
 	
 	public ServletContextHandler createRestHandler() {
 		logger.info("Initializing REST handler on " + SERVICES_CONTEXT);

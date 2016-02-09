@@ -63,6 +63,7 @@ public class GPSReplay {
 	public static void replayToService(String dirPath) {
 		File dir = new File(dirPath);
 		
+		//https://jersey.java.net/documentation/latest/client.html
 		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target(SERVER_URL);
 		logger.info("Requesting ping to " + SERVER_URL);

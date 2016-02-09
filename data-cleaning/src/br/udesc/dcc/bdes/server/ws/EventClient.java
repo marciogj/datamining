@@ -12,10 +12,8 @@ public class EventClient
         URI uri = URI.create("ws://localhost:9090/events/");
 
         WebSocketClient client = new WebSocketClient();
-        try
-        {
-            try
-            {
+        try {
+            try {
                 client.start();
                 // The socket that receives events
                 EventSocket socket = new EventSocket();
@@ -27,14 +25,10 @@ public class EventClient
                 session.getRemote().sendString("Hello");
                 // Close session
                 session.close();
-            }
-            finally
-            {
+            } finally {
                 client.stop();
             }
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t){
             t.printStackTrace(System.err);
         }
     }
