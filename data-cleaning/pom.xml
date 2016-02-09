@@ -1,40 +1,128 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>data-cleaning</groupId>
-	<artifactId>data-cleaning</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-		</dependency>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>data-cleaning</groupId>
+    <artifactId>data-cleaning</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <jetty-version>9.2.7.v20150116</jetty-version>
+        <jersey-version>2.7</jersey-version>
+        <!-- Jersey new version (not working properly yet with Jetty 9.2.7  
+        <jersey-version>2.22</jersey-version> 
+         -->
+    </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-core</artifactId>
+            <version>2.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.5</version>
+        </dependency>
+    
+        <!-- Legacy REST Client Dependency  
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>1.19</version>
+        </dependency>  
+        -->
+         
+        
+        <!-- REST SERVICES -->
+		  <dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-server</artifactId>
+		    <version>${jetty-version}</version>
+		  </dependency>
+		  <dependency>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-servlet</artifactId>
+		    <version>${jetty-version}</version>
+		  </dependency>
+		  <dependency>
+		    <groupId>org.glassfish.jersey.core</groupId>
+		    <artifactId>jersey-server</artifactId>
+		    <version>${jersey-version}</version>
+		  </dependency>
+		  <dependency>
+		    <groupId>org.glassfish.jersey.containers</groupId>
+		    <artifactId>jersey-container-servlet-core</artifactId>
+		    <version>${jersey-version}</version>
+		  </dependency>
+		  <dependency>
+		    <groupId>org.glassfish.jersey.containers</groupId>
+		    <artifactId>jersey-container-jetty-http</artifactId>
+		    <version>${jersey-version}</version>
+		  </dependency>
+		  <dependency>
+		    <groupId>org.glassfish.jersey.media</groupId>
+		    <artifactId>jersey-media-moxy</artifactId>
+		    <version>${jersey-version}</version>
+		  </dependency>
+        
+                            
+        <!-- WEBSOCKETS -->                
+        <dependency>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>websocket-api</artifactId>
+            <version>${jetty-version}</version>
+        </dependency>
+        
+        <!-- To run websockets in embedded server -->
+        <dependency>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>websocket-server</artifactId>
+            <version>${jetty-version}</version>
+        </dependency>
+        
+        <!-- To run websockets client --> 
+        <dependency>
+           <groupId>org.eclipse.jetty.websocket</groupId>
+           <artifactId>websocket-client</artifactId>
+           <version>${jetty-version}</version>
+        </dependency>                                         
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
-			<version>3.5</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.5</version>
+        </dependency>
 
 
-		<dependency>
-			<groupId>br.udesc</groupId>
-			<artifactId>cluster</artifactId>
-			<version>0.0.1</version>
-		</dependency>
-	</dependencies>
-	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+        <dependency>
+            <groupId>br.udesc</groupId>
+            <artifactId>cluster</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        
+        
+    </dependencies>
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

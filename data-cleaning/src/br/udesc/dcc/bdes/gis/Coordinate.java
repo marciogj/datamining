@@ -15,7 +15,8 @@ public class Coordinate {
 	double altitude;
 	double speed;
 	double acceleration;
-	LocalDateTime dateTime; 
+	LocalDateTime dateTime;
+	
 
 	public Coordinate() {
 		super();
