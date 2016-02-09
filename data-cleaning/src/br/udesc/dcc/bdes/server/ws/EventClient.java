@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.server;
+package br.udesc.dcc.bdes.server.ws;
 
 import java.net.URI;
 import java.util.concurrent.Future;

@@ -1,19 +1,18 @@
 import java.io.File;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Response;
 
 import br.udesc.dcc.bdes.analysis.RealTimeTrajectoryEvaluator;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.SeniorCSVFileReader;
-import br.udesc.dcc.bdes.server.GPSTrack;
 
 import com.google.gson.Gson;
-//import com.sun.jersey.api.client.Client;
-//import com.sun.jersey.api.client.WebResource;
-//import com.sun.jersey.api.client.config.ClientConfig;
-//import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 
 public class MainGPSReplay {
@@ -60,12 +59,19 @@ public class MainGPSReplay {
 	}
 	
 	public static void replayToService(String dirPath) {
-		File dir = new File(dirPath);
+		/*File dir = new File(dirPath);
 		
-		//ClientConfig config = new DefaultClientConfig();
-		//Client client = Client.create(config);
-		//WebResource service = client.resource(UriBuilder.fromUri("http://localhost:8080").build());
-        
+		Client client = ClientBuilder.newClient();
+		WebTarget target = client.target("http://localhost:9090");
+		
+		
+		
+		
+		
+		System.out.println("Requesting a ping....");
+		Response response = target.path("track").path("ping").request(MediaType.TEXT_PLAIN_TYPE).get();
+		System.out.println("Response: " + response.getEntity());
+		
 		
 		for(String file : dir.list()) {
 			Trajectory trajectory = SeniorCSVFileReader.read(dirPath+"\\"+file);
@@ -78,6 +84,8 @@ public class MainGPSReplay {
 				System.out.println(coordinate);
 				
 				if(batchSize > batchLimit) {
+					
+					target.path("track").request(MediaType.TEXT_PLAIN_TYPE).post(arg0)
 					//service.path("track").accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(gson.toJson(track));
 					track = new GPSTrack();					
 					batchSize = 0;
@@ -94,6 +102,7 @@ public class MainGPSReplay {
 			}
 			
 		}
+		*/
 	}
 
 

@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.server;
+package br.udesc.dcc.bdes.server.ws;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;

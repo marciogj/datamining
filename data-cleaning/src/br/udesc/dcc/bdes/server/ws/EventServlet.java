@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.server;
+package br.udesc.dcc.bdes.server.ws;
 
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
