@@ -36,8 +36,8 @@ public class SeniorCSVFileReader {
 	private static Trajectory parseHeader(String headerLine, Trajectory trajectory) {
 		if(headerLine.contains("@")) {
 			String[] parts = headerLine.split("@");
-			trajectory.setId(parts[0]);
-			trajectory.setDeviceId(parts[1]);
+			trajectory.setUserId(parts[1]);
+			trajectory.setDeviceId(parts[0]);
 		}
 		return trajectory;
 	}

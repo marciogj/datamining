@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.analysis;
+package br.udesc.dcc.bdes.analysis.deprecated;
 
 import br.udesc.dcc.bdes.gis.Trajectory;
 

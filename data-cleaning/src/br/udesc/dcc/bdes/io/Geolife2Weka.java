@@ -64,8 +64,8 @@ public class Geolife2Weka {
 					Optional<Trajectory> optTrajectory = binarySearch(trajectoriesLabels, coordinate);
 					if (optTrajectory.isPresent()) {
 						Trajectory labeledTrajectory = optTrajectory.get();
-						String id = trajectory.getId() == null ? trajectoryFile.getName() : trajectory.getId() + "_" + trajectoryFile.getName(); 
-						labeledTrajectory.setId(id);
+						String id = trajectory.getUserId() == null ? trajectoryFile.getName() : trajectory.getUserId() + "_" + trajectoryFile.getName(); 
+						labeledTrajectory.setUserId(id);
 						labeledTrajectory.add(coordinate);
 						System.out.println("\t\t>> " + coordinate + " is " + labeledTrajectory.getTransportMean());
 						matched++;
@@ -80,7 +80,7 @@ public class Geolife2Weka {
 			try {
 				Collection<Trajectory> trajectories = new LinkedList<>();
 				for(Trajectory trajectory : trajectoriesLabels) {
-					if (trajectory.getId() == null ) continue;
+					if (trajectory.getUserId() == null ) continue;
 					trajectories.add(trajectory);
 				}
 

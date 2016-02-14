@@ -5,6 +5,10 @@ import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
 import br.udesc.dcc.bdes.server.JettyServer;
 
+/**
+ * https://www.eclipse.org/jetty/documentation/9.2.2.v20140723/jetty-websocket-api-send-message.html
+ *
+ */
 public class EventSocket extends WebSocketAdapter {
 	
     @Override

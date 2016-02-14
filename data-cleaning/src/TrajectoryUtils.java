@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
-import br.udesc.dcc.bdes.analysis.EvaluatedTrajectory;
+import br.udesc.dcc.bdes.analysis.deprecated.EvaluatedTrajectory;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.io.TrajectoryCSVFileWriter;
 

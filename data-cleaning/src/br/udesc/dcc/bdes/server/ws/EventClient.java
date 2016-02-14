@@ -15,15 +15,10 @@ public class EventClient
         try {
             try {
                 client.start();
-                // The socket that receives events
                 EventSocket socket = new EventSocket();
-                // Attempt Connect
                 Future<Session> fut = client.connect(socket,uri);
-                // Wait for Connect
                 Session session = fut.get();
-                // Send a message
                 session.getRemote().sendString("Hello");
-                // Close session
                 session.close();
             } finally {
                 client.stop();

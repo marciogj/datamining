@@ -3,19 +3,25 @@ package br.udesc.dcc.bdes.analysis;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import br.udesc.dcc.bdes.gis.Acceleration;
 import br.udesc.dcc.bdes.gis.Coordinate;
+import br.udesc.dcc.bdes.gis.Distance;
+import br.udesc.dcc.bdes.gis.Speed;
+import br.udesc.dcc.bdes.gis.Time;
 import br.udesc.dcc.bdes.gis.Trajectory;
 
 
 /**
  * 
  * 
- * Speed will always return m/s (meter per second)
+ * Speed always return m/s (meter per second)
+ * Distance is stored as meters
+ * Time is stored in seconds
  * 
  * @author marciogj
  *
  */
-public class RealTimeTrajectoryEvaluator {
+public class TrajectoryEvaluation {
 	//private final EvaluatedTrajectory evaluated = new EvaluatedTrajectory();
 	private final Trajectory trajectory = new Trajectory();
 	private Coordinate previousCoordinate = null;
@@ -30,9 +36,9 @@ public class RealTimeTrajectoryEvaluator {
 	private double maxSpeed;
 	private double maxAccecelration;
 	private double maxDeceleration;
-	private long accecelerationCount;
-	private long decelerationCount;
-	private Collection<Acceleration> accelerations = new LinkedList<>();
+	private int accecelerationCount;
+	private int decelerationCount;
+	private Collection<AccInterval> accelerations = new LinkedList<>();
 	
 	private int overMaxSpeedCount;
 	private int overMaxAccelerationCount;
@@ -44,9 +50,9 @@ public class RealTimeTrajectoryEvaluator {
 	private double accSpeedSum;
 	private int accCoordinateCount;
 	
-	public RealTimeTrajectoryEvaluator() {}
+	public TrajectoryEvaluation() {}
 			
-	public RealTimeTrajectoryEvaluator(double maxAllowedSpeed, double maxAcceleration, double maxDeceleration) {
+	public TrajectoryEvaluation(double maxAllowedSpeed, double maxAcceleration, double maxDeceleration) {
 		super();
 		MAX_ALLOWED_SPEED = maxAllowedSpeed;
 		MAX_ACCELERATION = maxAcceleration;
@@ -87,8 +93,6 @@ public class RealTimeTrajectoryEvaluator {
 			maxSpeed = currentSpeed;
 		}
 		
-		
-		
 		//Update max acceleration/deceleration 
 		if (currentAcceleration > maxAccecelration) {
 			maxAccecelration = currentAcceleration;
@@ -106,7 +110,7 @@ public class RealTimeTrajectoryEvaluator {
 		} 
 		
 		if (isAccelerationInverted || isDecelerationInverted) {
-			Acceleration acceleration = new Acceleration(accelerationStart, currentCoordinate);
+			AccInterval acceleration = new AccInterval(accelerationStart, currentCoordinate);
 			acceleration.setDistance(accDistance);
 			acceleration.setTime(accTime);
 			acceleration.setSpeedAvg(accSpeedSum/accCoordinateCount);
@@ -148,71 +152,44 @@ public class RealTimeTrajectoryEvaluator {
 		return coordinate;
 	}
 	
-	public double getAvgSpeed() {
-		return speedSum/trajectory.size();
+	public TrajectoryTelemetry getCurrentTelemetry() {
+		TrajectoryTelemetry telemetry = new TrajectoryTelemetry();
+		telemetry.accCount = accecelerationCount;
+		telemetry.avgSpeed = new Speed(speedSum/trajectory.size());
+		telemetry.coordRate = totalTime == 0 ? 0 : trajectory.size() / totalTime;
+		telemetry.decCount = decelerationCount;
+		telemetry.maxAcc = new Acceleration(maxAccecelration);
+		//telemetry.maxAllowedSpeed = MAX_ALLOWED_SPEED;
+		//telemetry.maxSecureAcc =
+		
+		telemetry.maxDec = new Acceleration(maxDeceleration);
+		telemetry.maxSpeed = new Speed(maxSpeed);
+		telemetry.overMaxAllowedSpeedCount = overMaxSpeedCount;
+		telemetry.overMaxSecureAccCount = overMaxAccelerationCount;
+		telemetry.overMaxSecureDecCount = overMaxDecelerationCount;
+		telemetry.trajectoryDistance = new Distance(totalDistance);
+		telemetry.trajectoryTime = new Time(totalTime);
+		telemetry.vehicleId = trajectory.getUserId();
+		
+		return telemetry;
+	}
+
+	public void evaluate(Collection<Coordinate> coordinates) {
+		for (Coordinate coordinate : coordinates) {
+			evaluate(coordinate);
+		}
 	}
 	
-	public double getCoordinateRate() {
-		return trajectory.size()/totalTime;
-	}
-
-	public Trajectory getTrajectory() {
-		return trajectory;
-	}
-
-	public double getTotalDistance() {
-		return totalDistance;
-	}
-
-	public long getTotalTime() {
-		return totalTime;
-	}
-
-	public double getMaxSpeed() {
-		return maxSpeed;
-	}
-
-	public double getMaxAccecelration() {
-		return maxAccecelration;
-	}
-
-	public double getMaxDeceleration() {
-		return maxDeceleration;
-	}
-
-	public long getAccecelerationCount() {
-		return accecelerationCount;
-	}
-
-	public long getDecelerationCount() {
-		return decelerationCount;
-	}
-
-	public Collection<Acceleration> getAccelerations() {
-		return accelerations;
-	}
-
-	public int getOverMaxSpeedCount() {
-		return overMaxSpeedCount;
-	}
-
-	public int getOverMaxAccelerationCount() {
-		return overMaxAccelerationCount;
-	}
-
-	public int getOverMaxDecelerationCount() {
-		return overMaxDecelerationCount;
-	}
 }
 
-class Acceleration {
+class AccInterval {
 	private Coordinate start;
 	private Coordinate end;
 	private double speedAvg;
 	private double distance;
 	private long time;
 	
-	public Acceleration(Coordinate accelerationStart, Coordinate accelerationEnd) {
+	public AccInterval(Coordinate accelerationStart, Coordinate accelerationEnd) {
 		start = accelerationStart;
 		end = accelerationEnd;
 	}

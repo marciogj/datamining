@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 
-import br.udesc.dcc.bdes.analysis.EvaluatedTrajectory;
+import br.udesc.dcc.bdes.analysis.deprecated.EvaluatedTrajectory;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 

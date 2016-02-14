@@ -8,7 +8,7 @@ import java.util.List;
 public class Trajectory {
 	protected Collection<Coordinate> coordinates = new ArrayList<>();
 	protected String sourceProvider; //Geolife, UDESC
-	protected String id; //taxi id, user
+	protected String userId; //taxi id, user
 	protected String deviceId; 
 	protected String transportMean;
 	protected LocalDateTime start;
@@ -50,12 +50,12 @@ public class Trajectory {
 		this.sourceProvider = sourceProvider;
 	}
 
-	public String getId() {
-		return id;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setUserId(String id) {
+		this.userId = id;
 	}
 
 	public String getTransportMean() {

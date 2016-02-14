@@ -4,8 +4,8 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Collection;
 
-import br.udesc.dcc.bdes.analysis.EvaluatedTrajectory;
-import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.analysis.deprecated.EvaluatedTrajectory;
+import br.udesc.dcc.bdes.analysis.deprecated.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.gis.Trajectory;
 
 public class TrajectoryWekaFileWriter {
@@ -39,7 +39,7 @@ public class TrajectoryWekaFileWriter {
 			for (Trajectory trajectory : trajectories) {
 				EvaluatedTrajectory evaluatedTrajectory = TrajectoryEvaluator.evaluate(trajectory);
 				StringBuffer line = new StringBuffer();
-				line.append(trajectory.getId() + ",");
+				line.append(trajectory.getUserId() + ",");
 				line.append(evaluatedTrajectory.getAvgSpeed() + ",");
 				line.append(evaluatedTrajectory.getMaxSpeed() + ",");
 				line.append(evaluatedTrajectory.getMaxSpeedUp() + ",");
