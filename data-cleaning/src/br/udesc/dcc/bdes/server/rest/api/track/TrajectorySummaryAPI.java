@@ -24,6 +24,4 @@ public class TrajectorySummaryAPI {
 		TrajectoryEvaluation evaluation = repository.findTrajectoryEvaluationById(userId).orElseThrow( () -> new NotFoundException());
 		return TrajectoryMapper.toDto(evaluation);
 	}
-	
-
 }

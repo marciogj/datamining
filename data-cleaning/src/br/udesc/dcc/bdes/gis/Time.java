@@ -21,16 +21,16 @@ public class Time {
 	public String getTime() {
 		long remaing = seconds;
 		
-		long days = seconds % ONE_DAY_SECONDS;
+		long days = seconds / ONE_DAY_SECONDS;
 		remaing = seconds - (days * ONE_DAY_SECONDS);
 		
-		long hours = remaing % ONE_HOUR_SECONDS;
+		long hours = remaing / ONE_HOUR_SECONDS;
 		remaing = remaing - (hours * ONE_HOUR_SECONDS);
 		
-		long minutes = remaing % ONE_MIN_SECONDS;
+		long minutes = remaing / ONE_MIN_SECONDS;
 		remaing = remaing - (minutes * ONE_MIN_SECONDS);
 		
-		return twoDigits(days) + "d " + twoDigits(hours) + ":" + twoDigits(minutes) + ":" + twoDigits(seconds); 
+		return twoDigits(days) + "d " + twoDigits(hours) + ":" + twoDigits(minutes) + ":" + twoDigits(remaing); 
 	}
 	
 	private String twoDigits(long value) {

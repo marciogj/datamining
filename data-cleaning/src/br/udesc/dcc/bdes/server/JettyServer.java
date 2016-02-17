@@ -1,7 +1,6 @@
 package br.udesc.dcc.bdes.server;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +78,7 @@ public class JettyServer {
 		logger.info("Initializing REST handler on " + SERVICES_CONTEXT);
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 	    context.setContextPath(SERVICES_CONTEXT);
+	    
 	    ServletHolder holder =  new ServletHolder(new ServletContainer(new ServicesResourceConfig()));
 	    context.addServlet(holder, "/*");
 	    
