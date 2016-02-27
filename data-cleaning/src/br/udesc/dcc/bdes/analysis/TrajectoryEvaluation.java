@@ -2,6 +2,7 @@ package br.udesc.dcc.bdes.analysis;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Optional;
 
 import br.udesc.dcc.bdes.gis.Acceleration;
 import br.udesc.dcc.bdes.gis.Coordinate;
@@ -9,6 +10,7 @@ import br.udesc.dcc.bdes.gis.Distance;
 import br.udesc.dcc.bdes.gis.Speed;
 import br.udesc.dcc.bdes.gis.Time;
 import br.udesc.dcc.bdes.gis.Trajectory;
+import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
 
 
 /**
@@ -50,6 +52,8 @@ public class TrajectoryEvaluation {
 	private double accSpeedSum;
 	private int accCoordinateCount;
 	
+	private Optional<OpenWeatherConditionDTO> currentWeather; 
+	
 	public TrajectoryEvaluation() {}
 			
 	public TrajectoryEvaluation(double maxAllowedSpeed, double maxAcceleration, double maxDeceleration) {
@@ -58,9 +62,27 @@ public class TrajectoryEvaluation {
 		MAX_ACCELERATION = maxAcceleration;
 		MAX_DECELERATION = maxDeceleration;
 	}
+	
+	public void evaluate(Collection<Coordinate> coordinates, Optional<OpenWeatherConditionDTO> weather) {
+		for (Coordinate coordinate : coordinates) {
+			evaluate(coordinate, weather);
+		}
+	}
+	
+	public void evaluate(Collection<Coordinate> coordinates) {
+		for (Coordinate coordinate : coordinates) {
+			evaluate(coordinate, Optional.empty());
+		}
+	}
 
 	public void evaluate(final Coordinate coordinate) {
+		evaluate(coordinate, Optional.empty());
+	}
+	
+	public void evaluate(final Coordinate coordinate, Optional<OpenWeatherConditionDTO> weather) {
 		trajectory.add(coordinate);
+		currentWeather = weather;
+		
 		accCoordinateCount++;
 		if (previousCoordinate == null) {
 			previousCoordinate = coordinate;
@@ -173,11 +195,9 @@ public class TrajectoryEvaluation {
 		
 		return telemetry;
 	}
-
-	public void evaluate(Collection<Coordinate> coordinates) {
-		for (Coordinate coordinate : coordinates) {
-			evaluate(coordinate);
-		}
+	
+	public Optional<OpenWeatherConditionDTO> getCurrentWeather() {
+		return currentWeather;
 	}
 	
 }

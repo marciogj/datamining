@@ -11,9 +11,12 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.gis.Trajectory;
+import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
+import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.server.JettyServer;
 import br.udesc.dcc.bdes.server.repository.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
+import br.udesc.dcc.bdes.server.rest.api.track.dto.CoordinateDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
 
@@ -55,11 +58,23 @@ public class TrackAPI {
 			// how much time elapsed from last one
 			trajectoryEval = optTrajectory.get();
 		}
+		
 		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
-		trajectoryEval.evaluate(receivedTrajectory.getCoordinates());
+		Optional<OpenWeatherConditionDTO> currentWeather = getLastPositionWeather(trackDto);
+		trajectoryEval.evaluate(receivedTrajectory.getCoordinates(), currentWeather);
 		
 		return trajectoryEval;
 		
+	}
+	
+	private Optional<OpenWeatherConditionDTO> getLastPositionWeather(TrackDTO trackDto) {
+		Optional<String> openWetaherKey = JettyServer.get().getOpenWeatherKey();
+		if (openWetaherKey.isPresent()) {
+			CoordinateDTO lastCoord = trackDto.coordinates.get(trackDto.coordinates.size()-1);
+			return OpenWeatherClient.weatherByCooordinate(lastCoord.latitude, lastCoord.longitude, openWetaherKey.get());
+		}
+		
+		return Optional.empty();
 	}
 	
 	private void notifyWSClients(TrackDTO trackDto) {

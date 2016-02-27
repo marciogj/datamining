@@ -1,9 +1,14 @@
 package br.udesc.dcc.bdes.server;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -27,9 +32,11 @@ public class JettyServer {
 	public static final int HTTP_PORT = 9090;
 	private static final String SERVICES_CONTEXT = "/services";
 	private static final String WEBSOCKET_CONTEXT = "/ws";
-	
+		
 	private final Logger logger = Logger.getLogger("GPSSparkServer");
 	private static final JettyServer server = new JettyServer();
+	
+	private Properties properties = new Properties();
 	private final Map<String, Session> wsSesseions = new HashMap<>();
 	
 	/**
@@ -116,6 +123,9 @@ public class JettyServer {
 	public void startServer() {
 		logger.info("Initializing WebSocket server on port " + HTTP_PORT);
         Server server = new Server();
+        properties = loadServerProperties();
+		
+        
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(HTTP_PORT);
         server.addConnector(connector);
@@ -142,5 +152,26 @@ public class JettyServer {
         	server.destroy();
         }
     }
+	
+	public Optional<String> getOpenWeatherKey() {
+		String key = properties.getProperty("open-weather-key");
+		if(key != null) {
+			return Optional.of(key);
+		}
+		return Optional.empty();
+	}
+	
+	public static Properties loadServerProperties() {
+		Properties fileProperties = new Properties();
+		File keyFile = new File("server.properties");
+		try ( BufferedReader reader = new BufferedReader(new FileReader(keyFile))) {
+			fileProperties.load(reader);
+			reader.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return fileProperties;
+	}
 
 }

@@ -2,11 +2,14 @@ package br.udesc.dcc.bdes.server.rest.api.track.dto;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.analysis.TrajectoryTelemetry;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
+import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
+import br.udesc.dcc.bdes.openweather.WeatherDTO;
 
 public class TrajectoryMapper {
 	
@@ -52,7 +55,17 @@ public class TrajectoryMapper {
 		dto.totalDistance = telemetry.trajectoryDistance.getKilometers() + " km";
 		dto.trafficCondition = "Trânsito Intenso";
 		dto.trajectoryTime = telemetry.trajectoryTime.getTime();
-		dto.wheatherCondition = "Chuva moderada";
+		
+		dto.wheatherCondition = "-";
+		Optional<OpenWeatherConditionDTO> weatherData = evaluation.getCurrentWeather();
+		if(weatherData.isPresent()) {
+			Optional<WeatherDTO> weather = weatherData.get().weather.isEmpty() ? Optional.empty() : Optional.of(weatherData.get().weather.get(0));
+			if (weather.isPresent()) {
+				dto.wheatherCondition = weather.get().main + " " + weather.get().description;
+			}
+		}
+		
+		
 		return dto;
 	}
 
