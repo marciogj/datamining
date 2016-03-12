@@ -10,13 +10,14 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluation;
+import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
 import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.server.JettyServer;
+import br.udesc.dcc.bdes.server.model.DeviceId;
 import br.udesc.dcc.bdes.server.repository.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
-import br.udesc.dcc.bdes.server.rest.api.track.dto.CoordinateDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
 
@@ -41,39 +42,52 @@ public class TrackAPI {
     public void postTrack(TrackDTO trackDto) {
 		System.out.println("DeviceId: " + trackDto.deviceId + " - Coordinates: " + trackDto.coordinates.size());
 		
-		TrajectoryEvaluation trajectoryEval = evaluateTrack(trackDto);
-		repository.save(trackDto.userId, trajectoryEval);
+		evaluateTrack(trackDto);
+		
 		
 		notifyWSClients(trackDto);			
     }
 	
-	private TrajectoryEvaluation evaluateTrack(TrackDTO trackDto) {
+	private void evaluateTrack(TrackDTO trackDto) {
 		TrajectoryEvaluation trajectoryEval = new TrajectoryEvaluation();
-		Optional<TrajectoryEvaluation> optTrajectory = repository.findTrajectoryEvaluationById(trackDto.userId);
+		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
+		
+		Optional<TrajectoryEvaluation> optTrajectory = repository.loadLatestTrajectoryEvaluationById(new DeviceId(trackDto.deviceId));
+		long timeTolerance =  1000 * 60 * 5;
+		
 		if (optTrajectory.isPresent()) {
 			//TODO: Break trajectories considering contextual information: stops and place
-			//load from repository (as time goes on, we should split trajectories...)
-			//take the last one and evaluate:
-			// is it the same road (taken from google API)?
-			// how much time elapsed from last one
-			trajectoryEval = optTrajectory.get();
+			Trajectory previousTrajectory = optTrajectory.get().getTrajectory();
+			Optional<Coordinate> latestCoodrinate = previousTrajectory.getLastestCoordinate();
+			Optional<Coordinate> receivedCoordinate = receivedTrajectory.getFirstCoordintae();
+			
+			long lastTimePreviousCoord = receivedCoordinate.isPresent() ? receivedCoordinate.get().getDateTimeInMillis() : 0;
+			long firstTimeCurrentCoord = latestCoodrinate.isPresent() ? latestCoodrinate.get().getDateTimeInMillis() : 0;
+			long difference = firstTimeCurrentCoord - lastTimePreviousCoord;
+			//Evaluates whether it is the same trajectory or a new one
+			if (difference <= timeTolerance) {
+				trajectoryEval = optTrajectory.get();
+			}
 		}
 		
-		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
-		Optional<OpenWeatherConditionDTO> currentWeather = getLastPositionWeather(trackDto);
-		trajectoryEval.evaluate(receivedTrajectory.getCoordinates(), currentWeather);
+		List<Trajectory> subtrajectoriesByTime = trajectoryEval.subtrajectoriesByTime(receivedTrajectory, timeTolerance);
+		System.out.println("Subtrajectories: " + subtrajectoriesByTime.size());
 		
-		return trajectoryEval;
+		for (Trajectory subTrajectory : subtrajectoriesByTime) {
+			Optional<OpenWeatherConditionDTO> currentWeather = getLastPositionWeather(subTrajectory);
+			trajectoryEval.evaluate(receivedTrajectory.getCoordinates(), currentWeather);
+			repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
+			trajectoryEval = new TrajectoryEvaluation();
+		}
 		
 	}
 	
-	private Optional<OpenWeatherConditionDTO> getLastPositionWeather(TrackDTO trackDto) {
+	private Optional<OpenWeatherConditionDTO> getLastPositionWeather(Trajectory trajectory) {
 		Optional<String> openWetaherKey = JettyServer.get().getOpenWeatherKey();
-		if (openWetaherKey.isPresent()) {
-			CoordinateDTO lastCoord = trackDto.coordinates.get(trackDto.coordinates.size()-1);
-			return OpenWeatherClient.weatherByCooordinate(lastCoord.latitude, lastCoord.longitude, openWetaherKey.get());
+		Optional<Coordinate> lastCoord = trajectory.getLastestCoordinate();
+		if (openWetaherKey.isPresent() && lastCoord.isPresent()) {
+			return OpenWeatherClient.weatherByCooordinate(lastCoord.get().getLatitude(), lastCoord.get().getLongitude(), openWetaherKey.get());
 		}
-		
 		return Optional.empty();
 	}
 	

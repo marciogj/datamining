@@ -1,12 +1,13 @@
 package br.udesc.dcc.bdes.gis;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class Trajectory {
-	protected Collection<Coordinate> coordinates = new ArrayList<>();
+	protected List<Coordinate> coordinates = new LinkedList<>();
 	protected String sourceProvider; //Geolife, UDESC
 	protected String userId; //taxi id, user
 	protected String deviceId; 
@@ -26,7 +27,7 @@ public class Trajectory {
 		}
 	}
 
-	public Collection<Coordinate> getCoordinates() {
+	public List<Coordinate> getCoordinates() {
 		return coordinates;
 	}
 
@@ -35,6 +36,8 @@ public class Trajectory {
 	}
 
 	public int size() {
+		//TODO: Linked list enhance incoming coordinates but punish size call.
+		//Consider a cache in case of performance issues with big trajectories
 		return coordinates.size();
 	}
 
@@ -89,5 +92,32 @@ public class Trajectory {
 	public void setDeviceId(String deviceId) {
 		this.deviceId = deviceId;
 	}
+	
+	public Optional<Coordinate> getLastestCoordinate() {
+		if (coordinates.isEmpty()) {
+			return Optional.empty();
+		}
+		return Optional.of(coordinates.get(coordinates.size() -1));
+	}
+
+	public Optional<Coordinate> getFirstCoordintae() {
+		if (coordinates.isEmpty()) {
+			return Optional.empty();
+		}
+		return Optional.of(coordinates.get(0));
+	}
+	
+	/*
+	public List<Coordinate> getLastestCoordinates(int max) {
+		List<Coordinate> latest = new LinkedList<Coordinate>();
+		int totalCoordinates = this.size(); 
+		for(int i = max; i > 0; i--) {
+			int index = coordinates.size()-i;
+			if (index < totalCoordinates) {
+				latest.add(coordinates.get(index));
+			}
+		}
+		return latest;
+	}*/
 
 }

@@ -1,6 +1,6 @@
 package br.udesc.dcc.bdes.server.rest.api.track.dto;
 
-import br.udesc.dcc.bdes.analysis.TrajectoryTelemetry;
+import br.udesc.dcc.bdes.server.model.TrajectoryTelemetry;
 
 public class TrajectorySummaryMapper {
 	

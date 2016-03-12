@@ -1,3 +1,4 @@
+package br.udesc.dcc.bdes;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;

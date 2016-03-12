@@ -5,11 +5,11 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluation;
-import br.udesc.dcc.bdes.analysis.TrajectoryTelemetry;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.openweather.WeatherDTO;
+import br.udesc.dcc.bdes.server.model.TrajectoryTelemetry;
 
 public class TrajectoryMapper {
 	
@@ -55,6 +55,7 @@ public class TrajectoryMapper {
 		dto.totalDistance = telemetry.trajectoryDistance.getKilometers() + " km";
 		dto.trafficCondition = "Trânsito Intenso";
 		dto.trajectoryTime = telemetry.trajectoryTime.getTime();
+		dto.coordinateCount = ""+evaluation.getTrajectory().size();
 		
 		dto.wheatherCondition = "-";
 		Optional<OpenWeatherConditionDTO> weatherData = evaluation.getCurrentWeather();

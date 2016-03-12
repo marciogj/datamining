@@ -1,3 +1,4 @@
+package br.udesc.dcc.bdes;
 import java.io.File;
 import java.util.logging.Logger;
 
@@ -9,10 +10,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluation;
-import br.udesc.dcc.bdes.analysis.TrajectoryTelemetry;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.SeniorCSVFileReader;
+import br.udesc.dcc.bdes.server.model.TrajectoryTelemetry;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
 
@@ -23,7 +24,7 @@ public class GPSReplay {
 	
 	public static void main(String[] args) {
 		System.out.println("Simulating GPS coordinates from recorded files...");
-		String dirPath = "C:\\Users\\marciogj\\SkyDrive\\gps-tracker-service\\";
+		String dirPath = "C:\\Users\\marciogj\\SkyDrive\\gps-tracker-service\\001";
 		replayToService(dirPath);
 		//replayToEvaluator(dirPath);
 		

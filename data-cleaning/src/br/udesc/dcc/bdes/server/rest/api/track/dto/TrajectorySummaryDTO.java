@@ -10,6 +10,7 @@ public class TrajectorySummaryDTO {
 	public String speedChanges; //= "455";
 	public String agressiveIndex; //= "62";
 	public String overtakeCount; // = "15";
+	public String coordinateCount;
 	
 
 }

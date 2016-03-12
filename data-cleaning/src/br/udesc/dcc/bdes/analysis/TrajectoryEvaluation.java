@@ -2,6 +2,7 @@ package br.udesc.dcc.bdes.analysis;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 import br.udesc.dcc.bdes.gis.Acceleration;
@@ -11,6 +12,7 @@ import br.udesc.dcc.bdes.gis.Speed;
 import br.udesc.dcc.bdes.gis.Time;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
+import br.udesc.dcc.bdes.server.model.TrajectoryTelemetry;
 
 
 /**
@@ -52,7 +54,7 @@ public class TrajectoryEvaluation {
 	private double accSpeedSum;
 	private int accCoordinateCount;
 	
-	private Optional<OpenWeatherConditionDTO> currentWeather; 
+	private Optional<OpenWeatherConditionDTO> currentWeather = Optional.empty(); 
 	
 	public TrajectoryEvaluation() {}
 			
@@ -198,6 +200,35 @@ public class TrajectoryEvaluation {
 	
 	public Optional<OpenWeatherConditionDTO> getCurrentWeather() {
 		return currentWeather;
+	}
+	
+	public Trajectory getTrajectory(){
+		return trajectory;
+	}
+
+	
+	public List<Trajectory> subtrajectoriesByTime(Trajectory trajectory, long timeToleranceMilis) {
+		Trajectory subtrajectory = new Trajectory();
+		List<Trajectory> subtrajectories = new LinkedList<>();
+		subtrajectories.add(subtrajectory);
+		
+		Coordinate previous = null;
+		for (Coordinate current : trajectory.getCoordinates()) {
+			if(previous == null) {
+				previous = current;
+				subtrajectory.add(current);
+				continue;
+			}
+			long difference = current.getDateTimeInMillis() - previous.getDateTimeInMillis();
+			if (difference <= timeToleranceMilis) {
+				subtrajectory.add(current);
+			} else {
+				subtrajectory = new Trajectory();
+				subtrajectories.add(subtrajectory);
+			}
+			
+		}
+		return subtrajectories;
 	}
 	
 }

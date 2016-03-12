@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.analysis;
+package br.udesc.dcc.bdes.server.model;
 
 import java.time.LocalDate;
 
