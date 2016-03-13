@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,8 +43,8 @@ public class Geolife2Weka {
 			
 			//Sort trajectories to allow binary search later on
 			trajectoriesLabels.sort( (t1, t2) -> {
-				long t1Start = t1.getStart().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-				long t2Start = t2.getStart().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+				long t1Start = t1.getStart().get().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+				long t2Start = t2.getStart().get().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 				return (int) (t1Start - t2Start);
 			});
 			
@@ -106,13 +105,13 @@ public class Geolife2Weka {
 		boolean isLastIndexReached = false;
 		while(!isLastIndexReached) {
 			trajectory = trajectories.get(index);
-			isTrajectoryCoordinate = coordDateTime.isAfter(trajectory.getStart()) && coordDateTime.isBefore(trajectory.getEnd());
+			isTrajectoryCoordinate = coordDateTime.isAfter(trajectory.getStart().get()) && coordDateTime.isBefore(trajectory.getEnd().get());
 			if (isTrajectoryCoordinate) {
 				return Optional.of(trajectory);
 			}
 			isLastIndexReached = (index == 0 || index == trajectoriesSize) || (maxIndex - minIndex <= 1);
 			
-			if (coordDateTime.isAfter(trajectory.getStart())) {
+			if (coordDateTime.isAfter(trajectory.getStart().get())) {
 				minIndex = index;
 				index += (maxIndex - index)/2;
 				index = index >= trajectories.size() ? trajectoriesSize - 1 : index;
@@ -160,21 +159,22 @@ public class Geolife2Weka {
 
 	private static Trajectory parse(String line) {
 		String[] parts = line.split(" +|\t+");
-		LocalDateTime start = convertDateTime(parts[GeolifeLabelFields.START_DATE.getIndex()], parts[GeolifeLabelFields.START_TIME.getIndex()]);
-		LocalDateTime end = convertDateTime(parts[GeolifeLabelFields.END_DATE.getIndex()], parts[GeolifeLabelFields.END_TIME.getIndex()]);
+		//TODO: Review a better way to trust on coordinate start and end time instead of force a extra variable 
+		//LocalDateTime start = convertDateTime(parts[GeolifeLabelFields.START_DATE.getIndex()], parts[GeolifeLabelFields.START_TIME.getIndex()]);
+		//LocalDateTime end = convertDateTime(parts[GeolifeLabelFields.END_DATE.getIndex()], parts[GeolifeLabelFields.END_TIME.getIndex()]);
 
 		Trajectory trajectory = new Trajectory();
-		trajectory.setStart(start);
-		trajectory.setEnd(end);
 		trajectory.setTransportMean(parts[GeolifeLabelFields.TRANSPORT_MODE.getIndex()]);
 
 		return trajectory;
 	}
 
+	/*
 	private static LocalDateTime convertDateTime(String date, String time) { 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 		return LocalDateTime.parse(date + " " + time, formatter);
 	}
+	*/
 
 	private static File[] loadTrajectories(File dir) {
 		File[] trajectoryDir = dir.listFiles(new FilenameFilter() {

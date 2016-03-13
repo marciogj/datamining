@@ -12,8 +12,6 @@ public class Trajectory {
 	protected String userId; //taxi id, user
 	protected String deviceId; 
 	protected String transportMean;
-	protected LocalDateTime start;
-	protected LocalDateTime end;
 	
 	public Trajectory() {}
 
@@ -69,20 +67,18 @@ public class Trajectory {
 		this.transportMean = transportMean;
 	}
 
-	public LocalDateTime getStart() {
-		return start;
+	public Optional<LocalDateTime> getStart() {
+		if(coordinates.isEmpty()) {
+			return Optional.empty();
+		}
+		return Optional.of(coordinates.get(0).getDateTime());
 	}
 
-	public void setStart(LocalDateTime start) {
-		this.start = start;
-	}
-
-	public LocalDateTime getEnd() {
-		return end;
-	}
-
-	public void setEnd(LocalDateTime end) {
-		this.end = end;
+	public Optional<LocalDateTime> getEnd() {
+		if(coordinates.isEmpty()) {
+			return Optional.empty();
+		}
+		return Optional.of(coordinates.get(coordinates.size()-1).getDateTime());
 	}
 
 	public String getDeviceId() {

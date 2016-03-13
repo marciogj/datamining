@@ -48,11 +48,13 @@ public class TrajectoryMapper {
 		TrajectorySummaryDTO dto = new TrajectorySummaryDTO();
 		TrajectoryTelemetry telemetry = evaluation.getCurrentTelemetry();
 		//dto.agressiveIndex = "62";
+		dto.startDateTime = evaluation.getStartDate();
+		dto.endDateTime = evaluation.getEndDate();
 		dto.avgSpeed = String.format("%.2f km/h", telemetry.avgSpeed.getKmh());
-		dto.overtakeCount = "4";
-		dto.riskAlerts = "5";
+		dto.overtakeCount = "-";
+		dto.riskAlerts = "-";
 		//dto.speedChanges = telemetry.speedChanges;
-		dto.totalDistance = telemetry.trajectoryDistance.getKilometers() + " km";
+		dto.totalDistance = String.format("%.2f km", telemetry.trajectoryDistance.getKilometers());
 		dto.trafficCondition = "Trânsito Intenso";
 		dto.trajectoryTime = telemetry.trajectoryTime.getTime();
 		dto.coordinateCount = ""+evaluation.getTrajectory().size();

@@ -75,13 +75,18 @@ public class MemoryRepository {
 		
 	}
 
-	public int count(DeviceId deviceId) {
-		TrajectoryHistory history = evaluationRepository.get(deviceId);
+	public int count(DeviceId id) {
+		TrajectoryHistory history = evaluationRepository.get(id);
 		if (history == null) {
 			return 0;
 		}
 		return history.size();
-	}	
+	}
+
+	public void updateLatest(DeviceId id,	TrajectoryEvaluation trajectoryEval) {
+		TrajectoryHistory trajectoryHistory = evaluationRepository.get(id);
+		trajectoryHistory.replaceLatest(trajectoryEval);	
+	}
 	
 }
 
@@ -93,6 +98,13 @@ class TrajectoryHistory {
 			return Optional.empty();
 		}
 		return Optional.of(history.get(history.size()-1));
+	}
+
+	public void replaceLatest(TrajectoryEvaluation trajectoryEval) {
+		if(!history.isEmpty()) {
+			history.remove(history.size()-1);
+			history.add(trajectoryEval);
+		}
 	}
 
 	public void add(TrajectoryEvaluation trajectoryEval) {

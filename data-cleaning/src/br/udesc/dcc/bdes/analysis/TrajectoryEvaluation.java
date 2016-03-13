@@ -212,25 +212,33 @@ public class TrajectoryEvaluation {
 		List<Trajectory> subtrajectories = new LinkedList<>();
 		subtrajectories.add(subtrajectory);
 		
-		Coordinate previous = null;
-		for (Coordinate current : trajectory.getCoordinates()) {
-			if(previous == null) {
-				previous = current;
-				subtrajectory.add(current);
+		Coordinate previousCoord = null;
+		for (Coordinate currentCoord : trajectory.getCoordinates()) {
+			if(previousCoord == null) {
+				previousCoord = currentCoord;
+				subtrajectory.add(currentCoord);
 				continue;
 			}
-			long difference = current.getDateTimeInMillis() - previous.getDateTimeInMillis();
+			long difference = currentCoord.getDateTimeInMillis() - previousCoord.getDateTimeInMillis();
 			if (difference <= timeToleranceMilis) {
-				subtrajectory.add(current);
+				subtrajectory.add(currentCoord);
 			} else {
 				subtrajectory = new Trajectory();
+				subtrajectory.add(currentCoord);
 				subtrajectories.add(subtrajectory);
 			}
-			
+			previousCoord = currentCoord;
 		}
 		return subtrajectories;
 	}
 	
+	public String getStartDate() {
+		return trajectory.getStart().map(o -> o.toString()).orElse("");
+	}
+	
+	public String getEndDate() {
+		return trajectory.getEnd().map(o -> o.toString()).orElse("");
+	}
 }
 
 class AccInterval {

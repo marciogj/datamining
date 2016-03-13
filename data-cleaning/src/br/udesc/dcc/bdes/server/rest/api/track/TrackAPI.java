@@ -41,10 +41,7 @@ public class TrackAPI {
 	@POST
     public void postTrack(TrackDTO trackDto) {
 		System.out.println("DeviceId: " + trackDto.deviceId + " - Coordinates: " + trackDto.coordinates.size());
-		
 		evaluateTrack(trackDto);
-		
-		
 		notifyWSClients(trackDto);			
     }
 	
@@ -52,12 +49,13 @@ public class TrackAPI {
 		TrajectoryEvaluation trajectoryEval = new TrajectoryEvaluation();
 		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
 		
-		Optional<TrajectoryEvaluation> optTrajectory = repository.loadLatestTrajectoryEvaluationById(new DeviceId(trackDto.deviceId));
-		long timeTolerance =  1000 * 60 * 5;
+		Optional<TrajectoryEvaluation> dbTrajectory = repository.loadLatestTrajectoryEvaluationById(new DeviceId(trackDto.deviceId));
+		long timeTolerance =  1000 * 60 * 30;
+		boolean isNewTrajectory = true;
 		
-		if (optTrajectory.isPresent()) {
+		if (dbTrajectory.isPresent()) {
 			//TODO: Break trajectories considering contextual information: stops and place
-			Trajectory previousTrajectory = optTrajectory.get().getTrajectory();
+			Trajectory previousTrajectory = dbTrajectory.get().getTrajectory();
 			Optional<Coordinate> latestCoodrinate = previousTrajectory.getLastestCoordinate();
 			Optional<Coordinate> receivedCoordinate = receivedTrajectory.getFirstCoordintae();
 			
@@ -65,18 +63,36 @@ public class TrackAPI {
 			long firstTimeCurrentCoord = latestCoodrinate.isPresent() ? latestCoodrinate.get().getDateTimeInMillis() : 0;
 			long difference = firstTimeCurrentCoord - lastTimePreviousCoord;
 			//Evaluates whether it is the same trajectory or a new one
-			if (difference <= timeTolerance) {
-				trajectoryEval = optTrajectory.get();
-			}
+			isNewTrajectory = difference > timeTolerance;
+			if (!isNewTrajectory) {
+				trajectoryEval = dbTrajectory.get();
+			} 
 		}
 		
 		List<Trajectory> subtrajectoriesByTime = trajectoryEval.subtrajectoriesByTime(receivedTrajectory, timeTolerance);
 		System.out.println("Subtrajectories: " + subtrajectoriesByTime.size());
 		
 		for (Trajectory subTrajectory : subtrajectoriesByTime) {
-			Optional<OpenWeatherConditionDTO> currentWeather = getLastPositionWeather(subTrajectory);
-			trajectoryEval.evaluate(receivedTrajectory.getCoordinates(), currentWeather);
-			repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
+
+			//TODO: evaluate the minimal number of coordinates to consider a valid trajectory
+			//Evaluate the transport mean
+			//if (subTrajectory.size() < 10) {
+			//	continue;
+			//}
+			
+			//TODO: Enbale wheater later again
+			//Optional<OpenWeatherConditionDTO> currentWeather = getLastPositionWeather(subTrajectory);
+			//trajectoryEval.evaluate(receivedTrajectory.getCoordinates(), currentWeather);
+			trajectoryEval.evaluate(subTrajectory.getCoordinates());
+			//
+			
+			if (isNewTrajectory) {
+				repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
+			} else {
+				repository.updateLatest(new DeviceId(trackDto.deviceId), trajectoryEval);
+				isNewTrajectory  = true; //the next trajectory is a new one from subtrajectories
+			}
+
 			trajectoryEval = new TrajectoryEvaluation();
 		}
 		
