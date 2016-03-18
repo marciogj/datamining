@@ -11,7 +11,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import br.udesc.dcc.bdes.analysis.TrajectoryEvaluation;
+import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.SeniorCSVFileReader;
@@ -38,7 +38,7 @@ public class GPSReplay {
 
 	public static void replayToEvaluator(String dirPath) {
 		File dir = new File(dirPath);
-		TrajectoryEvaluation evaluator = new TrajectoryEvaluation(13.89, 6.95, -4.17);
+		TrajectoryEvaluator evaluator = new TrajectoryEvaluator(13.89, 6.95, -4.17);
 		for(String file : dir.list()) {
 			Trajectory trajectory = SeniorCSVFileReader.read(dirPath+"\\"+file);
 

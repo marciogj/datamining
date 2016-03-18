@@ -16,5 +16,7 @@ public class TrajectorySummaryDTO {
 	public String overtakeCount; // = "15";
 	public String coordinateCount;
 	
+	public AccelerationCountDTO acceleration; 
+	
 
 }

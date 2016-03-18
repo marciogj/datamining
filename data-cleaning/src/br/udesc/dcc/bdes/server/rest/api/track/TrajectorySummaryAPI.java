@@ -10,7 +10,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import br.udesc.dcc.bdes.analysis.TrajectoryEvaluation;
+import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.server.model.DeviceId;
 import br.udesc.dcc.bdes.server.repository.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
@@ -25,7 +25,7 @@ public class TrajectorySummaryAPI {
 	@Path("trajectory/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public TrajectorySummaryDTO getLastTrajectorySummary(@PathParam("id") String deviceId) {
-		TrajectoryEvaluation evaluation = repository.loadLatestTrajectoryEvaluationById(new DeviceId(deviceId)).orElseThrow( () -> new NotFoundException());
+		TrajectoryEvaluator evaluation = repository.loadLatestTrajectoryEvaluationById(new DeviceId(deviceId)).orElseThrow( () -> new NotFoundException());
 		return TrajectoryMapper.toDto(evaluation);
 	}
 	
@@ -33,7 +33,7 @@ public class TrajectorySummaryAPI {
 	@Path("trajectories/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<TrajectorySummaryDTO> getTrajectoriesSummary(@PathParam("id") String deviceId) {
-		List<TrajectoryEvaluation> evaluation = repository.loadTrajectoriesEvaluationById(new DeviceId(deviceId));
+		List<TrajectoryEvaluator> evaluation = repository.loadTrajectoriesEvaluationById(new DeviceId(deviceId));
 				
 		//Fn.transform(evaluation, TrajectoryMapper::toDto);
 		return evaluation.stream().map(TrajectoryMapper::toDto).collect(Collectors.toList());

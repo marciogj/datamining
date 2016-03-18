@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import br.udesc.dcc.bdes.analysis.TrajectoryEvaluation;
+import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.server.model.Device;
 import br.udesc.dcc.bdes.server.model.DeviceId;
 
@@ -34,7 +34,7 @@ public class MemoryRepository {
 //		return Optional.of(object);
 //	}
 //
-	public void save(DeviceId id, TrajectoryEvaluation trajectoryEval) {
+	public void save(DeviceId id, TrajectoryEvaluator trajectoryEval) {
 		if (!deviceRepository.containsKey(id)) {
 			deviceRepository.put(id, new Device(id));
 		}
@@ -46,7 +46,7 @@ public class MemoryRepository {
 		history.add(trajectoryEval);		
 	}
 
-	public Optional<TrajectoryEvaluation> loadLatestTrajectoryEvaluationById(DeviceId id) {
+	public Optional<TrajectoryEvaluator> loadLatestTrajectoryEvaluationById(DeviceId id) {
 		TrajectoryHistory history = evaluationRepository.get(id);
 		if (history == null) {
 			return Optional.empty();
@@ -54,7 +54,7 @@ public class MemoryRepository {
 		return history.getLatest();
 	}
 	
-	public List<TrajectoryEvaluation> loadTrajectoriesEvaluationById(DeviceId id) {
+	public List<TrajectoryEvaluator> loadTrajectoriesEvaluationById(DeviceId id) {
 		TrajectoryHistory history = evaluationRepository.get(id);
 		if (history == null) {
 			return new LinkedList<>();
@@ -83,7 +83,7 @@ public class MemoryRepository {
 		return history.size();
 	}
 
-	public void updateLatest(DeviceId id,	TrajectoryEvaluation trajectoryEval) {
+	public void updateLatest(DeviceId id,	TrajectoryEvaluator trajectoryEval) {
 		TrajectoryHistory trajectoryHistory = evaluationRepository.get(id);
 		trajectoryHistory.replaceLatest(trajectoryEval);	
 	}
@@ -91,23 +91,23 @@ public class MemoryRepository {
 }
 
 class TrajectoryHistory {
-	List<TrajectoryEvaluation> history = new LinkedList<>();
+	List<TrajectoryEvaluator> history = new LinkedList<>();
 	
-	public Optional<TrajectoryEvaluation> getLatest() {
+	public Optional<TrajectoryEvaluator> getLatest() {
 		if (history.isEmpty()) {
 			return Optional.empty();
 		}
 		return Optional.of(history.get(history.size()-1));
 	}
 
-	public void replaceLatest(TrajectoryEvaluation trajectoryEval) {
+	public void replaceLatest(TrajectoryEvaluator trajectoryEval) {
 		if(!history.isEmpty()) {
 			history.remove(history.size()-1);
 			history.add(trajectoryEval);
 		}
 	}
 
-	public void add(TrajectoryEvaluation trajectoryEval) {
+	public void add(TrajectoryEvaluator trajectoryEval) {
 		history.add(trajectoryEval);
 	}
 	

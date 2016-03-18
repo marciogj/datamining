@@ -9,13 +9,14 @@ import javax.ws.rs.Path;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 
-import br.udesc.dcc.bdes.analysis.TrajectoryEvaluation;
+import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
 import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.server.JettyServer;
 import br.udesc.dcc.bdes.server.model.DeviceId;
+import br.udesc.dcc.bdes.server.model.TrajectoryTelemetry;
 import br.udesc.dcc.bdes.server.repository.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;
@@ -46,10 +47,10 @@ public class TrackAPI {
     }
 	
 	private void evaluateTrack(TrackDTO trackDto) {
-		TrajectoryEvaluation trajectoryEval = new TrajectoryEvaluation();
+		TrajectoryEvaluator trajectoryEval = new TrajectoryEvaluator();
 		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
 		
-		Optional<TrajectoryEvaluation> dbTrajectory = repository.loadLatestTrajectoryEvaluationById(new DeviceId(trackDto.deviceId));
+		Optional<TrajectoryEvaluator> dbTrajectory = repository.loadLatestTrajectoryEvaluationById(new DeviceId(trackDto.deviceId));
 		long timeTolerance =  1000 * 60 * 30;
 		boolean isNewTrajectory = true;
 		
@@ -73,19 +74,10 @@ public class TrackAPI {
 		System.out.println("Subtrajectories: " + subtrajectoriesByTime.size());
 		
 		for (Trajectory subTrajectory : subtrajectoriesByTime) {
-
-			//TODO: evaluate the minimal number of coordinates to consider a valid trajectory
-			//Evaluate the transport mean
-			//if (subTrajectory.size() < 10) {
-			//	continue;
-			//}
-			
-			//TODO: Enbale wheater later again
 			//Optional<OpenWeatherConditionDTO> currentWeather = getLastPositionWeather(subTrajectory);
-			//trajectoryEval.evaluate(receivedTrajectory.getCoordinates(), currentWeather);
+			//trajectoryEval.evaluate(subTrajectory.getCoordinates(), currentWeather);
 			trajectoryEval.evaluate(subTrajectory.getCoordinates());
-			//
-			
+
 			if (isNewTrajectory) {
 				repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
 			} else {
@@ -93,7 +85,7 @@ public class TrackAPI {
 				isNewTrajectory  = true; //the next trajectory is a new one from subtrajectories
 			}
 
-			trajectoryEval = new TrajectoryEvaluation();
+			trajectoryEval = new TrajectoryEvaluator();
 		}
 		
 	}

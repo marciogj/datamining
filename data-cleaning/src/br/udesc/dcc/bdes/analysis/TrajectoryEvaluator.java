@@ -25,14 +25,12 @@ import br.udesc.dcc.bdes.server.model.TrajectoryTelemetry;
  * @author marciogj
  *
  */
-public class TrajectoryEvaluation {
+public class TrajectoryEvaluator {
 	//private final EvaluatedTrajectory evaluated = new EvaluatedTrajectory();
 	private final Trajectory trajectory = new Trajectory();
 	private Coordinate previousCoordinate = null;
 	
 	private double MAX_ALLOWED_SPEED = 13.89; //50 km/h
-	private double MAX_ACCELERATION = 6.95; //25 km/h
-	private double MAX_DECELERATION = -4.17; //15 km/h
 	
 	private double totalDistance;
 	private long totalTime;
@@ -54,15 +52,15 @@ public class TrajectoryEvaluation {
 	private double accSpeedSum;
 	private int accCoordinateCount;
 	
+	private AccelerationEvaluator accEvaluator = new AccelerationEvaluator();
+	
 	private Optional<OpenWeatherConditionDTO> currentWeather = Optional.empty(); 
 	
-	public TrajectoryEvaluation() {}
+	public TrajectoryEvaluator() {}
 			
-	public TrajectoryEvaluation(double maxAllowedSpeed, double maxAcceleration, double maxDeceleration) {
+	public TrajectoryEvaluator(double maxAllowedSpeed, double maxAcceleration, double maxDeceleration) {
 		super();
 		MAX_ALLOWED_SPEED = maxAllowedSpeed;
-		MAX_ACCELERATION = maxAcceleration;
-		MAX_DECELERATION = maxDeceleration;
 	}
 	
 	public void evaluate(Collection<Coordinate> coordinates, Optional<OpenWeatherConditionDTO> weather) {
@@ -79,6 +77,10 @@ public class TrajectoryEvaluation {
 
 	public void evaluate(final Coordinate coordinate) {
 		evaluate(coordinate, Optional.empty());
+	}
+	
+	public AccelerationEvaluator getAccEvaluator() {
+		return accEvaluator;
 	}
 	
 	public void evaluate(final Coordinate coordinate, Optional<OpenWeatherConditionDTO> weather) {
@@ -103,14 +105,10 @@ public class TrajectoryEvaluation {
 		totalDistance += distanceFromPrevious;
 		speedSum += currentSpeed;
 		
+		accEvaluator.weight(currentAcceleration);
+		
 		if (currentSpeed > MAX_ALLOWED_SPEED) {
 			overMaxSpeedCount++;
-		}
-		if (currentAcceleration > MAX_ACCELERATION) {
-			overMaxAccelerationCount++;
-		}
-		if (currentAcceleration > MAX_DECELERATION) {
-			overMaxDecelerationCount++;
 		}
 		
 		if(currentSpeed > maxSpeed) {

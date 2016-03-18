@@ -4,7 +4,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-import br.udesc.dcc.bdes.analysis.TrajectoryEvaluation;
+import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
@@ -43,7 +43,7 @@ public class TrajectoryMapper {
 		return trajectory;
 	}
 
-	public static TrajectorySummaryDTO toDto(TrajectoryEvaluation evaluation) {
+	public static TrajectorySummaryDTO toDto(TrajectoryEvaluator evaluation) {
 		//TODO: Map all parameters from telemetry
 		TrajectorySummaryDTO dto = new TrajectorySummaryDTO();
 		TrajectoryTelemetry telemetry = evaluation.getCurrentTelemetry();
@@ -58,6 +58,9 @@ public class TrajectoryMapper {
 		dto.trafficCondition = "Trânsito Intenso";
 		dto.trajectoryTime = telemetry.trajectoryTime.getTime();
 		dto.coordinateCount = ""+evaluation.getTrajectory().size();
+		
+		 AccelerationCountDTO accDto = new AccelerationCountDTO();
+		 
 		
 		dto.wheatherCondition = "-";
 		Optional<OpenWeatherConditionDTO> weatherData = evaluation.getCurrentWeather();
