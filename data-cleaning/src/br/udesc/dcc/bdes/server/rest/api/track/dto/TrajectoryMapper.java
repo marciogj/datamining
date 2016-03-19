@@ -4,6 +4,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
+import br.udesc.dcc.bdes.analysis.AccelerationEvaluator;
+import br.udesc.dcc.bdes.analysis.AccelerationLimit;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.gis.Coordinate;
 import br.udesc.dcc.bdes.gis.Trajectory;
@@ -58,9 +60,7 @@ public class TrajectoryMapper {
 		dto.trafficCondition = "Trânsito Intenso";
 		dto.trajectoryTime = telemetry.trajectoryTime.getTime();
 		dto.coordinateCount = ""+evaluation.getTrajectory().size();
-		
-		 AccelerationCountDTO accDto = new AccelerationCountDTO();
-		 
+		dto.accEvaluation = toDto(evaluation.getAccEvaluator());
 		
 		dto.wheatherCondition = "-";
 		Optional<OpenWeatherConditionDTO> weatherData = evaluation.getCurrentWeather();
@@ -70,8 +70,39 @@ public class TrajectoryMapper {
 				dto.wheatherCondition = weather.get().main + " " + weather.get().description;
 			}
 		}
+	
+		return dto;
+	}
+
+	private static AccelerationCountDTO toDto(AccelerationEvaluator accEval) {
+		AccelerationCountDTO dto = new AccelerationCountDTO();
+		int accCount = 0;
+		int desaccCount = 0;
 		
+		for (AccelerationLimit accLimit : accEval.getAccEval()) {
+			dto.limitCount.add( toDto(accLimit) );
+			dto.fullAvg += accLimit.getSum();
+			if (accLimit.getLimit() > 0 ) {
+				dto.accAvg += accLimit.getSum(); 
+				accCount += accLimit.getCount();
+			} else {
+				dto.desaccAvg += accLimit.getSum();
+				desaccCount += accLimit.getCount();
+			}	
+		}
 		
+		dto.fullAvg = (accCount + desaccCount) == 0 ? 0 : dto.fullAvg / (accCount + desaccCount);
+		dto.accAvg = accCount == 0 ? 0 : dto.accAvg / accCount;
+		dto.desaccAvg = desaccCount == 0 ? 0 : dto.desaccAvg / desaccCount;
+		return dto;
+	}
+
+	private static AccelerationLimitDTO toDto(AccelerationLimit accLimit) {
+		AccelerationLimitDTO dto = new AccelerationLimitDTO();
+		dto.avg = accLimit.getAvg();
+		dto.count = accLimit.getCount();
+		dto.description = accLimit.getDescription();
+		dto.limit = accLimit.getLimit();
 		return dto;
 	}
 

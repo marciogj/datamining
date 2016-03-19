@@ -16,7 +16,6 @@ import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
 import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.server.JettyServer;
 import br.udesc.dcc.bdes.server.model.DeviceId;
-import br.udesc.dcc.bdes.server.model.TrajectoryTelemetry;
 import br.udesc.dcc.bdes.server.repository.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;

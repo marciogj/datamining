@@ -105,7 +105,7 @@ public class TrajectoryEvaluator {
 		totalDistance += distanceFromPrevious;
 		speedSum += currentSpeed;
 		
-		accEvaluator.weight(currentAcceleration);
+		accEvaluator.evaluate(currentAcceleration);
 		
 		if (currentSpeed > MAX_ALLOWED_SPEED) {
 			overMaxSpeedCount++;
