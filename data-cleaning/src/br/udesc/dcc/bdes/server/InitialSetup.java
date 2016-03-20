@@ -1,6 +1,5 @@
 package br.udesc.dcc.bdes.server;
 
-import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.server.model.Device;
 import br.udesc.dcc.bdes.server.model.DeviceId;
 import br.udesc.dcc.bdes.server.repository.MemoryRepository;
