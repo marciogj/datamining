@@ -87,6 +87,16 @@ public class MemoryRepository {
 		TrajectoryHistory trajectoryHistory = evaluationRepository.get(id);
 		trajectoryHistory.replaceLatest(trajectoryEval);	
 	}
+
+	public Optional<TrajectoryEvaluator> loadTrajectoryEvaluationById(String evaluationId) {
+		for(TrajectoryHistory history : evaluationRepository.values() ) {
+			Optional<TrajectoryEvaluator> eval = history.findById(evaluationId);
+			if (eval.isPresent()) {
+				return eval;
+			}
+		}
+		return Optional.empty();
+	}
 	
 }
 
@@ -109,6 +119,11 @@ class TrajectoryHistory {
 
 	public void add(TrajectoryEvaluator trajectoryEval) {
 		history.add(trajectoryEval);
+	}
+	
+
+	public Optional<TrajectoryEvaluator> findById(String id) {
+		return history.stream().filter(trajectoryEval -> trajectoryEval.getId().equals(id)).findFirst();	
 	}
 	
 	public int size() {

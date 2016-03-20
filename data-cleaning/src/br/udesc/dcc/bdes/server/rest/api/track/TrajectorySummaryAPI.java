@@ -1,6 +1,7 @@
 package br.udesc.dcc.bdes.server.rest.api.track;
 
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
@@ -14,17 +15,20 @@ import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.server.model.DeviceId;
 import br.udesc.dcc.bdes.server.repository.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
+import br.udesc.dcc.bdes.server.rest.api.track.dto.SpeedTelemetryDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectorySummaryDTO;
 
 @Path(APIPath.SUMMARY)
 public class TrajectorySummaryAPI {
 	private final MemoryRepository repository = MemoryRepository.get();
+	private final Logger logger = Logger.getLogger("api");
 	
 	@GET
 	@Path("trajectory/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public TrajectorySummaryDTO getLastTrajectorySummary(@PathParam("id") String deviceId) {
+		//logger.info("getLastTrajectorySummary " + deviceId);
 		TrajectoryEvaluator evaluation = repository.loadLatestTrajectoryEvaluationById(new DeviceId(deviceId)).orElseThrow( () -> new NotFoundException());
 		return TrajectoryMapper.toDto(evaluation);
 	}
@@ -33,9 +37,19 @@ public class TrajectorySummaryAPI {
 	@Path("trajectories/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<TrajectorySummaryDTO> getTrajectoriesSummary(@PathParam("id") String deviceId) {
+		//logger.info("getTrajectoriesSummary " + deviceId);
 		List<TrajectoryEvaluator> evaluation = repository.loadTrajectoriesEvaluationById(new DeviceId(deviceId));
 				
 		//Fn.transform(evaluation, TrajectoryMapper::toDto);
 		return evaluation.stream().map(TrajectoryMapper::toDto).collect(Collectors.toList());
+	}
+	
+	@GET
+	@Path("trajectories/telemetry/speed/{trajectoryEvaluationId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public SpeedTelemetryDTO getTrajectoriesSpeedTelemetry(@PathParam("trajectoryEvaluationId") String trajectoryEvaluationId) {
+		logger.info("getTrajectoriesSpeedTelemetry " + trajectoryEvaluationId);
+		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(trajectoryEvaluationId).orElseThrow( () -> new NotFoundException());
+		return TrajectoryMapper.toDto(evaluation.getTrajectory().getCoordinates());
 	}
 }

@@ -2,12 +2,15 @@ package br.udesc.dcc.bdes.server.rest.api.track.dto;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import br.udesc.dcc.bdes.analysis.AccelerationEvaluator;
 import br.udesc.dcc.bdes.analysis.AccelerationLimit;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.gis.Coordinate;
+import br.udesc.dcc.bdes.gis.Speed;
 import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.openweather.WeatherDTO;
@@ -48,6 +51,8 @@ public class TrajectoryMapper {
 	public static TrajectorySummaryDTO toDto(TrajectoryEvaluator evaluation) {
 		//TODO: Map all parameters from telemetry
 		TrajectorySummaryDTO dto = new TrajectorySummaryDTO();
+		dto.evaluationId = evaluation.getId();
+		
 		TrajectoryTelemetry telemetry = evaluation.getCurrentTelemetry();
 		//dto.agressiveIndex = "62";
 		dto.startDateTime = evaluation.getStartDate();
@@ -103,6 +108,16 @@ public class TrajectoryMapper {
 		dto.count = accLimit.getCount();
 		dto.description = accLimit.getDescription();
 		dto.limit = accLimit.getLimit();
+		return dto;
+	}
+	
+	public static SpeedTelemetryDTO toDto(List<Coordinate> coordinates) {
+		SpeedTelemetryDTO dto = new SpeedTelemetryDTO();
+		dto.speedList = new ArrayList<>(coordinates.size());
+		for (Coordinate coordinate : coordinates) {
+			double speed = new Speed(coordinate.getSpeed()).getKmh();
+			dto.speedList.add(Math.round(speed));
+		}
 		return dto;
 	}
 
