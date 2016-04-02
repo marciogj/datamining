@@ -21,7 +21,8 @@ public class AccelerationEvaluator {
 	
 	private AccelerationLimit findLimit(double value) {
 		for (AccelerationLimit accLimit : limits) {
-			if (value <= accLimit.limit) {
+			boolean isFromThisLimit = value < 0 ? value >= accLimit.limit : value <= accLimit.limit; 
+			if (isFromThisLimit) {
 				return accLimit;
 			}
 		}

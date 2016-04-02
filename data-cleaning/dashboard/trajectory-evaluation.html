@@ -123,7 +123,7 @@
         <section class="content-header">
           <h1>
             Dashboard
-            <small>Visão Geral</small>
+            <small>Análise da Trajetória</small>
           </h1>
           <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -132,7 +132,7 @@
         </section>
 
         <!-- Main content -->
-        <section class="content" ng-controller="vehicleDashboardCtrl">
+        <section class="content" ng-controller="trajectoryEvaluationCtrl">
 		
           <!-- Small boxes (Stat box) -->
           <div class="row">
@@ -181,7 +181,7 @@
                 <div class="inner">
                   <h3></h3>
                   <p>{{wheatherCondition}}</p>
-				  <p>{{trafficCondition}}</p>
+				          <p>{{trafficCondition}}</p>
                 </div>
                 <div class="icon">
                   <i class="ion ion-ios-rainy"></i>
@@ -191,8 +191,67 @@
             </div><!-- ./col -->
           </div><!-- /.row -->
 		  
-		  <!-- Second row -->
+		  <!-- Third row -->
 		  <div class="row">
+            <div class="col-lg-3 col-xs-6">
+              <!-- small box -->
+              <div class="small-box bg-aqua">
+                <div class="inner">
+                  <h3>{{accEvaluation.limitCount[0].count}}</h3>
+                  <h3>{{accEvaluation.limitCount[1].count}}</h3>
+                  <p>Desacelerações Seguras</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-arrow-graph-down-right"></i>
+                </div>
+                <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
+            </div><!-- ./col -->
+            <div class="col-lg-3 col-xs-6">
+              <!-- small box -->
+              <div class="small-box bg-red">
+                <div class="inner">
+                  <h3>{{accEvaluation.limitCount[2].count}}</h3>
+                  <h3>{{accEvaluation.limitCount[3].count}}</h3>
+                  <p>Desacelerações Perigosas</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-arrow-graph-down-right"></i>
+                </div>
+                <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
+            </div><!-- ./col -->
+            <div class="col-lg-3 col-xs-6">
+              <!-- small box -->
+              <div class="small-box bg-aqua">
+                <div class="inner">
+                  <h3>{{accEvaluation.limitCount[4].count}}</h3>
+                  <h3>{{accEvaluation.limitCount[5].count}}</h3>
+                  <p>Acelerações Seguras</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-arrow-graph-up-right"></i>
+                </div>
+                <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
+            </div><!-- ./col -->
+            <div class="col-lg-3 col-xs-6">
+              <!-- small box -->
+              <div class="small-box bg-red">
+                <div class="inner">
+                  <h3>{{accEvaluation.limitCount[6].count}}</h3>
+                  <h3>{{accEvaluation.limitCount[7].count}}</h3>
+                  <p>Acelerações Perigosas</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-arrow-graph-up-right"></i>
+                </div>
+                <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
+            </div><!-- ./col -->
+          </div><!-- /.row -->
+
+          <div class="row">
             <div class="col-lg-3 col-xs-6">
               <!-- small box -->
               <div class="small-box bg-aqua">
@@ -253,29 +312,6 @@
             <!-- Left col -->
             <section class="col-lg-12 connectedSortable">
 			
-			  <div>
-				<table class="table table-striped">
-					<tr>
-            <td>Id</td>
-						<td>Início</td>
-						<td>Fim</td>
-						<td>Distância</td>
-						<td>Tempo Total</td>
-						<td>Coordenadas</td>
-						<td>Velocidade Média</td>
-					</tr>
-					<tr ng-repeat="trajectory in trajectories">
-            <td><a href="trajectory-evaluation.html?evaluationId={{trajectory.evaluationId}}">{{trajectory.evaluationId}}</a></td>
-						<td>{{trajectory.startDateTime}}</td>
-						<td>{{trajectory.endDateTime}}</td>
-						<td>{{trajectory.totalDistance}}</td>
-						<td>{{trajectory.trajectoryTime}}</td>
-						<td>{{trajectory.coordinateCount}}</td>
-						<td><a href="telemetry.html?trajectoryId={{trajectory.evaluationId}}">{{trajectory.avgSpeed}}</a></td>
-					</tr>
-					
-				</table>
-			  </div>
 			
 			  <!-- Custom tabs (Charts with tabs)-->
             </section>

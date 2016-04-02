@@ -24,12 +24,22 @@ public class TrajectorySummaryAPI {
 	private final MemoryRepository repository = MemoryRepository.get();
 	private final Logger logger = Logger.getLogger("api");
 	
+	@Deprecated
 	@GET
-	@Path("trajectory/{id}")
+	@Path("trajectory/{deviceId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public TrajectorySummaryDTO getLastTrajectorySummary(@PathParam("id") String deviceId) {
+	public TrajectorySummaryDTO getLastTrajectorySummary(@PathParam("deviceId") String deviceId) {
 		//logger.info("getLastTrajectorySummary " + deviceId);
 		TrajectoryEvaluator evaluation = repository.loadLatestTrajectoryEvaluationById(new DeviceId(deviceId)).orElseThrow( () -> new NotFoundException());
+		return TrajectoryMapper.toDto(evaluation);
+	}
+	
+	@GET
+	@Path("trajectory-evaluation/{evaluationId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public TrajectorySummaryDTO getTrajectoryEvaluation(@PathParam("evaluationId") String evaluationId) {
+		logger.info("getTrajectoryEvaluation " + evaluationId);
+		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(evaluationId).orElseThrow( () -> new NotFoundException());
 		return TrajectoryMapper.toDto(evaluation);
 	}
 	
