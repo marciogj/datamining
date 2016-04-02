@@ -1,0 +1,9 @@
+{
+  "name": "gps",
+  "version": "0.0.1",
+  "dependencies": {
+    "deferred": "0.7.3",
+    "mysql": "^2.5.4",
+    "node-schedule": "^1.1.0"
+  }
+}
