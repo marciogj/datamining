@@ -1,13 +1,11 @@
 package br.udesc.dcc.bdes.server.rest.api.track.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AccelerationCountDTO {
-	public int verySecureDesaccelerations;
-	public int avgSecureDesaccelerations;
-	public int avgDangerDesaccelerations;
-	public int veryDangerDesacceleration;
-	
-	public int verySecureAccelerations;
-	public int avgSecureAccelerations;
-	public int avgDangerAccelerations;
-	public int veryDangerAcceleration;
+	public double accAvg;
+	public double desaccAvg;
+	public double fullAvg;
+	public List<AccelerationLimitDTO> limitCount = new ArrayList<>();
 }

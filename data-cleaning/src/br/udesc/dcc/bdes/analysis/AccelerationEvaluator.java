@@ -28,29 +28,17 @@ public class AccelerationEvaluator {
 		return limits.get(limits.size()-1);
 	}
 		
-	public int weight(double acceleration) {
+	public int evaluate(double acceleration) {
 		AccelerationLimit limit = findLimit(acceleration);
-		limit.increment();
+		limit.evaluate(acceleration);
 		return (int) Math.round(acceleration * limit.weight);
 		
 	}
+	
+	public List<AccelerationLimit> getAccEval(){
+		return limits;
+	}
 }
 
-class AccelerationLimit {
-	protected double limit;
-	protected String description;
-	protected int count = 0;
-	protected double weight = 0;
-	
-	public AccelerationLimit(double limit, String desc, double weight) {
-		this.description = desc;
-		this.limit = limit;
-		this.weight = weight;
-	}
 
-	public void increment() {
-		count++;
-	}
-	
-}
 

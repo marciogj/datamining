@@ -3,6 +3,7 @@ package br.udesc.dcc.bdes.server;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,11 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -46,7 +52,8 @@ public class JettyServer {
 	public class ServicesResourceConfig extends ResourceConfig {
 	    public ServicesResourceConfig() {
 	    	//Register servcies using semiclon: //package1;packeage2
-	        packages("br.udesc.dcc.bdes.server.rest.api"); 
+	    	packages("br.udesc.dcc.bdes.server.rest.api");
+	    	register(CORSResponseFilter.class);
 	    }
 	}
 	
@@ -172,6 +179,18 @@ public class JettyServer {
 		}
 		
 		return fileProperties;
+	}
+
+}
+
+//Based on http://www.codingpedia.org/ama/how-to-add-cors-support-on-the-server-side-in-java-with-jersey/
+class CORSResponseFilter implements ContainerResponseFilter {
+
+	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+		MultivaluedMap<String, Object> headers = responseContext.getHeaders();
+		headers.add("Access-Control-Allow-Origin", "*");
+		headers.add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");			
+		headers.add("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, X-Codingpedia");
 	}
 
 }

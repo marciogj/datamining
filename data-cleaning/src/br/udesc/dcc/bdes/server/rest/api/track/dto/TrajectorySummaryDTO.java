@@ -1,6 +1,7 @@
 package br.udesc.dcc.bdes.server.rest.api.track.dto;
 
 public class TrajectorySummaryDTO {
+	public String evaluationId;
 	public String startDateTime; 
 	public String endDateTime;
 	
@@ -16,7 +17,7 @@ public class TrajectorySummaryDTO {
 	public String overtakeCount; // = "15";
 	public String coordinateCount;
 	
-	public AccelerationCountDTO acceleration; 
+	public AccelerationCountDTO accEvaluation; 
 	
 
 }

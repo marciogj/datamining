@@ -5,15 +5,19 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class Trajectory {
+	protected String id;
 	protected List<Coordinate> coordinates = new LinkedList<>();
 	protected String sourceProvider; //Geolife, UDESC
 	protected String userId; //taxi id, user
 	protected String deviceId; 
 	protected String transportMean;
 	
-	public Trajectory() {}
+	public Trajectory() {
+		this.id = UUID.randomUUID().toString();
+	}
 
 	public Trajectory(Collection<Coordinate> elements) {
 		coordinates.addAll(elements);
@@ -115,5 +119,9 @@ public class Trajectory {
 		}
 		return latest;
 	}*/
+	
+	public String getId() {
+		return id;
+	}
 
 }

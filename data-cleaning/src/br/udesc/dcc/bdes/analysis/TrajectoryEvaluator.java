@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import br.udesc.dcc.bdes.gis.Acceleration;
 import br.udesc.dcc.bdes.gis.Coordinate;
@@ -26,7 +27,7 @@ import br.udesc.dcc.bdes.server.model.TrajectoryTelemetry;
  *
  */
 public class TrajectoryEvaluator {
-	//private final EvaluatedTrajectory evaluated = new EvaluatedTrajectory();
+	private String id;
 	private final Trajectory trajectory = new Trajectory();
 	private Coordinate previousCoordinate = null;
 	
@@ -56,7 +57,13 @@ public class TrajectoryEvaluator {
 	
 	private Optional<OpenWeatherConditionDTO> currentWeather = Optional.empty(); 
 	
-	public TrajectoryEvaluator() {}
+	public TrajectoryEvaluator() {
+		this.id = UUID.randomUUID().toString();
+	}
+	
+	public String getId() {
+		return id;
+	}
 			
 	public TrajectoryEvaluator(double maxAllowedSpeed, double maxAcceleration, double maxDeceleration) {
 		super();
@@ -105,7 +112,7 @@ public class TrajectoryEvaluator {
 		totalDistance += distanceFromPrevious;
 		speedSum += currentSpeed;
 		
-		accEvaluator.weight(currentAcceleration);
+		accEvaluator.evaluate(currentAcceleration);
 		
 		if (currentSpeed > MAX_ALLOWED_SPEED) {
 			overMaxSpeedCount++;
