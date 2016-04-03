@@ -8,3 +8,12 @@ TODO
 test.html
 *.log
 test.html
+LICENSE
+changelog
+/documentation
+/dist
+/plugins
+/bootstrap
+/build
+/pages
+starter.html

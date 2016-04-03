@@ -1,1 +1,7 @@
 ./node_modules
+.classpath
+.project
+.settings
+.metadata/
+.idea/
+data-cleaning.iml
