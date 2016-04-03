@@ -1,11 +1,10 @@
 "use strict";
 
-var //https = require('https'),
-    http = require('http'),
+var http = require('http'),
     fs = require('fs'),
-    //mysql = require('mysql'),
-    schedule = require('node-schedule');
-    //deferred = require('deferred');
+    schedule = require('node-schedule'),
+    parser = require('./rj-gps-bus-parser');
+    
 	   
 var strDateTime = function() {
     return new Date().toISOString().split('.')[0].replace(/-/g, '.').replace(/T/, '_').replace(/:/g, '');
@@ -13,7 +12,7 @@ var strDateTime = function() {
 
 var log = function(msg) {
     var date = new Date(); 
-    console.log( date.toISOString() +' - ' + msg);
+    console.log(date.toLocaleString() +' - ' + msg);
 };
  
 var allDayPositions2FS = function() {
@@ -42,7 +41,9 @@ var allDayPositions2FS = function() {
           });    
           res.on("end", function() {
               stream.end();
-              log('Stream writen to file ' + filename);
+              log('Stream written to file ' + filename);
+              parser.updatePositionByBus(filename, new Date());
+
           });  
         }
     );
@@ -67,7 +68,7 @@ var scheduleBusesGPSData = function(hour, min, sec) {
 //-------------------------- MAIN EXECUTION ---------------------------
 //Reading input parameters
 //http://stackoverflow.com/questions/4351521/how-do-i-pass-command-line-arguments-to-node-js
-var scheduledHour = 23, scheduledMin = 59, scheduledSec = 55;
+var scheduledHour = '*', scheduledMin = '*', scheduledSec = '';
 var isScheduledMode = true;
 
 process.argv.forEach(function (val, index, array) {
@@ -80,12 +81,10 @@ process.argv.forEach(function (val, index, array) {
 console.log('############################');
 console.log('RJ Data Store ');
 console.log('############################');
-
 console.log();
 
-
 if (isScheduledMode) {
-  log('Scheduling GPS extraction every day at ' + scheduledHour + ':' + scheduledMin + ':' + scheduledSec);
+  log('Scheduling GPS extraction every day at hours(' + scheduledHour + ') min(' + scheduledMin + ') sec(' + scheduledSec+')');
   scheduleBusesGPSData(scheduledHour, scheduledMin, scheduledSec);
 } else {
   allDayPositions2FS();
