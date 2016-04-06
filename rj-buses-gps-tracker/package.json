@@ -4,6 +4,7 @@
   "dependencies": {
     "deferred": "0.7.3",
     "mysql": "^2.5.4",
-    "node-schedule": "^1.1.0"
+    "node-schedule": "^1.1.0",
+    "q": "^1.4.1"
   }
 }

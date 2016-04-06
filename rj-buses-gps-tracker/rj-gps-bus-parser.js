@@ -31,28 +31,33 @@ var updatePositionByBus = function(filePath, latestDatePosition) {
     if (err) {
       return console.log(err);
     }
-    var gpsContent = JSON.parse(data);
-    var gpsData = gpsContent.DATA;
     
-    gpsData.forEach(function(entry) {
-      var positionDateTime = toDate(entry[0]);
-      var isNewPosition = positionDateTime.getTime() < latestDatePosition.getTime();
+    try {
+      var gpsContent = JSON.parse(data);
+      var gpsData = gpsContent.DATA;
+    
+      gpsData.forEach(function(entry) {
+        var positionDateTime = toDate(entry[0]);
+        var isNewPosition = positionDateTime.getTime() < latestDatePosition.getTime();
 
-      if (isNewPosition) {
-        var busEntry = {
-          datetime: positionDateTime,
-          busId: entry[1],
-          busLine: entry[2],
-          latitude: entry[3],
-          longitude: entry[4],
-          speed: entry[5]
-        };
+        if (isNewPosition) {
+          var busEntry = {
+            datetime: positionDateTime,
+            busId: entry[1], 
+            busLine: entry[2],
+            latitude: entry[3],
+            longitude: entry[4],
+            speed: entry[5]
+          };
 
-        updateBusPosition(busEntry);
-      }
+          updateBusPosition(busEntry);
+        }
+      });
+    } catch (e) {
+      
+      return console.error(e);
+    }
 
-    });
-	
   });
 };
 
@@ -82,5 +87,3 @@ module.exports = {
   
 };
 
-
-//updatePositionByBus('2016.04.01_235956.json');

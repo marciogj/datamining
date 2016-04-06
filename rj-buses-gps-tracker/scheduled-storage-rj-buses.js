@@ -3,7 +3,8 @@
 var http = require('http'),
     fs = require('fs'),
     schedule = require('node-schedule'),
-    parser = require('./rj-gps-bus-parser');
+    parser = require('./rj-gps-bus-parser'),
+    openweather = require('./openweather');
     
 	   
 var strDateTime = function() {
@@ -29,7 +30,7 @@ var allDayPositions2FS = function() {
     };
  
     var request = http.request(options, function(res) {
-          log('HTTP Server response status ' + res.statusCode);
+          log('DadosAbertos Response status ' + res.statusCode);
           res.setEncoding('utf8');
           
           var filename = strDateTime() + '.json';
@@ -49,7 +50,7 @@ var allDayPositions2FS = function() {
     );
 	
 	request.on('error', function(err) {
-		log('Error during HTTP Request: ' + error);
+		log('Error during HTTP Request: ' + err);
 	});
 	
 	request.end();
@@ -62,6 +63,19 @@ var scheduleBusesGPSData = function(hour, min, sec) {
       allDayPositions2FS();
     });
  
+};
+
+var loadOpenWeatherKey = function(filePath) {
+  var key = undefined;
+  var content = fs.readFileSync(filePath, 'utf8');
+
+  var lines = content.split('\n');
+  lines.forEach(function(line) {
+    if (line.indexOf('open-weather-key=') > -1) {
+        key = line.split('open-weather-key=')[1];
+    }
+  });
+  return key;
 };
 
 
@@ -77,15 +91,22 @@ process.argv.forEach(function (val, index, array) {
   }
 });
 
-
 console.log('############################');
 console.log('RJ Data Store ');
 console.log('############################');
 console.log();
 
+var openWeatherKey = loadOpenWeatherKey('server.properties');
+
+openweather.currentWeather(35, 1, openWeatherKey).then( function(weather) {
+  console.log('Current Weather at lat: 35 and lon: 1 ');
+  console.log(weather);  
+});
+
+
 if (isScheduledMode) {
   log('Scheduling GPS extraction every day at hours(' + scheduledHour + ') min(' + scheduledMin + ') sec(' + scheduledSec+')');
   scheduleBusesGPSData(scheduledHour, scheduledMin, scheduledSec);
 } else {
-  allDayPositions2FS();
+ allDayPositions2FS();
 }
