@@ -72,7 +72,7 @@ plot_taxi_geolife_dir <- function(dirPath) {
       #print( paste(length(dataFrame[[1]]), " (+", length(gpsData[[1]]), ")") )
       
     }
-
+    
   }
   
   lonCenter <- lonCenter / length(gpsFiles)
@@ -90,7 +90,7 @@ plot_taxi_geolife_dir <- function(dirPath) {
     )
   
   ggsave(mapImage, filename = "china2.png")
-
+  
 }
 
 
@@ -109,19 +109,44 @@ plot_taxi_geolife <- function(filePath) {
       taxiId = gpsData[[1]],
       longitude = gpsData[[3]],
       latitude = gpsData[[4]]      
-     ),
+    ),
     .Names = c("id", "longitude", "latitude"), class = "data.frame"
   )
   
   ggmap(map) + 
     geom_point(
-       data = dataFrame, 
-       aes(x = longitude, y = latitude, fill = "red", colour = "red", alpha = 1/3),
-       size = 3, shape = 21
+      data = dataFrame, 
+      aes(x = longitude, y = latitude, fill = "red", colour = "red", alpha = 1/3),
+      size = 3, shape = 21
     ) + 
     guides(
       fill=FALSE, alpha=FALSE, size=FALSE, colour = FALSE
     )
+}
+
+plot_rj_buses <- function(filePath) {
+  gpsData <- read.csv(filePath)
+  lonCenter <- mean(gpsData[[5]], na.rm = TRUE)
+  latCenter <- mean(gpsData[[4]], na.rm = TRUE)
+      
+  # Get a map
+  map <- get_map(location = c(lon = lonCenter, lat = latCenter), zoom = 10)
+  
+  dataFrame <- structure(
+    list(
+      busId = gpsData[[2]],
+      longitude = gpsData[[5]],
+      latitude = gpsData[[4]]      
+    ),
+    .Names = c("id", "longitude", "latitude"), class = "data.frame"
+  )
+  
+  ggmap(map) + 
+    geom_point(
+      data = dataFrame, 
+      aes(x = longitude, y = latitude, fill = "red", colour = "red", alpha = 1/3),
+      size = 3, shape = 21
+    ) 
 }
 
 
@@ -250,3 +275,36 @@ plot_ester_heuristic <- function() {
   axis(side=1, at=seq(0,800, by=100))
   box()
 }
+
+
+plot_openweather_coord <- function(filePath) {
+  gpsData <- read.csv(filePath)
+  lonCenter <- mean(gpsData[[2]], na.rm = TRUE)
+  latCenter <- mean(gpsData[[1]], na.rm = TRUE)
+  
+  # Get a map
+  map <- get_map(location = c(lon = lonCenter, lat = latCenter), zoom = 10)
+  
+  dataFrame <- structure(
+    list(
+      longitude = gpsData[[2]],
+      latitude = gpsData[[1]]      
+    ),
+    .Names = c("longitude", "latitude"), class = "data.frame"
+  )
+  
+  ggmap(map) + 
+    geom_point(
+      data = dataFrame, 
+      colour = "red",
+      shape=21, 
+      size = 4,
+      aes(x = longitude, y = latitude, fill = "red"
+          ),
+      size = 3, shape = 18
+    ) 
+  
+  
+}
+
+
