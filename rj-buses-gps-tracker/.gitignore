@@ -3,3 +3,6 @@
 *.pem
 /build
 /plugins
+/ARCHIVE
+server.properties
+*.pem
