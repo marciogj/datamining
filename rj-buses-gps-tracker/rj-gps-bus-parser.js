@@ -10,11 +10,11 @@ var toDate = function(strDate) {
   var day = dateParts[1];
   var year = dateParts[2];
 
-  return new Date(year + '-' + month + '-' + day + ' ' + parts[1]);
+  return new Date(year + '-' + (month+1) + '-' + day + ' ' + parts[1]);
 };
 
 var twoDigits = function(num) {
-  return num < 9 ? '0' + num : num.toString();
+  return num < 10 ? '0' + num : num.toString();
 };
 
 var strLocalDateTime = function(aDate) {
@@ -54,7 +54,37 @@ var updatePositionByBus = function(filePath, latestDatePosition) {
         }
       });
     } catch (e) {
-      
+      return console.error(e);
+    }
+
+  });
+};
+
+var jsonToCSV = function(filePath) {
+  fs.readFile(filePath, 'utf8', function (err, data) {
+    if (err) {
+      return console.log(err);
+    }
+    
+    try {
+      var gpsContent = JSON.parse(data);
+      var gpsData = gpsContent.DATA;
+      var fileName = filePath + '.csv';
+  
+      gpsData.forEach(function(entry) {
+        var busEntry = {
+            datetime: entry[0],
+            busId: entry[1], 
+            busLine: entry[2],
+            latitude: entry[3],
+            longitude: entry[4],
+            speed: entry[5]
+        };
+
+        var newLine = busEntry.datetime + ',' + busEntry.busId + ', ' + busEntry.busLine+ ', ' + busEntry.latitude + ', ' + busEntry.longitude + ',' + busEntry.speed + '\r\n';
+        fs.appendFileSync(fileName, newLine);
+      });
+    } catch (e) {
       return console.error(e);
     }
 
@@ -84,6 +114,7 @@ var updateBusPosition = function(busEntry) {
 //-----------------------------------------------------
 module.exports = {
   updatePositionByBus: updatePositionByBus,
+  jsonToCSV: jsonToCSV
   
 };
 
