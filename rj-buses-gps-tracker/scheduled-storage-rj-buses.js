@@ -60,12 +60,16 @@ var allDayPositions2FS = function(filename) {
 var scheduleBusesGPSData = function(hour, min, sec) {
     var openWeatherKey = loadOpenWeatherKey('server.properties');    
     var dailyPositionsJob = schedule.scheduleJob(sec + ' ' + min + ' ' + hour + ' * * *', function(){
-      console.log('Storing all buses positions and weather from ' + new Date());
-      var filename = strDateTime();
-      allDayPositions2FS(filename + '_buses.json');
+      try {
+        console.log('Storing all buses positions and weather from ' + new Date());
+        var filename = strDateTime();
+        allDayPositions2FS(filename + '_buses.json');
 
-      var rjCoordsWeather = new RJWeather(openWeatherKey);
-      rjCoordsWeather.coordinatesWeather2FS(filename + '_weather.json');
+        var rjCoordsWeather = new RJWeather(openWeatherKey);
+        rjCoordsWeather.coordinatesWeather2FS(filename + '_weather.json');
+      } catch(err) {
+        console.error(err);
+      }
     });
  
 };
@@ -86,7 +90,7 @@ var loadOpenWeatherKey = function(filePath) {
 
 var showWeather = function(lat, lon) {
   if (lat === undefined || lon === undefined) {
-    console.log('Error! Cannot check weather at invalid location');
+    log('Error! Cannot check weather at invalid location');
     process.exit();
   } 
   var openWeatherKey = loadOpenWeatherKey('server.properties');
@@ -105,11 +109,6 @@ var deamon = function() {
   var openWeatherKey = loadOpenWeatherKey('server.properties');
   log('Scheduling GPS extraction every day at hours(' + scheduledHour + ') min(' + scheduledMin + ') sec(' + scheduledSec+')');
   scheduleBusesGPSData(scheduledHour, scheduledMin, scheduledSec);
-
-
-/*var filepath = './rj-weather.txt';
-
-*/
 };
 
 var convertToCSV = function(filepath) {

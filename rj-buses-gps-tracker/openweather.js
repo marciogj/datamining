@@ -20,28 +20,32 @@ var currentWeather = function(lat,lon, key) {
   var strData = '';
 
   if (key != undefined && key != null) {
-    var request = http.request(options, function(res) {
-          console.log('OpenWeather Response ' + res.statusCode);
-          res.setEncoding('utf8');
+    
+    try { 
+      var request = http.request(options, function(res) {
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                strData += chunk;
+            });
 
-          res.on('data', function (chunk) {
-              strData += chunk;
-          });
+            res.on("end", function() {
+            	try {
+            		deferred.resolve(JSON.parse(strData));
+            	} catch (e) {
+        			 console.error(e);
+        			 deferred.reject(e);
+      		    }
+            }); 
 
-          res.on("end", function() {
-          	try {
-          		deferred.resolve(JSON.parse(strData));
-          	} catch (e) {
-      			console.error(e);
-      			deferred.reject(e);
-    		}
-          }); 
-
-          res.on("error", function(error) {
-              console.log('Error requesting OpenWeather at ' + new Date());
-              deferred.reject(err);
-          });  
-    });
+            res.on("error", function(error) {
+                console.log('Error requesting OpenWeather at ' + new Date());
+                deferred.reject(err);
+            });  
+      });
+    } catch (err) {
+      deferred.reject(e);
+      return console.error(err);
+    }
 
     request.end();
     return deferred.promise;
@@ -50,6 +54,5 @@ var currentWeather = function(lat,lon, key) {
 };
 
 module.exports = {
-  currentWeather: currentWeather,
-  
+  currentWeather: currentWeather
 };
