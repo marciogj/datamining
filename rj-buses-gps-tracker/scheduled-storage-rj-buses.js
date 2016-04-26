@@ -46,7 +46,11 @@ var allDayPositions2FS = function(filename) {
               log('Stream written to file ' + filename);
               parser.updatePositionByBus(filename, new Date());
 
-          });  
+          });
+
+          res.on("error", function(error) {
+              log('Error requesting DadosAbertos at ' + error);
+          });    
         }
     );
 	
