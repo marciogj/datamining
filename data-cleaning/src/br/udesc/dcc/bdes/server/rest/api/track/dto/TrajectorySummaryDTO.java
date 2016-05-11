@@ -2,6 +2,7 @@ package br.udesc.dcc.bdes.server.rest.api.track.dto;
 
 public class TrajectorySummaryDTO {
 	public String evaluationId;
+	public String trajectoryId;
 	public String startDateTime; 
 	public String endDateTime;
 	
