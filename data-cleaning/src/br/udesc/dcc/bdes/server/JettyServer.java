@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
+import br.udesc.dcc.bdes.server.repository.DBPool;
 import br.udesc.dcc.bdes.server.ws.EventServlet;
 
 
@@ -129,9 +132,11 @@ public class JettyServer {
 	
 	public void startServer() {
 		logger.info("Initializing WebSocket server on port " + HTTP_PORT);
-        Server server = new Server();
-        properties = loadServerProperties();
+        
+		mySQLHealthCheck();		
 		
+		Server server = new Server();
+        properties = loadServerProperties();
         
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(HTTP_PORT);
@@ -159,6 +164,21 @@ public class JettyServer {
         	server.destroy();
         }
     }
+	
+	public void mySQLHealthCheck() {
+		Optional<Connection> optConn = DBPool.get().getConnection();
+		if (optConn.isPresent()) {
+			System.out.println("Connection to MySQL ready.");
+			try {
+				optConn.get().close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.err.println("MySQL is not avaliable. Cannot init service");
+			System.exit(1);
+		}
+	}
 	
 	public Optional<String> getOpenWeatherKey() {
 		String key = properties.getProperty("open-weather-key");

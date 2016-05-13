@@ -2,9 +2,22 @@ package br.udesc.dcc.bdes.server;
 
 import br.udesc.dcc.bdes.server.model.Device;
 import br.udesc.dcc.bdes.server.model.DeviceId;
+import br.udesc.dcc.bdes.server.model.UDriver;
 import br.udesc.dcc.bdes.server.repository.MemoryRepository;
+import br.udesc.dcc.bdes.server.repository.UDriverDAO;
 
 public class InitialSetup {
+	
+	public static void main(String[] args) {
+		createDrivers();
+	}
+	
+	public static void  createDrivers() {
+		UDriver d = new UDriver("Marcio Jasinski", new DeviceId("moto-x"));
+		UDriverDAO repository = new UDriverDAO();
+		repository.add(d);
+		
+	}
 	
 	public static void  createVehicles() {
 		MemoryRepository repository = MemoryRepository.get();
@@ -16,19 +29,11 @@ public class InitialSetup {
 	
 	public static void  createTrajectories() {
 		MemoryRepository repository = MemoryRepository.get();
-		
-		
-		
-		repository.getVehicles().forEach( v -> {
-			
-			
-			//repository.save(v.getId().get(), );
-			
-		});
-		
-		
-	}
 	
+		repository.getVehicles().forEach( v -> {
+			//repository.save(v.getId().get(), );	
+		});
+	}
 	
 
 }

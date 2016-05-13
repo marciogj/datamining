@@ -51,6 +51,7 @@ public class TrajectoryMapper {
 	public static TrajectorySummaryDTO toDto(TrajectoryEvaluator evaluation) {
 		//TODO: Map all parameters from telemetry
 		TrajectorySummaryDTO dto = new TrajectorySummaryDTO();
+		dto.trajectoryId = evaluation.getTrajectory().getId();
 		dto.evaluationId = evaluation.getId();
 		
 		TrajectoryTelemetry telemetry = evaluation.getCurrentTelemetry();
