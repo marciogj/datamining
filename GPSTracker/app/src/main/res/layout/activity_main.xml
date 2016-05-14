@@ -67,6 +67,13 @@
             android:layout_height="wrap_content"
             android:text="Local" />
 
+
+        <TextView
+            android:id="@+id/accuracy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Precisão:" />
+
     </LinearLayout>
 
 <!--

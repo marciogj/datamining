@@ -48,7 +48,7 @@ var currentWeather = function(lat,lon, key) {
     }
 
     request.on('error', function(err) {
-      log('Error during HTTP Request: ' + err);
+      console.log('Error during HTTP Request: ' + err);
     });
 
     request.end();

@@ -9,7 +9,6 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.GpsSatellite;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -28,7 +27,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -81,17 +79,8 @@ public class MainActivity extends AppCompatActivity {
                                 TextView title = (TextView) findViewById(R.id.pendingDataLabel);
                                 title.setText("Pending Data " + LocationStorage.getInstance(getApplicationContext()).count());
 
-
-
-                                Iterator<GpsSatellite> sattelites = locationManager.getGpsStatus(null).getSatellites().iterator();
-                                int count = 0;
-                                while(sattelites.hasNext()) {
-                                    count++;
-                                    sattelites.next();
-                                }
-
                                 TextView statusTxt = (TextView) findViewById(R.id.status);
-                                statusTxt.setText("Status: Procurando Satelites");
+                                statusTxt.setText("Status: Procurando Satélites");
                             }
                         });
                         Thread.sleep(5000);
@@ -195,29 +184,33 @@ public class MainActivity extends AppCompatActivity {
             longitudeTxt.setText(longitude);
 
             TextView speedTxt = (TextView) findViewById(R.id.speed);
-            float speedKmh = loc.getSpeed() + 3.6f;
+            float speedKmh = loc.getSpeed() * 3.6f;
             speedTxt.setText("Velocidade: " + speedKmh + " km/h");
 
             //Stop detection based on time
-            long timeDifference = loc.getTime() - lastLocation.getTime();
+            long timeDifference = loc.getTime() - ( lastLocation == null ? 0 : lastLocation.getTime());
             if (timeDifference > FIVE_MIN_MILIS) {
                 distance = 0;
             }
 
             TextView distanceTxt = (TextView) findViewById(R.id.distance);
-            float distanceFromLast = loc.distanceTo(lastLocation);
+            float distanceFromLast = lastLocation == null ? 0 : loc.distanceTo(lastLocation);
             distance += distanceFromLast;
+
             if ( distance < 1000 ) {
-                distanceTxt.setText("Distância: " + distance + " m");
+                distanceTxt.setText("Distância: " + String.format(Locale.ENGLISH,"%.2f", distance) + " m");
             } else {
-                distanceTxt.setText("Distância: " + distance/1000 + " km");
+                distanceTxt.setText("Distância: " + String.format(Locale.ENGLISH, "%.2f", distance/1000) + " km");
             }
 
-            TextView localext = (TextView) findViewById(R.id.locale);
-            speedTxt.setText("Local: " + getLocale(loc));
+            //TextView localeTxt = (TextView) findViewById(R.id.locale);
+            //localeTxt.setText("Local: " + getLocale(loc));
 
             TextView statusTxt = (TextView) findViewById(R.id.status);
             statusTxt.setText("Status: " + loc.getExtras().get("satellites") + " Satelites");
+
+            TextView accuracyTxt = (TextView) findViewById(R.id.accuracy);
+            accuracyTxt.setText("Precisão: " + loc.getAccuracy() + " m");
 
             lastLocation = loc;
         }
