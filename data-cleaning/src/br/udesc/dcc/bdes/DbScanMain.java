@@ -12,9 +12,9 @@ import br.udesc.dcc.bdes.datamining.cluster.density.DBScan;
 import br.udesc.dcc.bdes.datamining.cluster.density.DBScanResult;
 import br.udesc.dcc.bdes.datamining.cluster.density.EsterDBScan;
 import br.udesc.dcc.bdes.datamining.cluster.density.EsterDBScanHeuristic;
-import br.udesc.dcc.bdes.gis.Coordinate;
-import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.PltFileReader;
+import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.Trajectory;
 
 
 public class DbScanMain {

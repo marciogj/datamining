@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import br.udesc.dcc.bdes.gis.Acceleration;
-import br.udesc.dcc.bdes.gis.Coordinate;
-import br.udesc.dcc.bdes.gis.Distance;
-import br.udesc.dcc.bdes.gis.Speed;
-import br.udesc.dcc.bdes.gis.Time;
-import br.udesc.dcc.bdes.gis.Trajectory;
+import br.udesc.dcc.bdes.model.Acceleration;
+import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.Distance;
+import br.udesc.dcc.bdes.model.Speed;
+import br.udesc.dcc.bdes.model.Time;
+import br.udesc.dcc.bdes.model.Trajectory;
+import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
-import br.udesc.dcc.bdes.server.model.TrajectoryTelemetry;
 
 
 /**
@@ -153,11 +153,12 @@ public class TrajectoryEvaluator {
 			accDistance += distanceFromPrevious;
 			accSpeedSum += currentAcceleration;
 			accTime += elapsedTime;
-			if (currentAcceleration >= 0) {
-				accecelerationCount++;
-			} else {
-				decelerationCount++;
-			}
+			// It should not increase acc count again
+			//if (currentAcceleration >= 0) {
+			//	accecelerationCount++;
+			//} else {
+			//	decelerationCount++;
+			//}
 		}
 		
 		previousCoordinate = currentCoordinate;
@@ -181,12 +182,12 @@ public class TrajectoryEvaluator {
 		return coordinate;
 	}
 	
-	public TrajectoryTelemetry getCurrentTelemetry() {
-		TrajectoryTelemetry telemetry = new TrajectoryTelemetry();
+	public TrajectoryEvaluation getCurrentTelemetry() {
+		TrajectoryEvaluation telemetry = new TrajectoryEvaluation();
 		telemetry.accCount = accecelerationCount;
+		telemetry.decCount = decelerationCount;
 		telemetry.avgSpeed = new Speed(speedSum/trajectory.size());
 		telemetry.coordRate = totalTime == 0 ? 0 : trajectory.size() / totalTime;
-		telemetry.decCount = decelerationCount;
 		telemetry.maxAcc = new Acceleration(maxAccecelration);
 		//telemetry.maxAllowedSpeed = MAX_ALLOWED_SPEED;
 		//telemetry.maxSecureAcc =

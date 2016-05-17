@@ -1,6 +1,6 @@
 package br.udesc.dcc.bdes.analysis.deprecated;
 
-import br.udesc.dcc.bdes.gis.Trajectory;
+import br.udesc.dcc.bdes.model.Trajectory;
 
 
 /**

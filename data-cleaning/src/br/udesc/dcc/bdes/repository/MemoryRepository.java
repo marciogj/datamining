@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.server.repository;
+package br.udesc.dcc.bdes.repository;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
-import br.udesc.dcc.bdes.server.model.Device;
-import br.udesc.dcc.bdes.server.model.DeviceId;
+import br.udesc.dcc.bdes.model.Device;
+import br.udesc.dcc.bdes.model.DeviceId;
 
 
 public class MemoryRepository {

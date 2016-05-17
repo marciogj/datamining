@@ -21,10 +21,10 @@ import org.apache.commons.math3.random.RandomGenerator;
 
 import br.udesc.dcc.bdes.analysis.deprecated.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.filter.SimpleKalmanFilter;
-import br.udesc.dcc.bdes.gis.Coordinate;
-import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.InfoWriter;
 import br.udesc.dcc.bdes.io.PltFileReader;
+import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.Trajectory;
 
 
 public class KalmanFilterSamples {

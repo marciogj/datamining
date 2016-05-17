@@ -7,8 +7,8 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import br.udesc.dcc.bdes.gis.Coordinate;
-import br.udesc.dcc.bdes.gis.Trajectory;
+import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.Trajectory;
 
 public class CoordinateFileReader {	
 	public static int HEADER_SIZE = 8;

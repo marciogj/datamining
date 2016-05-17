@@ -1,5 +1,6 @@
 package br.udesc.dcc.bdes.server.rest.api.track;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,13 +11,15 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
-import br.udesc.dcc.bdes.gis.Coordinate;
-import br.udesc.dcc.bdes.gis.Trajectory;
+import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.DeviceId;
+import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
 import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
+import br.udesc.dcc.bdes.repository.MemoryRepository;
+import br.udesc.dcc.bdes.repository.sql.DBPool;
+import br.udesc.dcc.bdes.repository.sql.TrajectoryDAO;
 import br.udesc.dcc.bdes.server.JettyServer;
-import br.udesc.dcc.bdes.server.model.DeviceId;
-import br.udesc.dcc.bdes.server.repository.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
@@ -78,7 +81,20 @@ public class TrackAPI {
 			trajectoryEval.evaluate(subTrajectory.getCoordinates());
 
 			if (isNewTrajectory) {
-				repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
+				Connection conn = null;
+				try {
+					repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
+					conn = DBPool.getConnection().orElseThrow( () -> new RuntimeException("Could not allocate db connection"));
+					
+					//TrajectoryDAO dao = new TrajectoryDAO(conn);
+					//dao.add(trajectoryEval.getTrajectory());
+					
+					
+				} catch(Exception e) {
+					e.printStackTrace();
+				} finally {
+					DBPool.release(conn);
+				}
 			} else {
 				repository.updateLatest(new DeviceId(trackDto.deviceId), trajectoryEval);
 				isNewTrajectory  = true; //the next trajectory is a new one from subtrajectories

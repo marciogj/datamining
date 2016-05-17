@@ -9,12 +9,12 @@ import java.util.Optional;
 import br.udesc.dcc.bdes.analysis.AccelerationEvaluator;
 import br.udesc.dcc.bdes.analysis.AccelerationLimit;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
-import br.udesc.dcc.bdes.gis.Coordinate;
-import br.udesc.dcc.bdes.gis.Speed;
-import br.udesc.dcc.bdes.gis.Trajectory;
+import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.Speed;
+import br.udesc.dcc.bdes.model.Trajectory;
+import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.openweather.WeatherDTO;
-import br.udesc.dcc.bdes.server.model.TrajectoryTelemetry;
 
 public class TrajectoryMapper {
 	
@@ -51,22 +51,30 @@ public class TrajectoryMapper {
 	public static TrajectorySummaryDTO toDto(TrajectoryEvaluator evaluation) {
 		//TODO: Map all parameters from telemetry
 		TrajectorySummaryDTO dto = new TrajectorySummaryDTO();
-		dto.trajectoryId = evaluation.getTrajectory().getId();
+		dto.trajectoryId = evaluation.getTrajectory().getId().getValue();
 		dto.evaluationId = evaluation.getId();
 		
-		TrajectoryTelemetry telemetry = evaluation.getCurrentTelemetry();
+		TrajectoryEvaluation telemetry = evaluation.getCurrentTelemetry();
 		//dto.agressiveIndex = "62";
 		dto.startDateTime = evaluation.getStartDate();
 		dto.endDateTime = evaluation.getEndDate();
+		
 		dto.avgSpeed = String.format("%.2f km/h", telemetry.avgSpeed.getKmh());
+		dto.maxSpeed = String.format("%.2f km/h", telemetry.maxSpeed.getKmh());
+
+		dto.maxAcc = String.format("%.2f m/s²", telemetry.maxAcc.getMPerSec2()); 
+		dto.maxDec = String.format("%.2f m/s²", telemetry.maxDec.getMPerSec2());
+		
+		
 		dto.overtakeCount = "-";
-		dto.riskAlerts = "-";
-		//dto.speedChanges = telemetry.speedChanges;
+		dto.riskAlerts = 0;
+		dto.speedChanges = telemetry.accCount + telemetry.decCount;
 		dto.totalDistance = String.format("%.2f km", telemetry.trajectoryDistance.getKilometers());
 		dto.trafficCondition = "Trânsito Intenso";
 		dto.trajectoryTime = telemetry.trajectoryTime.getTime();
-		dto.coordinateCount = ""+evaluation.getTrajectory().size();
+		dto.coordinateCount = evaluation.getTrajectory().size();
 		dto.accEvaluation = toDto(evaluation.getAccEvaluator());
+		
 		
 		dto.wheatherCondition = "-";
 		Optional<OpenWeatherConditionDTO> weatherData = evaluation.getCurrentWeather();
@@ -119,6 +127,20 @@ public class TrajectoryMapper {
 			double speed = new Speed(coordinate.getSpeed()).getKmh();
 			dto.speedList.add(Math.round(speed));
 		}
+		return dto;
+	}
+
+	public static TrajectoryDTO toDto(Trajectory trajectory) {
+		TrajectoryDTO dto = new TrajectoryDTO();
+		dto.deviceId = trajectory.getDeviceId();
+		dto.id = trajectory.getId().getValue();
+		dto.sourceProvider = trajectory.getSourceProvider();
+		dto.transportMean = trajectory.getTransportMean();
+		dto.userId = trajectory.getUserId();
+		for(Coordinate coordinate : trajectory.getCoordinates()) {
+			dto.coordinates.add(toDto(coordinate));
+		}
+		
 		return dto;
 	}
 

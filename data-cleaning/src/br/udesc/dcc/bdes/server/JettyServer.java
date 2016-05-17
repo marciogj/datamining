@@ -33,7 +33,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-import br.udesc.dcc.bdes.server.repository.DBPool;
+import br.udesc.dcc.bdes.repository.sql.DBPool;
 import br.udesc.dcc.bdes.server.ws.EventServlet;
 
 

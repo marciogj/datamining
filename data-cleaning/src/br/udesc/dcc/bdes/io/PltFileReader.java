@@ -5,9 +5,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-import br.udesc.dcc.bdes.gis.Coordinate;
-import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.fields.GeolifeCoordinateFields;
+import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.Trajectory;
 
 public class PltFileReader {
 	public static int HEADER_SIZE = 8;

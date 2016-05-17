@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 
-import br.udesc.dcc.bdes.gis.Coordinate;
-import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.fields.SeniorCoordinateFields;
+import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.Trajectory;
 
 public class SeniorCSVFileReader {
 	private static int HEADER_SIZE = 2;

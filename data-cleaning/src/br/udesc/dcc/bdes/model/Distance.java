@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.gis;
+package br.udesc.dcc.bdes.model;
 
 public class Distance {
 	private double meters;

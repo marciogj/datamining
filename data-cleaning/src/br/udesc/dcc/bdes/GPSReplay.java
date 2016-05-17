@@ -12,10 +12,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
-import br.udesc.dcc.bdes.gis.Coordinate;
-import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.SeniorCSVFileReader;
-import br.udesc.dcc.bdes.server.model.TrajectoryTelemetry;
+import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.Trajectory;
+import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
 
@@ -42,13 +42,16 @@ public class GPSReplay {
 		for(String file : dir.list()) {
 			Trajectory trajectory = SeniorCSVFileReader.read(dirPath+"\\"+file);
 
+			//TMP
+			trajectory.setUserId("moto-x");
+			
 			//TODO: Evaluate track changes 
 			//TODO: Evaluate important places like schools 
 			for (Coordinate coordinate : trajectory.getCoordinates()) {
 				System.out.println(coordinate);
 
 				evaluator.evaluate(coordinate);
-				TrajectoryTelemetry telemetry = evaluator.getCurrentTelemetry();
+				TrajectoryEvaluation telemetry = evaluator.getCurrentTelemetry();
 
 				System.out.println("Time: " + telemetry.trajectoryTime.getTime());
 				System.out.println("Distance: " + telemetry.trajectoryDistance.getKilometers() + " km");

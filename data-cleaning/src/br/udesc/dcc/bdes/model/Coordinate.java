@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.gis;
+package br.udesc.dcc.bdes.model;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

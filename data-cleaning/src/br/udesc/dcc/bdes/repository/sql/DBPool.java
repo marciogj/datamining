@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.server.repository;
+package br.udesc.dcc.bdes.repository.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -52,7 +52,10 @@ public class DBPool {
 	}
 	
 	public static synchronized void release(Connection conn) {
-		get().releaseConnection(conn);
+		if (conn != null) {
+			get().releaseConnection(conn);
+		}
+		
 	}
 	
 	public synchronized void releaseConnection(Connection conn) {

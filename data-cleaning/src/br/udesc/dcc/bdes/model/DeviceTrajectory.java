@@ -1,8 +1,6 @@
-package br.udesc.dcc.bdes.server.model;
+package br.udesc.dcc.bdes.model;
 
 import java.util.Optional;
-
-import br.udesc.dcc.bdes.gis.Trajectory;
 
 public class DeviceTrajectory {
 	private DeviceTrajectoryId id;

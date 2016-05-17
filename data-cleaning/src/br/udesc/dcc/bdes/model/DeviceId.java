@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.server.model;
+package br.udesc.dcc.bdes.model;
 
 
 public class DeviceId extends Id{

@@ -44,6 +44,13 @@ app.config(function($locationProvider, $stateProvider, $urlRouterProvider) {
       controllerAs: 'vm'
     })
 
+    .state('trajectory-map', {
+      url: "/trajectory-map/{evaluationId}",
+      templateUrl: "views/trajectory-map.html",
+      controller: 'trajectoryMapCtrl',
+      controllerAs: 'vm'
+    })
+
     .state('trajectory-evaluation', {
       url: "/trajectory-evaluation/{id}",
       templateUrl: "views/trajectory-evaluation.html",
@@ -54,6 +61,51 @@ app.config(function($locationProvider, $stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise("/drivers");
 
 });
+
+app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  function($scope , $stateParams, $http){
+	var self = this;
+	
+	
+	function initialize(evaluationId) {
+		$http.get(DBP_API + '/summary/trajectory-evaluation-coordinates/' + evaluationId).success(function(data) {			
+			//http://stackoverflow.com/questions/29803045/how-to-clear-an-angular-array			
+			drawTrajectory(data.coordinates);
+        });		
+    };
+
+
+    function drawTrajectory(coordinates) {
+    	var googleCoordinates = [];
+
+		coordinates.forEach( function(coordinate) {
+          googleCoordinates.push(new google.maps.LatLng(parseFloat(coordinate.latitude), parseFloat(coordinate.longitude)));
+        });
+
+        var middle = Math.floor(coordinates.length / 2);
+		var latCenter = coordinates[middle].latitude;
+		var lonCenter = coordinates[middle].longitude;
+
+		var lineCoordinatesPath = new google.maps.Polyline({
+			path: googleCoordinates,
+			geodesic: true,
+			strokeColor: '#2E10FF',
+			strokeOpacity: 1.0,
+			strokeWeight: 2
+		});
+
+		var map = new google.maps.Map(document.getElementById('map-canvas'), {
+			zoom: 12,
+			center: { lat: latCenter, lng : lonCenter, alt: 0 }
+		});
+
+      	lineCoordinatesPath.setMap(map);
+	};
+
+
+    initialize($stateParams.evaluationId);
+
+}]);
+
 
 app.controller('driversCtrl',  ['$scope','$stateParams',  function($scope , $stateParams ){
 	var self = this;
@@ -103,10 +155,13 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 				trajectoryTime: data.trajectoryTime,
 				totalDistance: data.totalDistance,
 				avgSpeed: data.avgSpeed,
+				maxSpeed: data.maxSpeed,
+				maxDec: data.maxDec,
+				maxAcc: data.maxAcc,
 				wheatherCondition: data.wheatherCondition,
 				trafficCondition: data.trafficCondition,
 				riskAlerts: data.riskAlerts,
-				speedChanges: "-",
+				speedChanges: data.speedChanges,
 				agressiveIndex: "-",
 				overtakeCount: data.overtakeCount,
 				accEvaluation: data.accEvaluation

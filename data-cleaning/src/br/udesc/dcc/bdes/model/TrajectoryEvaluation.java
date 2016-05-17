@@ -1,13 +1,10 @@
-package br.udesc.dcc.bdes.server.model;
+package br.udesc.dcc.bdes.model;
 
 import java.time.LocalDate;
 
-import br.udesc.dcc.bdes.gis.Acceleration;
-import br.udesc.dcc.bdes.gis.Distance;
-import br.udesc.dcc.bdes.gis.Speed;
-import br.udesc.dcc.bdes.gis.Time;
-
-public class TrajectoryTelemetry {
+public class TrajectoryEvaluation {
+	public TrajectoryEvaluationId id;
+	public Trajectory trajectory;
 	public String vehicleId;
 	public LocalDate updateTime;
 	public Distance trajectoryDistance;

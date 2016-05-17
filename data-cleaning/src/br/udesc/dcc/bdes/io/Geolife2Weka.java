@@ -11,9 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import br.udesc.dcc.bdes.gis.Coordinate;
-import br.udesc.dcc.bdes.gis.Trajectory;
 import br.udesc.dcc.bdes.io.fields.GeolifeLabelFields;
+import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.Trajectory;
 
 public class Geolife2Weka {
 	

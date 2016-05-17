@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.server.model;
+package br.udesc.dcc.bdes.model;
 
 import java.util.Optional;
 

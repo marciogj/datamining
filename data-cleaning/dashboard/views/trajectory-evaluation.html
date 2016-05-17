@@ -6,7 +6,9 @@
 	  <div class="small-box bg-aqua">
 	    <div class="inner">
 	      <h3>{{vm.evaluation.trajectoryTime}}</h3>
-	      <p>Tempo do trajeto</p>
+	      <p>Terça feira 24 de Março</p>
+	      <h2>14:00 - 15:29</h2>
+	      <p>Horário Comercial</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-ios-stopwatch"></i>
@@ -20,6 +22,8 @@
 	    <div class="inner">
 	      <h3>{{vm.evaluation.totalDistance}}</sup></h3>
 	      <p>percorridos</p>
+	      <h2>BR-101/SC-401</h2>
+	      <p>Rodovia</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-android-navigate"></i>
@@ -33,6 +37,8 @@
 	    <div class="inner">
 	      <h3>{{vm.evaluation.avgSpeed}}</h3>
 	      <p>Velocidade média</p>
+	      <h2>{{vm.evaluation.maxSpeed}}</h2>
+	      <p>Velocidade Máxima</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-speedometer"></i>
@@ -44,9 +50,10 @@
 	  <!-- small box -->
 	  <div class="small-box bg-red">
 	    <div class="inner">
-	      <h3></h3>
-	      <p>{{vm.evaluation.wheatherCondition}}</p>
-		  <p>{{vm.evaluation.trafficCondition}}</p>
+	      <h3>{{vm.evaluation.maxDec}}</h3>
+	      <p>Desaceleração Máxima</p>
+	      <h2>{{vm.evaluation.maxAcc}}</h2>
+	      <p>Aceleração Máxima</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-ios-rainy"></i>
@@ -102,13 +109,15 @@
 	  <!-- small box -->
 	  <div class="small-box bg-red">
 	    <div class="inner">
-	      <h3>{{vm.evaluation.overtakeCount}}</h3>
-	      <p>Ultrapassagens</p>
+	      <h3></h3>
+	      <p>{{vm.evaluation.wheatherCondition}}</p>
+		  <p>{{vm.evaluation.trafficCondition}}</p>
 	    </div>
 	    <div class="icon">
-	      <i class="ion ion-shuffle"></i>
+	      <i class="ion ion-ios-rainy"></i>
 	    </div>
 	    <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
 	  </div>
 	</div><!-- ./col -->
 </div><!-- /.row -->
+<a ui-sref="trajectory-map({evaluationId: vm.evaluation.evaluationId})">Mapa</a>

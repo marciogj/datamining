@@ -1,10 +1,15 @@
 package br.udesc.dcc.bdes.server;
 
-import br.udesc.dcc.bdes.server.model.Device;
-import br.udesc.dcc.bdes.server.model.DeviceId;
-import br.udesc.dcc.bdes.server.model.UDriver;
-import br.udesc.dcc.bdes.server.repository.MemoryRepository;
-import br.udesc.dcc.bdes.server.repository.UDriverDAO;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+
+import br.udesc.dcc.bdes.model.Device;
+import br.udesc.dcc.bdes.model.DeviceId;
+import br.udesc.dcc.bdes.model.UDriver;
+import br.udesc.dcc.bdes.repository.MemoryRepository;
+import br.udesc.dcc.bdes.repository.sql.DBPool;
+import br.udesc.dcc.bdes.repository.sql.UDriverDAO;
 
 public class InitialSetup {
 	
@@ -13,9 +18,20 @@ public class InitialSetup {
 	}
 	
 	public static void  createDrivers() {
-		UDriver d = new UDriver("Marcio Jasinski", new DeviceId("moto-x"));
-		UDriverDAO repository = new UDriverDAO();
-		repository.add(d);
+		try {
+			Connection conn = DBPool.getConnection().orElseThrow( () -> new RuntimeException("Could not allocate db connection"));
+			UDriverDAO repository = new UDriverDAO(conn);
+			//repository.add(new UDriver("Marcio Jasinski", new DeviceId("moto-x")));
+			//repository.add(new UDriver("Anderson Torres", new DeviceId("123")));
+			//repository.add(new UDriver("Taxi 547", new DeviceId("121")));
+			
+			List<UDriver> all = repository.loadAll();
+			System.out.println(all.size());
+			
+			DBPool.release(conn);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
 	}
 	

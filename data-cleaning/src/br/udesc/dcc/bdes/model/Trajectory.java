@@ -1,14 +1,13 @@
-package br.udesc.dcc.bdes.gis;
+package br.udesc.dcc.bdes.model;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class Trajectory {
-	protected String id;
+	protected TrajectoryId id;
 	protected List<Coordinate> coordinates = new LinkedList<>();
 	protected String sourceProvider; //Geolife, UDESC
 	protected String userId; //taxi id, user
@@ -16,7 +15,7 @@ public class Trajectory {
 	protected String transportMean;
 	
 	public Trajectory() {
-		this.id = UUID.randomUUID().toString();
+		this.id = new TrajectoryId();
 	}
 
 	public Trajectory(Collection<Coordinate> elements) {
@@ -120,8 +119,12 @@ public class Trajectory {
 		return latest;
 	}*/
 	
-	public String getId() {
+	public TrajectoryId getId() {
 		return id;
+	}
+
+	public void setId(TrajectoryId trajectoryId) {
+		this.id = trajectoryId;
 	}
 
 }

@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import br.udesc.dcc.bdes.analysis.deprecated.EvaluatedTrajectory;
 import br.udesc.dcc.bdes.analysis.deprecated.TrajectoryEvaluator;
-import br.udesc.dcc.bdes.gis.Trajectory;
+import br.udesc.dcc.bdes.model.Trajectory;
 
 public class TrajectoryWekaFileWriter {
 	

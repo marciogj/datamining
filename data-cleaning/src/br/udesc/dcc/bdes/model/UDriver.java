@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.server.model;
+package br.udesc.dcc.bdes.model;
 
 public class UDriver {
 	protected UDriverId id;
@@ -9,6 +9,9 @@ public class UDriver {
 		this.id = new UDriverId();
 		this.name = name;
 		this.deviceId = deviceId;
+	}
+
+	public UDriver() {
 	}
 
 	public UDriverId getId() {

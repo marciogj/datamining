@@ -4,8 +4,8 @@ import java.util.Collection;
 
 import br.udesc.dcc.bdes.datamining.cluster.density.DBScanResult;
 import br.udesc.dcc.bdes.datamining.cluster.density.EsterDBScan;
-import br.udesc.dcc.bdes.gis.Coordinate;
-import br.udesc.dcc.bdes.gis.Trajectory;
+import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.Trajectory;
 
 public class TrajectoryCleaner {
 	

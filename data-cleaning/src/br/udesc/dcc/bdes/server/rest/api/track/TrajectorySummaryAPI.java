@@ -12,10 +12,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
-import br.udesc.dcc.bdes.server.model.DeviceId;
-import br.udesc.dcc.bdes.server.repository.MemoryRepository;
+import br.udesc.dcc.bdes.model.DeviceId;
+import br.udesc.dcc.bdes.repository.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.SpeedTelemetryDTO;
+import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectorySummaryDTO;
 
@@ -39,8 +40,17 @@ public class TrajectorySummaryAPI {
 	@Produces(MediaType.APPLICATION_JSON)
 	public TrajectorySummaryDTO getTrajectoryEvaluation(@PathParam("evaluationId") String evaluationId) {
 		logger.info("getTrajectoryEvaluation " + evaluationId);
+		TrajectoryEvaluator evaluator = repository.loadTrajectoryEvaluationById(evaluationId).orElseThrow( () -> new NotFoundException());
+		return TrajectoryMapper.toDto(evaluator);
+	}
+	
+	@GET
+	@Path("trajectory-evaluation-coordinates/{evaluationId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public TrajectoryDTO getTrajectoryEvaluationCoordinates(@PathParam("evaluationId") String evaluationId) {
+		logger.info("getTrajectoryEvaluationCoordinates " + evaluationId);
 		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(evaluationId).orElseThrow( () -> new NotFoundException());
-		return TrajectoryMapper.toDto(evaluation);
+		return TrajectoryMapper.toDto(evaluation.getTrajectory());
 	}
 	
 	@GET

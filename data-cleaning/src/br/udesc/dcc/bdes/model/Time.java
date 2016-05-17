@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.gis;
+package br.udesc.dcc.bdes.model;
 
 public class Time {
 	private static int ONE_DAY_SECONDS = 24*3600;
