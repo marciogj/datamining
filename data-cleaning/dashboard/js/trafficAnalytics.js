@@ -4,6 +4,21 @@ var app = angular.module('trafficAnalytics', [
 
 var DBP_API = "http://localhost:9090/services";
 
+var weekDayMonth = function(date) {
+	var weekDays = [ 'Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+	var months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+	var weekDay = weekDays[date.getDay()];
+	var month = months[date.getMonth()];
+
+	return weekDay + ' ' + date.getDate() + ' de ' + month;
+};
+
+var hoursMins = function(date) {
+	var time = date.toLocaleTimeString().split(":");
+	return time[0] + ':' + time[1];
+};
+
 //http://stackoverflow.com/questions/16288190/angularjs-location-service-apparently-not-parsing-url
 /*app.config(['$locationProvider', '$stateProvider', function($locationProvider, $stateProvider) {
 	$locationProvider.html5Mode({
@@ -153,6 +168,11 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
           		trajectoryId: data.trajectoryId,
 	          	evaluationId: data.evaluationId,
 				trajectoryTime: data.trajectoryTime,
+				startDateStr: weekDayMonth(new Date(data.startDateTime)),
+				startDateTime: new Date(data.startDateTime),
+				endDateTime: new Date(data.endDateTime),
+				timeInterval: hoursMins(new Date(data.startDateTime)) + ' - ' + hoursMins(new Date(data.endDateTime)),
+				timeClassification: 'Horário Comercial',
 				totalDistance: data.totalDistance,
 				avgSpeed: data.avgSpeed,
 				maxSpeed: data.maxSpeed,
@@ -166,6 +186,7 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 				overtakeCount: data.overtakeCount,
 				accEvaluation: data.accEvaluation
 			};
+
 
 			self.evaluation = evaluation;
           
