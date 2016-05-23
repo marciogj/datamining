@@ -1,8 +1,11 @@
 package br.udesc.dcc.bdes.server.rest.api.track;
 
-import java.sql.Connection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -11,16 +14,19 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.datamining.cluster.density.DBScan;
+import br.udesc.dcc.bdes.datamining.cluster.density.DBScanResult;
+import br.udesc.dcc.bdes.io.OpenWheatherDTOFileWriter;
+import br.udesc.dcc.bdes.io.TrackDTOCSVFileWriter;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
 import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.repository.MemoryRepository;
-import br.udesc.dcc.bdes.repository.sql.DBPool;
-import br.udesc.dcc.bdes.repository.sql.TrajectoryDAO;
 import br.udesc.dcc.bdes.server.JettyServer;
 import br.udesc.dcc.bdes.server.rest.APIPath;
+import br.udesc.dcc.bdes.server.rest.api.track.dto.CoordinateDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
 
@@ -42,18 +48,78 @@ public class TrackAPI {
 	 * @param trackDto
 	 */
 	@POST
-    public void postTrack(TrackDTO trackDto) {
-		System.out.println("DeviceId: " + trackDto.deviceId + " - Coordinates: " + trackDto.coordinates.size());
+	@Path("/evaluate")
+    public void evaluate(TrackDTO trackDto) {
+		System.out.println("Evaluate Source: " + trackDto.deviceId + "@" + trackDto.userId+ " - Coordinates: " + trackDto.coordinates.size());
 		evaluateTrack(trackDto);
 		notifyWSClients(trackDto);			
     }
+	
+	@POST
+	@Path("/save")
+    public void save(TrackDTO trackDto) {
+		System.out.println("Evaluate Source: " + trackDto.deviceId + "@" + trackDto.userId+ " - Coordinates: " + trackDto.coordinates.size());
+		if (trackDto.coordinates.isEmpty()) return;
+		CoordinateDTO firstCoord = trackDto.coordinates.get(0);
+		String datetime = removeInvalidFilenameChars(firstCoord.dateTime);
+		String filename = trackDto.userId + "_" + trackDto.deviceId + "_" + datetime;
+		
+		TrackDTOCSVFileWriter.write(trackDto, filename + ".csv");
+		
+		Optional<OpenWeatherConditionDTO> optWheather = getWeather(firstCoord.latitude, firstCoord.longitude);
+		if (optWheather.isPresent()) {
+			OpenWheatherDTOFileWriter.write(optWheather.get(), filename + "_weather.json");
+		}
+    }
+	
+	@POST
+	@Path("/save-evaluate")
+    public void saveEvaluateTrack(TrackDTO trackDto) {
+		//Save track is executed as a separated process
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		executor.submit(() -> {
+			save(trackDto);
+		});
+		
+		evaluate(trackDto);
+    }
+	
+	private static String removeInvalidFilenameChars(String isoDatetime) {
+		return isoDatetime.replaceAll(":", "").replaceAll("+", "p").replaceAll("-", "m");
+	}
 	
 	private void evaluateTrack(TrackDTO trackDto) {
 		TrajectoryEvaluator trajectoryEval = new TrajectoryEvaluator();
 		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
 		
+		//--------------------------------------------------------Cleaning noises
+		
+		/*
+		DBScan<Coordinate> dbscan = new DBScan<>();
+		DBScanResult<Coordinate> dbscaneResult = dbscan.evaluate(receivedTrajectory.getCoordinates(), 50.0, 5, Coordinate::distance);
+		Trajectory cleanTrajectory = new Trajectory();
+		dbscaneResult.getClusters().forEach( cluster -> cleanTrajectory.addAll(cluster.getElements()));
+		receivedTrajectory.setCoordinates(cleanTrajectory.getCoordinates());
+		*/
+		
+		/*
+		Collections.sort(receivedTrajectory.getCoordinates(), new Comparator<Coordinate>(){
+			public int compare(Coordinate c1, Coordinate c2){
+				return c1.getDateTime().compareTo(c2.getDateTime());
+			}
+		});
+		*/
+		
+		//
+		
+		
+		
+		
+		//--------------------------------------------------------
+		
+		
 		Optional<TrajectoryEvaluator> dbTrajectory = repository.loadLatestTrajectoryEvaluationById(new DeviceId(trackDto.deviceId));
-		long timeTolerance =  1000 * 60 * 30;
+		long timeTolerance =  1000 * 60 * 30;//30 min
 		boolean isNewTrajectory = true;
 		
 		if (dbTrajectory.isPresent()) {
@@ -72,29 +138,68 @@ public class TrackAPI {
 			} 
 		}
 		
+		//identificar o meio de transporte
+		//aceleração baixa
+		//velocidade média abaixo de 10km/h
+		//velocidade máxima abaixo de 20 km/h
+		
+		
 		List<Trajectory> subtrajectoriesByTime = trajectoryEval.subtrajectoriesByTime(receivedTrajectory, timeTolerance);
 		System.out.println("Subtrajectories: " + subtrajectoriesByTime.size());
 		
+		//Map<Trajectory,TransportType> subtrajectoriesByTransport = new HashMap<>();
+		//for (Trajectory subTrajectory : subtrajectoriesByTime) {
+		//	subtrajectoriesByTransport.putAll(trajectoryEval.subtrajectoriesByTransport(subTrajectory));
+		//}
+		
+		
+		//TODO: Avaliar se é necessário mesmo ordenar após a clusterização
+//		Collections.sort(subTrajectory.getCoordinates(), new Comparator<Coordinate>(){
+//			public int compare(Coordinate c1, Coordinate c2){
+//				return c1.getDateTime().compareTo(c2.getDateTime());
+//			}
+//		});
+		
+		
+		
 		for (Trajectory subTrajectory : subtrajectoriesByTime) {
+			
+			//if (subtrajectoriesByTransport.get(subTrajectory) == TransportType.NON_MOTORIZED) {
+			//	System.out.println("Ignoring trajectory with " + subTrajectory.size() + " coordinates since it is no motorized");
+			//	continue;
+			//}
+			
 			//Optional<OpenWeatherConditionDTO> currentWeather = getLastPositionWeather(subTrajectory);
 			//trajectoryEval.evaluate(subTrajectory.getCoordinates(), currentWeather);
+			
+			
+			
+			
+			
 			trajectoryEval.evaluate(subTrajectory.getCoordinates());
 
 			if (isNewTrajectory) {
-				Connection conn = null;
-				try {
+				
+				//Trajetórias muito curtas 
+				//if (trajectoryEval.getCurrentTelemetry().trajectoryDistance.getKilometers() < 2) {
+				//	continue;
+				//}
+				
+				//Connection conn = null;
+				//try {
 					repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
-					conn = DBPool.getConnection().orElseThrow( () -> new RuntimeException("Could not allocate db connection"));
 					
+					
+					//conn = DBPool.getConnection().orElseThrow( () -> new RuntimeException("Could not allocate db connection"));
 					//TrajectoryDAO dao = new TrajectoryDAO(conn);
 					//dao.add(trajectoryEval.getTrajectory());
 					
 					
-				} catch(Exception e) {
-					e.printStackTrace();
-				} finally {
-					DBPool.release(conn);
-				}
+				//} catch(Exception e) {
+				//	e.printStackTrace();
+				//} finally {
+				//	DBPool.release(conn);
+				//}
 			} else {
 				repository.updateLatest(new DeviceId(trackDto.deviceId), trajectoryEval);
 				isNewTrajectory  = true; //the next trajectory is a new one from subtrajectories
@@ -105,11 +210,10 @@ public class TrackAPI {
 		
 	}
 	
-	private Optional<OpenWeatherConditionDTO> getLastPositionWeather(Trajectory trajectory) {
+	private Optional<OpenWeatherConditionDTO> getWeather(double latitude, double longitude) {
 		Optional<String> openWetaherKey = JettyServer.get().getOpenWeatherKey();
-		Optional<Coordinate> lastCoord = trajectory.getLastestCoordinate();
-		if (openWetaherKey.isPresent() && lastCoord.isPresent()) {
-			return OpenWeatherClient.weatherByCooordinate(lastCoord.get().getLatitude(), lastCoord.get().getLongitude(), openWetaherKey.get());
+		if (openWetaherKey.isPresent()) {
+			return OpenWeatherClient.weatherByCooordinate(latitude, longitude, openWetaherKey.get());
 		}
 		return Optional.empty();
 	}

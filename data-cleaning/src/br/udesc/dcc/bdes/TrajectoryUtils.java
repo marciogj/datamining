@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
-import br.udesc.dcc.bdes.analysis.deprecated.EvaluatedTrajectory;
+import br.udesc.dcc.bdes.analysis.deprecated.DeprecatedEvaluatedTrajectory;
 import br.udesc.dcc.bdes.io.TrajectoryCSVFileWriter;
 import br.udesc.dcc.bdes.model.Coordinate;
 
@@ -33,11 +33,11 @@ public class TrajectoryUtils {
 		}
 	}
 
-	public static void print(EvaluatedTrajectory trajectory) {
+	public static void print(DeprecatedEvaluatedTrajectory trajectory) {
 		System.out.println(evaluatedTrajectoryToString(trajectory));
 	}
 	
-	public static String evaluatedTrajectoryToString(EvaluatedTrajectory trajectory) {
+	public static String evaluatedTrajectoryToString(DeprecatedEvaluatedTrajectory trajectory) {
 		StringBuffer str = new StringBuffer();
 		str.append("Coordinates: " + trajectory.getTotalCoordinates());
 		str.append("\nCoordinate Rate: " + trajectory.getCoordinateRate() + " seconds/coordinate");

@@ -27,7 +27,7 @@ public class CoordinateDAO extends Repository {
 			pst.setDouble(3, coordinate.getLatitude());
 			pst.setDouble(4, coordinate.getLongitude());
 			pst.setDouble(5, coordinate.getAltitude());
-			pst.setDouble(6, coordinate.getSpeed());
+			pst.setDouble(6, coordinate.getSpeed().get());
 			pst.execute();
 		} finally {
 			if (pst != null) {

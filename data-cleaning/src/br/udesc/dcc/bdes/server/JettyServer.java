@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -33,6 +34,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
+import br.udesc.dcc.bdes.GPSReplay;
 import br.udesc.dcc.bdes.repository.sql.DBPool;
 import br.udesc.dcc.bdes.server.ws.EventServlet;
 
@@ -46,7 +48,7 @@ public class JettyServer {
 	private static final JettyServer server = new JettyServer();
 	
 	private Properties properties = new Properties();
-	private final Map<String, Session> wsSesseions = new HashMap<>();
+	private final Map<String, Session> wsSessions = new HashMap<>();
 	
 	/**
 	 * Resource configuration performs an auto discovery over specified packages.
@@ -61,7 +63,21 @@ public class JettyServer {
 	}
 	
 	public static void main(String[] args) {
+		
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		executor.submit(() -> {
+			try {
+				Thread.sleep(3000);
+				GPSReplay.main(args);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		
 		server.startServer();
+		
+		
+		
 	}
 	
 	public JettyServer() {}
@@ -72,22 +88,21 @@ public class JettyServer {
 	
 	public String registerWSSession(Session session) {
 		String uuid = UUID.randomUUID().toString();
-		wsSesseions.put(uuid, session);
+		wsSessions.put(uuid, session);
 		return uuid;
-		
 	}
 	
 	public void unregisterWSSession(String uuid) {
-		wsSesseions.remove(uuid);
+		wsSessions.remove(uuid);
 	}
 	
 	public void unregisterSession(Session session) {
-		wsSesseions.forEach( (k,v)-> { if(v.equals(session)) { wsSesseions.remove(k);} } );
+		wsSessions.forEach( (k,v)-> { if(v.equals(session)) { wsSessions.remove(k);} } );
 	}
 	
 	public List<Session> getRegisteredSessions() {
-		List<Session> sessions = new ArrayList<>(wsSesseions.size());
-		wsSesseions.forEach( (k,v)-> sessions.add(v) );
+		List<Session> sessions = new ArrayList<>(wsSessions.size());
+		wsSessions.forEach( (k,v)-> sessions.add(v) );
 		return sessions;
 	}
 	
@@ -166,18 +181,14 @@ public class JettyServer {
     }
 	
 	public void mySQLHealthCheck() {
-		Optional<Connection> optConn = DBPool.get().getConnection();
+		Optional<Connection> optConn = DBPool.getConnection();
 		if (optConn.isPresent()) {
 			System.out.println("Connection to MySQL ready.");
-			try {
-				optConn.get().close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			DBPool.release(optConn.get());
 		} else {
 			System.err.println("MySQL is not avaliable. Cannot init service");
 			System.exit(1);
-		}
+		} 
 	}
 	
 	public Optional<String> getOpenWeatherKey() {
@@ -210,7 +221,7 @@ class CORSResponseFilter implements ContainerResponseFilter {
 		MultivaluedMap<String, Object> headers = responseContext.getHeaders();
 		headers.add("Access-Control-Allow-Origin", "*");
 		headers.add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");			
-		headers.add("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, X-Codingpedia");
+		headers.add("Access-Control-Allow-Headers", "X-Requested-With, Content-Type");
 	}
 
 }

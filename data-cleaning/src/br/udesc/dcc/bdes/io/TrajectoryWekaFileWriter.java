@@ -4,8 +4,8 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Collection;
 
-import br.udesc.dcc.bdes.analysis.deprecated.EvaluatedTrajectory;
-import br.udesc.dcc.bdes.analysis.deprecated.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.analysis.deprecated.DeprecatedEvaluatedTrajectory;
+import br.udesc.dcc.bdes.analysis.deprecated.DeprecatedTrajectoryEvaluator;
 import br.udesc.dcc.bdes.model.Trajectory;
 
 public class TrajectoryWekaFileWriter {
@@ -37,7 +37,7 @@ public class TrajectoryWekaFileWriter {
 			writer.println("@DATA");
 			
 			for (Trajectory trajectory : trajectories) {
-				EvaluatedTrajectory evaluatedTrajectory = TrajectoryEvaluator.evaluate(trajectory);
+				DeprecatedEvaluatedTrajectory evaluatedTrajectory = DeprecatedTrajectoryEvaluator.evaluate(trajectory);
 				StringBuffer line = new StringBuffer();
 				line.append(trajectory.getUserId() + ",");
 				line.append(evaluatedTrajectory.getAvgSpeed() + ",");

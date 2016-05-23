@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import br.udesc.dcc.bdes.analysis.deprecated.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.analysis.deprecated.DeprecatedTrajectoryEvaluator;
 import br.udesc.dcc.bdes.datamining.cluster.density.Cluster;
 import br.udesc.dcc.bdes.datamining.cluster.density.DBScan;
 import br.udesc.dcc.bdes.datamining.cluster.density.DBScanResult;
@@ -28,7 +28,7 @@ public class DbScanMain {
 		int minPts = 5;		
 		Trajectory trajectory = PltFileReader.read("20081023055305.plt");//"20081023025304.plt");
 		System.out.println("=== Raw Trajectory Evaluation ===");
-		TrajectoryUtils.print(TrajectoryEvaluator.evaluate(trajectory));
+		TrajectoryUtils.print(DeprecatedTrajectoryEvaluator.evaluate(trajectory));
 		System.out.println();
 
 		BiFunction<Coordinate, Coordinate, Double> distanceInSeconds = (c1,c2) -> {
@@ -82,10 +82,10 @@ public class DbScanMain {
 			//TODO: Find out why reset all speeds is needed
 			//FIXME: Speed are being propagated to all coordinates - clone() needed.
 			cleanedTrajectory.getCoordinates().forEach(c -> c.setSpeed(0.0));
-			TrajectoryUtils.print(TrajectoryEvaluator.evaluate(cleanedTrajectory));
+			TrajectoryUtils.print(DeprecatedTrajectoryEvaluator.evaluate(cleanedTrajectory));
 
 			System.out.println("#### Speed Evolution ####");
-			cleanedTrajectory.getCoordinates().forEach(c -> System.out.print( (Math.round(c.getSpeed()*3.6*100.0)/100.0) + ", "));
+			cleanedTrajectory.getCoordinates().forEach(c -> System.out.print( (Math.round(c.getSpeed().get()*3.6*100.0)/100.0) + ", "));
 
 			System.out.println("Noises " + dbScanDistance.getNoises().size());
 			TrajectoryUtils.save(cluster.getName(), cleanedTrajectory.getCoordinates(), dbScanDistance.getNoises());
@@ -125,7 +125,7 @@ public class DbScanMain {
 		double eps = 25.0;
 		int minPts = 4;		
 		Trajectory trajectory = PltFileReader.read("20081023055305.plt");			
-		TrajectoryUtils.print(TrajectoryEvaluator.evaluate(trajectory));
+		TrajectoryUtils.print(DeprecatedTrajectoryEvaluator.evaluate(trajectory));
 
 		//List<Map.Entry<Coordinate, Double>> kdistance = EsterDBScanHeuristic.kdistance(trajectory.getCoordinates(), minPts, Coordinate::distance);
 		//kdistance.forEach( e -> System.out.print(e.getValue() +","));
@@ -148,14 +148,14 @@ public class DbScanMain {
 		cleanedTrajectory.addAll(coordinates);
 
 
-		TrajectoryUtils.print(TrajectoryEvaluator.evaluate(cleanedTrajectory));
+		TrajectoryUtils.print(DeprecatedTrajectoryEvaluator.evaluate(cleanedTrajectory));
 	}
 
 	public static void distanceDBScan() {
 		double eps = 25.0;
 		int minPts = 4;		
 		Trajectory trajectory = PltFileReader.read("20081023055305.plt");			
-		TrajectoryUtils.print(TrajectoryEvaluator.evaluate(trajectory));
+		TrajectoryUtils.print(DeprecatedTrajectoryEvaluator.evaluate(trajectory));
 
 		//List<Map.Entry<Coordinate, Double>> kdistance = EsterDBScanHeuristic.kdistance(trajectory.getCoordinates(), minPts, Coordinate::distance);
 		//kdistance.forEach( e -> System.out.print(e.getValue() +","));
@@ -177,7 +177,7 @@ public class DbScanMain {
 		Trajectory cleanedTrajectory = new Trajectory();
 		cleanedTrajectory.addAll(coordinates);
 
-		TrajectoryUtils.print(TrajectoryEvaluator.evaluate(cleanedTrajectory));
+		TrajectoryUtils.print(DeprecatedTrajectoryEvaluator.evaluate(cleanedTrajectory));
 	}
 	
 

@@ -27,7 +27,9 @@ public class SeniorCSVFileReader {
 		coordinate.setAltitude(Double.parseDouble(parts[SeniorCoordinateFields.ALTITUDE.getIndex()]));
 		coordinate.setLatitude(Double.parseDouble(parts[SeniorCoordinateFields.LATITUDE.getIndex()]));
 		coordinate.setLongitude(Double.parseDouble(parts[SeniorCoordinateFields.LONGITUDE.getIndex()]));
-		coordinate.setSpeed(Double.parseDouble(parts[SeniorCoordinateFields.SPEED.getIndex()]));
+		coordinate.setSpeed(Double.parseDouble(parts[SeniorCoordinateFields.SPEED.getIndex()])/3.6);
+		coordinate.setAccuracy(Double.parseDouble(parts[SeniorCoordinateFields.ACCURACY.getIndex()]));
+		coordinate.setBearing(Double.parseDouble(parts[SeniorCoordinateFields.BEARING.getIndex()]));
 		long timestamp = Long.parseLong(parts[SeniorCoordinateFields.TIMESTAMP.getIndex()]); 
 		coordinate.setDateTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()));
 		return Optional.of(coordinate);

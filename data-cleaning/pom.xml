@@ -127,6 +127,15 @@
 		    <artifactId>jongo</artifactId>
 		    <version>1.3.0</version>
 		</dependency>
+		
+	    <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-releasetrain</artifactId>
+            <version>Hopper-SR1</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    
 				
     </dependencies>
     <build>

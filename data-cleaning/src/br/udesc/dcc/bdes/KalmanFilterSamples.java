@@ -19,7 +19,7 @@ import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 
-import br.udesc.dcc.bdes.analysis.deprecated.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.analysis.deprecated.DeprecatedTrajectoryEvaluator;
 import br.udesc.dcc.bdes.filter.SimpleKalmanFilter;
 import br.udesc.dcc.bdes.io.InfoWriter;
 import br.udesc.dcc.bdes.io.PltFileReader;
@@ -412,7 +412,7 @@ public class KalmanFilterSamples {
 		//double eps = 25.0;
 		//int minPts = 4;		
 		Trajectory trajectory = PltFileReader.read("20081023055305.plt");			
-		TrajectoryUtils.print(TrajectoryEvaluator.evaluate(trajectory));
+		TrajectoryUtils.print(DeprecatedTrajectoryEvaluator.evaluate(trajectory));
 
 		System.out.println("-------------");
 		Coordinate first = trajectory.getCoordinates().iterator().next();
@@ -521,7 +521,7 @@ public class KalmanFilterSamples {
 
 
 
-		TrajectoryUtils.print(TrajectoryEvaluator.evaluate(cleanedTrajectory));
+		TrajectoryUtils.print(DeprecatedTrajectoryEvaluator.evaluate(cleanedTrajectory));
 
 		//save("apache_lat_kalman", cleanedTrajectory.getCoordinates());
 	}
@@ -539,7 +539,7 @@ public class KalmanFilterSamples {
 
 		Trajectory rawTrajectory = PltFileReader.read("20081023055305.plt");
 		String rawEvaluation = "=== Raw Trajectory Evaluation ===\n";
-		rawEvaluation += TrajectoryUtils.evaluatedTrajectoryToString(TrajectoryEvaluator.evaluate(rawTrajectory));
+		rawEvaluation += TrajectoryUtils.evaluatedTrajectoryToString(DeprecatedTrajectoryEvaluator.evaluate(rawTrajectory));
 
 		System.out.println(algorithmInfo);
 		System.out.println(rawEvaluation);
@@ -567,7 +567,7 @@ public class KalmanFilterSamples {
 
 
 		String cleanedEvaluation = "=== Cleaned Trajectory Evaluation ===\n";
-		cleanedEvaluation += TrajectoryUtils.evaluatedTrajectoryToString(TrajectoryEvaluator.evaluate(cleanedTrajectory));
+		cleanedEvaluation += TrajectoryUtils.evaluatedTrajectoryToString(DeprecatedTrajectoryEvaluator.evaluate(cleanedTrajectory));
 		System.out.println(cleanedEvaluation);
 
 		System.out.println(cleanedEvaluation);

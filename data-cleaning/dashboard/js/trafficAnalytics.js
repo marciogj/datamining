@@ -66,6 +66,13 @@ app.config(function($locationProvider, $stateProvider, $urlRouterProvider) {
       controllerAs: 'vm'
     })
 
+    .state('trajectory-coordinates', {
+      url: "/trajectory-coordinates/{evaluationId}",
+      templateUrl: "views/trajectory-coordinates.html",
+      controller: 'trajectoryCoordinatesCtrl',
+      controllerAs: 'vm'
+    })
+
     .state('trajectory-evaluation', {
       url: "/trajectory-evaluation/{id}",
       templateUrl: "views/trajectory-evaluation.html",
@@ -76,6 +83,20 @@ app.config(function($locationProvider, $stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise("/drivers");
 
 });
+
+app.controller('trajectoryCoordinatesCtrl',  ['$scope','$stateParams', '$http',  function($scope , $stateParams, $http){
+	var self = this;
+	
+	function initialize(evaluationId) {
+		$http.get(DBP_API + '/summary/trajectory-evaluation-coordinates/' + evaluationId).success(function(data) {			
+			self.trajectory = data;
+			console.log(data);
+        });		
+    };
+	
+	initialize($stateParams.evaluationId);
+
+}]);
 
 app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  function($scope , $stateParams, $http){
 	var self = this;

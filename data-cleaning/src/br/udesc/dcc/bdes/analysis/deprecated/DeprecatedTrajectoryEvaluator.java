@@ -14,10 +14,10 @@ import br.udesc.dcc.bdes.model.Trajectory;
  * @author marciogj
  *
  */
-public class TrajectoryEvaluator {
+public class DeprecatedTrajectoryEvaluator {
 		
-	public static EvaluatedTrajectory evaluate(Trajectory trajectory) {
-		EvaluatedTrajectory evaluated = new EvaluatedTrajectory(trajectory);
+	public static DeprecatedEvaluatedTrajectory evaluate(Trajectory trajectory) {
+		DeprecatedEvaluatedTrajectory evaluated = new DeprecatedEvaluatedTrajectory(trajectory);
 		Collection<Coordinate> coordinates = trajectory.getCoordinates();
 		if (coordinates.isEmpty()) {
 			return evaluated;
@@ -37,10 +37,10 @@ public class TrajectoryEvaluator {
 			updateMomentum(previous, coordinate);
 			
 			totalDistance += coordinate.distanceInMeters(previous);
-			avgSpeed += coordinate.getSpeed();
+			avgSpeed += coordinate.getSpeed().get();
 			
-			if(coordinate.getSpeed() > maxSpeed) {
-				maxSpeed = coordinate.getSpeed();
+			if(coordinate.getSpeed().get() > maxSpeed) {
+				maxSpeed = coordinate.getSpeed().get();
 				//System.out.println(coordinate);
 			}
 			
@@ -84,7 +84,7 @@ public class TrajectoryEvaluator {
 	
 	private static double acceleration(Coordinate start, Coordinate end) {
 		double deltaTSeconds = (end.getDateTimeInMillis() - start.getDateTimeInMillis())/1000;
-		double deltaV = end.getSpeed() - (start.getSpeed());
+		double deltaV = end.getSpeed().get() - (start.getSpeed().get());
 		double acceleration = deltaV/deltaTSeconds;
 		
 		return acceleration;
@@ -107,7 +107,7 @@ public class TrajectoryEvaluator {
 		double distance = currentCoordinate.distanceInMeters(previousCoordinate);
 		double speed = deltaTSeconds != 0 ?  distance/deltaTSeconds : distance;
 		
-		double deltaV = speed - (previousCoordinate.getSpeed());
+		double deltaV = speed - (previousCoordinate.getSpeed().get());
 		double acceleration = deltaV/deltaTSeconds;
 		
 		currentCoordinate.setAcceleration(acceleration);

@@ -3,6 +3,7 @@ package br.udesc.dcc.bdes.model;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 /**
  * http://stackoverflow.com/questions/6754881/java-double-vs-bigdecimal-for-latitude-longtitude
@@ -13,11 +14,12 @@ public class Coordinate {
 	double latitude; 
 	double longitude; 
 	double altitude;
-	double speed;
+	Double speed;
 	double acceleration;
+	double accuracy;
+	double bearing;
 	LocalDateTime dateTime;
 	
-
 	public Coordinate() {
 		super();
 	}
@@ -67,8 +69,8 @@ public class Coordinate {
 		this.dateTime = dateTime;
 	}
 
-	public double getSpeed() {
-		return speed;
+	public Optional<Double> getSpeed() {
+		return Optional.ofNullable(speed);
 	}
 
 	public void setSpeed(double speed) {
@@ -83,6 +85,22 @@ public class Coordinate {
 		this.acceleration = acceleration;
 	}
 	
+	public double getAccuracy() {
+		return accuracy;
+	}
+
+	public void setAccuracy(double accuracy) {
+		this.accuracy = accuracy;
+	}
+	
+	public double getBearing() {
+		return bearing;
+	}
+
+	public void setBearing(double bearing) {
+		this.bearing = bearing;
+	}
+
 	@Override
 	public String toString() {
 		return dateTime + ", " + latitude + ", " + longitude + ", " + altitude + ", " + speed + ", " + acceleration;

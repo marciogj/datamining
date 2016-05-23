@@ -78,7 +78,12 @@ public class TrajectoryEvaluator {
 	
 	public void evaluate(Collection<Coordinate> coordinates) {
 		for (Coordinate coordinate : coordinates) {
-			evaluate(coordinate, Optional.empty());
+			//update coordinate with values from speed
+			Coordinate updatedCoordinate = evaluate(coordinate, Optional.empty());
+			coordinate.setAcceleration(updatedCoordinate.getAcceleration());
+
+			//TODO: This update creates noise on Data with provided speed
+			//coordinate.setSpeed(updatedCoordinate.getSpeed());
 		}
 	}
 
@@ -90,7 +95,7 @@ public class TrajectoryEvaluator {
 		return accEvaluator;
 	}
 	
-	public void evaluate(final Coordinate coordinate, Optional<OpenWeatherConditionDTO> weather) {
+	public Coordinate evaluate(final Coordinate coordinate, Optional<OpenWeatherConditionDTO> weather) {
 		trajectory.add(coordinate);
 		currentWeather = weather;
 		
@@ -98,13 +103,13 @@ public class TrajectoryEvaluator {
 		if (previousCoordinate == null) {
 			previousCoordinate = coordinate;
 			accelerationStart = coordinate;
-			return;
+			return coordinate;
 		}
 		
 		Coordinate currentCoordinate = this.updateMomentum(previousCoordinate, coordinate);
 		double distanceFromPrevious = coordinate.distanceInMeters(previousCoordinate);
 		double elapsedTime = (currentCoordinate.getDateTimeInMillis() - previousCoordinate.getDateTimeInMillis())/1000;
-		double currentSpeed = currentCoordinate.getSpeed();
+		double currentSpeed = currentCoordinate.getSpeed().isPresent() ? currentCoordinate.getSpeed().get() : 0;
 		double currentAcceleration = currentCoordinate.getAcceleration();
 		double previousAcceleration = previousCoordinate.getAcceleration();
 		
@@ -120,6 +125,15 @@ public class TrajectoryEvaluator {
 		
 		if(currentSpeed > maxSpeed) {
 			maxSpeed = currentSpeed;
+		}
+		
+		if (maxSpeed > (120/3.6)) {
+			System.out.println("Que velocidade é essa?");
+			for(Coordinate c : trajectory.getCoordinates()) {
+				
+				System.out.println(c);
+			}
+			System.err.println("...");
 		}
 		
 		//Update max acceleration/deceleration 
@@ -162,17 +176,21 @@ public class TrajectoryEvaluator {
 		}
 		
 		previousCoordinate = currentCoordinate;
+		
+		return currentCoordinate;
 	}
 			
 	private Coordinate updateMomentum(final Coordinate previousCoordinate, final Coordinate currentCoordinate) {
 		final long coordinateTime = currentCoordinate.getDateTimeInMillis()/1000;
 		final long previousCoordinateTime = previousCoordinate.getDateTimeInMillis()/1000;
-		final double deltaTSeconds = coordinateTime - previousCoordinateTime;
+		final double deltaTSeconds = Math.abs(coordinateTime - previousCoordinateTime);
+		final double distance = Math.abs(currentCoordinate.distanceInMeters(previousCoordinate));
 		
-		final double distance = currentCoordinate.distanceInMeters(previousCoordinate);
-		final double speed = deltaTSeconds != 0 ?  distance/deltaTSeconds : distance;
-		
-		final double deltaV = speed - (previousCoordinate.getSpeed());
+		double speed = deltaTSeconds != 0 ?  distance/deltaTSeconds : distance;
+
+		speed = currentCoordinate.getSpeed().isPresent() ? currentCoordinate.getSpeed().get() : speed; 
+		double previousSpeed = previousCoordinate.getSpeed().isPresent() ? previousCoordinate.getSpeed().get() : 0; 
+		final double deltaV = speed - previousSpeed;
 		final double acceleration = deltaV/deltaTSeconds;
 		
 		Coordinate coordinate = new Coordinate(currentCoordinate.getLatitude(), currentCoordinate.getLongitude(), currentCoordinate.getAltitude(), currentCoordinate.getDateTime());
@@ -211,7 +229,58 @@ public class TrajectoryEvaluator {
 	public Trajectory getTrajectory(){
 		return trajectory;
 	}
-
+	
+	/*
+	public Map<Trajectory, TransportType> subtrajectoriesByTransport(Trajectory trajectory) {
+		Map<Trajectory, TransportType> trajectories = new HashMap<>();
+		DBScan<Coordinate> dbscan = new DBScan<>();
+		
+		BiFunction<Coordinate, Coordinate, Double> distanceInSpeed = (c1,c2) -> {
+			return new Double(Math.abs((c1.getSpeed() - c2.getSpeed())));
+		};
+		double speed = 10/3.6; //10 km/h in m/s
+		DBScanResult<Coordinate> result = dbscan.evaluate(trajectory.getCoordinates(), speed, 5, distanceInSpeed);
+		
+		Collection<Cluster<Coordinate>> clusters = result.getClusters();
+		for(Cluster<Coordinate> cluster : clusters) {
+			int motorizedChance = 0;
+			int nonMotorizedChance = 0;
+			Trajectory t = new Trajectory();
+			t.addAll(cluster.getElements());
+		
+			TrajectoryEvaluator evaluator = new TrajectoryEvaluator();
+			evaluator.evaluate(t.getCoordinates());
+			
+			
+			if ( evaluator.getCurrentTelemetry().maxSpeed.getKmh() > 30 ) {
+				motorizedChance++;
+			} else {
+				nonMotorizedChance++;
+			}
+			
+			if ( evaluator.getCurrentTelemetry().avgSpeed.getKmh() > 20 ) {
+				motorizedChance++;
+			} else {
+				nonMotorizedChance++;
+			}
+			
+			if ( evaluator.getCurrentTelemetry().maxAcc.getMPerSec2() > 1 ) {
+				motorizedChance++;
+			} else {
+				nonMotorizedChance++;
+			}
+			
+			if (motorizedChance > nonMotorizedChance) {
+				trajectories.put(t, TransportType.MOTORIZED);
+			} else {
+				trajectories.put(t, TransportType.NON_MOTORIZED);
+			}
+			
+		}
+		
+		return trajectories;
+	}
+	*/
 	
 	public List<Trajectory> subtrajectoriesByTime(Trajectory trajectory, long timeToleranceMilis) {
 		Trajectory subtrajectory = new Trajectory();

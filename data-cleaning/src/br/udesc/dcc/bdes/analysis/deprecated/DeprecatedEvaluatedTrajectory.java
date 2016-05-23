@@ -11,7 +11,7 @@ import br.udesc.dcc.bdes.model.Trajectory;
  * @author marciogj
  *
  */
-public class EvaluatedTrajectory {
+public class DeprecatedEvaluatedTrajectory {
 	protected Trajectory trajectory;
 	protected double totalDistance;
 	protected long totalTime;
@@ -22,9 +22,9 @@ public class EvaluatedTrajectory {
 	protected double maxSlowdown;
 	protected double speedUpDownOscilations;
 	
-	public EvaluatedTrajectory() {}
+	public DeprecatedEvaluatedTrajectory() {}
 	
-	public EvaluatedTrajectory(Trajectory aTrajectory) {
+	public DeprecatedEvaluatedTrajectory(Trajectory aTrajectory) {
 		trajectory = aTrajectory;
 	}
 

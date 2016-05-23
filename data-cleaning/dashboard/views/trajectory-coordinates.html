@@ -1,0 +1,34 @@
+<div>ID: {{vm.trajectory.id}}</div>
+<div>Source: {{vm.trajectory.sourceProvider}}</div>
+<div>User: {{vm.trajectory.userId}}</div>
+<div>Device: {{vm.trajectory.deviceId}}</div>
+<div>Meio: {{vm.trajectory.transportMean}}</div>
+
+<div>Coordenadas: {{vm.trajectory.coordinates.length}}</div>
+
+<div>
+	<h2>Coordenadas</h2>
+	<table class="table table-striped">
+		<tr>
+			<td>Data</td>
+			<td>Hora</td>
+			<td>Latitude</td>
+			<td>Longitude</td>
+			<td>Velocidade</td>
+			<td>Aceleração</td>
+			<td>Precisão</td>
+			<td>Bearing</td>
+		</tr>
+		
+		<tr ng-repeat="coordinate in vm.trajectory.coordinates">
+			<td>{{coordinate.dateTime | date:'yyyy-MM-dd' }}</td>
+			<td>{{coordinate.dateTime | date:'HH:mm:ss'}}</td>
+			<td>{{coordinate.latitude}}</td>
+			<td>{{coordinate.longitude}}</td>
+			<td>{{coordinate.speed}}</td>
+			<td>{{coordinate.acceleration}}</td>
+			<td>{{coordinate.accuracy}}</td>
+			<td>{{coordinate.bearing}}</td>
+		</tr>
+	</table>
+</div>
