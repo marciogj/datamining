@@ -1,11 +1,15 @@
 package br.udesc.dcc.bdes.analysis;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import br.udesc.dcc.bdes.google.GeocodeAddress;
 import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.Distance;
@@ -13,7 +17,7 @@ import br.udesc.dcc.bdes.model.Speed;
 import br.udesc.dcc.bdes.model.Time;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
-import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
+import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
 
 
 /**
@@ -43,6 +47,7 @@ public class TrajectoryEvaluator {
 	private int decelerationCount;
 	private Collection<AccInterval> accelerations = new LinkedList<>();
 	
+	
 	private int overMaxSpeedCount;
 	private int overMaxAccelerationCount;
 	private int overMaxDecelerationCount;
@@ -52,6 +57,9 @@ public class TrajectoryEvaluator {
 	private long accTime;
 	private double accSpeedSum;
 	private int accCoordinateCount;
+	
+	private Set<String> streets = new HashSet<>();
+	
 	
 	private AccelerationEvaluator accEvaluator = new AccelerationEvaluator();
 	
@@ -64,19 +72,60 @@ public class TrajectoryEvaluator {
 	public String getId() {
 		return id;
 	}
+	
 			
+	public Set<String> getStreets() {
+		return streets;
+	}
+
 	public TrajectoryEvaluator(double maxAllowedSpeed, double maxAcceleration, double maxDeceleration) {
 		super();
 		MAX_ALLOWED_SPEED = maxAllowedSpeed;
 	}
 	
-	public void evaluate(Collection<Coordinate> coordinates, Optional<OpenWeatherConditionDTO> weather) {
+	public void evaluate(Collection<Coordinate> coordinates, Optional<OpenWeatherConditionDTO> weather, Optional<GeocodeAddress> optAddress) {
+		if(optAddress.isPresent()) {
+			String streetAddress = optAddress.get().getStreetAddress();
+			streets.add(streetAddress);
+			Speed currentSpeedLimit = SpeedLimit.getSpeedByAddress(streetAddress);
+			MAX_ALLOWED_SPEED = currentSpeedLimit.getMs();
+		}
+		
 		for (Coordinate coordinate : coordinates) {
 			evaluate(coordinate, weather);
 		}
 	}
 	
+	public String getTimeInfo() {
+		LocalDateTime startTime = trajectory.getStart().get();
+		int hour = startTime.getHour();
+		if (hour > 7 && hour < 19 ) {
+			return "Horário Comercial";
+		}
+		
+		if (hour > 0 && hour < 5 ) {
+			return "Madrugada";
+		}
+		
+		return "Noite"; 
+	}
+	
+	public String getTrafficInfo() {
+		LocalDateTime startTime = trajectory.getStart().get();
+		int hour = startTime.getHour();
+		if (hour > 7 && hour < 19 ) {
+			return "Trânsito Intenso";
+		}
+		
+		if (hour > 0 && hour < 5 ) {
+			return "Trânsito Livre";
+		}
+		
+		return "Trânsito Tranquilo"; 
+	}
+	
 	public void evaluate(Collection<Coordinate> coordinates) {
+		
 		for (Coordinate coordinate : coordinates) {
 			//update coordinate with values from speed
 			Coordinate updatedCoordinate = evaluate(coordinate, Optional.empty());

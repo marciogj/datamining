@@ -2,7 +2,7 @@ package br.udesc.dcc.bdes.io;
 
 import java.io.PrintWriter;
 
-import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
+import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
 
 import com.google.gson.Gson;
 

@@ -192,9 +192,17 @@ public class JettyServer {
 	}
 	
 	public Optional<String> getOpenWeatherKey() {
-		String key = properties.getProperty("open-weather-key");
-		if(key != null) {
-			return Optional.of(key);
+		return getPropertyValue("open-weather-key");
+	}
+	
+	public Optional<String> getGoogleMapsKey() {
+		return getPropertyValue("google-key");
+	}
+	
+	public Optional<String> getPropertyValue(String key) {
+		String value = properties.getProperty(key);
+		if(value != null) {
+			return Optional.of(value);
 		}
 		return Optional.empty();
 	}

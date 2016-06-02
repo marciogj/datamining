@@ -8,6 +8,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
+
 public class OpenWeatherClient {
 	public static final String OPEN_WEATHER_API = "http://api.openweathermap.org";
 	

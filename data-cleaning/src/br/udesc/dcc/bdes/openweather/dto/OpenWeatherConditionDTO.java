@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.openweather;
+package br.udesc.dcc.bdes.openweather.dto;
 
 import java.util.List;
 

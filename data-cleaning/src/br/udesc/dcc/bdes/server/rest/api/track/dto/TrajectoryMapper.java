@@ -1,5 +1,6 @@
 package br.udesc.dcc.bdes.server.rest.api.track.dto;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,8 +16,8 @@ import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.Speed;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
-import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
-import br.udesc.dcc.bdes.openweather.WeatherDTO;
+import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
+import br.udesc.dcc.bdes.openweather.dto.WeatherDTO;
 
 public class TrajectoryMapper {
 	
@@ -76,10 +77,14 @@ public class TrajectoryMapper {
 		dto.riskAlerts = 0;
 		dto.speedChanges = telemetry.accCount + telemetry.decCount;
 		dto.totalDistance = String.format("%.2f km", telemetry.trajectoryDistance.getKilometers());
-		dto.trafficCondition = "Trânsito Intenso";
+		
+		dto.trafficCondition = evaluation.getTrafficInfo();
+		dto.hourClassification = evaluation.getTimeInfo();
 		dto.trajectoryTime = telemetry.trajectoryTime.getTime();
 		dto.coordinateCount = evaluation.getTrajectory().size();
 		dto.accEvaluation = toDto(evaluation.getAccEvaluator());
+		
+		evaluation.getStreets().forEach( streetName -> dto.streets.add(streetName));
 		
 		
 		dto.wheatherCondition = "-";

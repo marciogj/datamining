@@ -1,5 +1,8 @@
 package br.udesc.dcc.bdes.google;
 
+import br.udesc.dcc.bdes.google.dto.GeocodeAddressDTO;
+import br.udesc.dcc.bdes.google.dto.InverseGeocodingResultDTO;
+
 public class GeocodeAddress {
 	private String street_address;
 	private String sublocality_level_1;
@@ -9,8 +12,8 @@ public class GeocodeAddress {
 	private String country;
 	
 	public GeocodeAddress(GeocodeAddressDTO dto) {
-		for(InverseGeocodingResult result : dto.results) {
-			if (result.types.contains("street_address")) {
+		for(InverseGeocodingResultDTO result : dto.results) {
+			if (result.types.contains("street_address") || result.types.contains("route")) {
 				street_address = result.formatted_address;
 			}
 			if (result.types.contains("sublocality_level_1")) {
@@ -28,7 +31,6 @@ public class GeocodeAddress {
 			if (result.types.contains("country")) {
 				country = result.formatted_address;
 			}
-			
 		}
 	}
 

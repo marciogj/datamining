@@ -1,7 +1,5 @@
 package br.udesc.dcc.bdes.server.rest.api.track;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -14,15 +12,15 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
-import br.udesc.dcc.bdes.datamining.cluster.density.DBScan;
-import br.udesc.dcc.bdes.datamining.cluster.density.DBScanResult;
+import br.udesc.dcc.bdes.google.GeocodeAddress;
+import br.udesc.dcc.bdes.google.InverseGeocodingClient;
 import br.udesc.dcc.bdes.io.OpenWheatherDTOFileWriter;
 import br.udesc.dcc.bdes.io.TrackDTOCSVFileWriter;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
-import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
+import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.repository.MemoryRepository;
 import br.udesc.dcc.bdes.server.JettyServer;
 import br.udesc.dcc.bdes.server.rest.APIPath;
@@ -93,7 +91,6 @@ public class TrackAPI {
 		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
 		
 		//--------------------------------------------------------Cleaning noises
-		
 		/*
 		DBScan<Coordinate> dbscan = new DBScan<>();
 		DBScanResult<Coordinate> dbscaneResult = dbscan.evaluate(receivedTrajectory.getCoordinates(), 50.0, 5, Coordinate::distance);
@@ -111,10 +108,6 @@ public class TrackAPI {
 		*/
 		
 		//
-		
-		
-		
-		
 		//--------------------------------------------------------
 		
 		
@@ -169,14 +162,26 @@ public class TrackAPI {
 			//	continue;
 			//}
 			
-			//Optional<OpenWeatherConditionDTO> currentWeather = getLastPositionWeather(subTrajectory);
-			//trajectoryEval.evaluate(subTrajectory.getCoordinates(), currentWeather);
 			
 			
 			
+			boolean externalData = true; 
+			
+			if (externalData) {
+				Optional<Coordinate> optCoord = subTrajectory.getFirstCoordintae();
+				if (optCoord.isPresent()) {
+					Coordinate coord = optCoord.get();
+					Optional<OpenWeatherConditionDTO> optWeather = getWeather(coord.getLatitude(), coord.getLongitude());
+					Optional<GeocodeAddress> optAddress = getAddress(coord.getLatitude(), coord.getLongitude());
+					trajectoryEval.evaluate(subTrajectory.getCoordinates(), optWeather, optAddress);
+				}
+				
+			} else {
+				trajectoryEval.evaluate(subTrajectory.getCoordinates());
+			}
 			
 			
-			trajectoryEval.evaluate(subTrajectory.getCoordinates());
+			
 
 			if (isNewTrajectory) {
 				
@@ -208,6 +213,10 @@ public class TrackAPI {
 			trajectoryEval = new TrajectoryEvaluator();
 		}
 		
+	}
+	
+	private  Optional<GeocodeAddress> getAddress(double latitude, double longitude) {
+		return InverseGeocodingClient.getAddresses(latitude, longitude, JettyServer.get().getGoogleMapsKey().get());
 	}
 	
 	private Optional<OpenWeatherConditionDTO> getWeather(double latitude, double longitude) {

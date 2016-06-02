@@ -8,7 +8,7 @@ import java.util.Properties;
 import org.junit.Test;
 
 import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
-import br.udesc.dcc.bdes.openweather.OpenWeatherConditionDTO;
+import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.server.JettyServer;
 
 public class OpenWeatherTest {

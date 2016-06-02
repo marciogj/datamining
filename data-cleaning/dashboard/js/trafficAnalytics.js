@@ -193,7 +193,7 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 				startDateTime: new Date(data.startDateTime),
 				endDateTime: new Date(data.endDateTime),
 				timeInterval: hoursMins(new Date(data.startDateTime)) + ' - ' + hoursMins(new Date(data.endDateTime)),
-				timeClassification: 'Horário Comercial',
+				hourClassification: data.hourClassification,
 				totalDistance: data.totalDistance,
 				avgSpeed: data.avgSpeed,
 				maxSpeed: data.maxSpeed,
@@ -205,8 +205,11 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 				speedChanges: data.speedChanges,
 				agressiveIndex: "-",
 				overtakeCount: data.overtakeCount,
-				accEvaluation: data.accEvaluation
+				accEvaluation: data.accEvaluation,
+				streets: data.streets
 			};
+
+			console.log(data.streets);
 
 
 			self.evaluation = evaluation;

@@ -1,8 +1,8 @@
 import java.util.Optional;
 
 import br.udesc.dcc.bdes.google.GeocodeAddress;
-import br.udesc.dcc.bdes.google.GeocodeAddressDTO;
 import br.udesc.dcc.bdes.google.InverseGeocodingClient;
+import br.udesc.dcc.bdes.google.dto.GeocodeAddressDTO;
 
 
 public class Main {
@@ -21,7 +21,7 @@ public class Main {
 		double lon = -49.36797419;
 		 	
 		
-		Optional<GeocodeAddressDTO> address = InverseGeocodingClient.address(lat, lon, "AIzaSyDQD30bsMMQZ_QgkAa2qlNXROTEToa1wZY");
+		Optional<GeocodeAddressDTO> address = InverseGeocodingClient.geAddress(lat, lon, "AIzaSyDQD30bsMMQZ_QgkAa2qlNXROTEToa1wZY");
 		if(address.isPresent()) {
 			GeocodeAddress geoAddress = new GeocodeAddress(address.get());
 			System.out.println(geoAddress.getStreetAddress());
