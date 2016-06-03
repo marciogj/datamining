@@ -206,7 +206,7 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 				agressiveIndex: "-",
 				overtakeCount: data.overtakeCount,
 				accEvaluation: data.accEvaluation,
-				streets: data.streets
+				mainStreet: data.mainStreet
 			};
 
 			console.log(data.streets);
@@ -214,7 +214,7 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 
 			self.evaluation = evaluation;
           
-          }).error(function(data, status, header, config) {
+          }).error(function(data, status, header, config) {thgtt
           	console.log('Error: ' + status);
           });
 	};

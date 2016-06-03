@@ -19,7 +19,7 @@ public class SpeedLimit {
 		}
 	
 		//Rua ...
-		if (address.contains("R. ")){
+		if (address.contains("R. ") || address.contains("Rua ")){
 			return Speed.fromKmh(50);
 		}
 		

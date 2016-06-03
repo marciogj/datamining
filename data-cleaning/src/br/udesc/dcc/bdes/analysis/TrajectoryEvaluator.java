@@ -2,11 +2,12 @@ package br.udesc.dcc.bdes.analysis;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import br.udesc.dcc.bdes.google.GeocodeAddress;
@@ -58,7 +59,7 @@ public class TrajectoryEvaluator {
 	private double accSpeedSum;
 	private int accCoordinateCount;
 	
-	private Set<String> streets = new HashSet<>();
+	private Map<String, Double> streets = new HashMap();
 	
 	
 	private AccelerationEvaluator accEvaluator = new AccelerationEvaluator();
@@ -73,9 +74,17 @@ public class TrajectoryEvaluator {
 		return id;
 	}
 	
-			
-	public Set<String> getStreets() {
-		return streets;
+	public String getMainStreet() {
+		double max = 0;
+		String mainStreet = "";
+		for(Entry<String, Double> entry : streets.entrySet()) {
+			if (entry.getValue() > max) {
+				mainStreet = entry.getKey();
+				max = entry.getValue();
+			}
+		}
+		
+		return mainStreet;
 	}
 
 	public TrajectoryEvaluator(double maxAllowedSpeed, double maxAcceleration, double maxDeceleration) {
@@ -84,15 +93,22 @@ public class TrajectoryEvaluator {
 	}
 	
 	public void evaluate(Collection<Coordinate> coordinates, Optional<OpenWeatherConditionDTO> weather, Optional<GeocodeAddress> optAddress) {
-		if(optAddress.isPresent()) {
-			String streetAddress = optAddress.get().getStreetAddress();
-			streets.add(streetAddress);
-			Speed currentSpeedLimit = SpeedLimit.getSpeedByAddress(streetAddress);
-			MAX_ALLOWED_SPEED = currentSpeedLimit.getMs();
-		}
 		
+		double initialDistance = totalDistance;
 		for (Coordinate coordinate : coordinates) {
 			evaluate(coordinate, weather);
+		}
+		
+		double diffDistance = totalDistance - initialDistance;
+		
+		if(optAddress.isPresent()) {
+			String streetName = optAddress.get().getStreetName();
+			Double previous = streets.get(streetName);
+			previous = previous == null ? 0 : previous;
+			
+			streets.put(streetName, previous + diffDistance);
+			Speed currentSpeedLimit = SpeedLimit.getSpeedByAddress(streetName);
+			MAX_ALLOWED_SPEED = currentSpeedLimit.getMs();
 		}
 	}
 	

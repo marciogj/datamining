@@ -34,6 +34,13 @@ public class GeocodeAddress {
 		}
 	}
 
+	public String getStreetName() {
+		if (street_address.contains(",")) {
+			return street_address.split(",")[0];
+		}
+		return street_address;
+	}
+	
 	public String getStreetAddress() {
 		return street_address;
 	}

@@ -1,6 +1,5 @@
 package br.udesc.dcc.bdes.server.rest.api.track.dto;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -84,8 +83,8 @@ public class TrajectoryMapper {
 		dto.coordinateCount = evaluation.getTrajectory().size();
 		dto.accEvaluation = toDto(evaluation.getAccEvaluator());
 		
-		evaluation.getStreets().forEach( streetName -> dto.streets.add(streetName));
-		
+		//evaluation.getStreets().forEach( streetName -> dto.streets.add(streetName));
+		dto.mainStreet = evaluation.getMainStreet();
 		
 		dto.wheatherCondition = "-";
 		Optional<OpenWeatherConditionDTO> weatherData = evaluation.getCurrentWeather();
