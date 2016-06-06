@@ -193,12 +193,12 @@ public class TrajectoryEvaluator {
 		}
 		
 		if (maxSpeed > (120/3.6)) {
-			System.out.println("Que velocidade é essa?");
-			for(Coordinate c : trajectory.getCoordinates()) {
+			System.out.println("Que velocidade é essa? " + currentSpeed*3.6 + " km/h");
+			//for(Coordinate c : trajectory.getCoordinates()) {
 				
-				System.out.println(c);
-			}
-			System.err.println("...");
+			//	System.out.println(c);
+			//}
+			//System.err.println("...");
 		}
 		
 		//Update max acceleration/deceleration 
@@ -379,6 +379,21 @@ public class TrajectoryEvaluator {
 	public String getEndDate() {
 		return trajectory.getEnd().map(o -> o.toString()).orElse("");
 	}
+
+	public double getTotalDistance() {
+		return totalDistance;
+	}
+
+	public long getTotalTime() {
+		return totalTime;
+	}
+
+	public double getAggressiveIndex() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	
 }
 
 class AccInterval {
@@ -432,5 +447,7 @@ class AccInterval {
 	public void setTime(long time) {
 		this.time = time;
 	}
+	
+	
 
 }

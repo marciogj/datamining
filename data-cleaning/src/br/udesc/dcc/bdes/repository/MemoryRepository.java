@@ -10,13 +10,15 @@ import java.util.Optional;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.model.Device;
 import br.udesc.dcc.bdes.model.DeviceId;
+import br.udesc.dcc.bdes.model.DriverProfile;
+import br.udesc.dcc.bdes.model.UDriverId;
 
 
 public class MemoryRepository {
 	//private static Map<String, TrajectoryTelemetry> telemetryRepository = new HashMap<>();
 	private static Map<DeviceId, TrajectoryHistory> evaluationRepository = new HashMap<>();
-	
 	private static Map<DeviceId, Device> deviceRepository = new HashMap<>();
+	private static Map<UDriverId, DriverProfile> driverProfileRepository = new HashMap<>();
 	
 
 	
@@ -62,6 +64,9 @@ public class MemoryRepository {
 		return history.history;
 	}
 	
+	public void save(DriverProfile profile) {
+		driverProfileRepository.put(profile.getDriverId(), profile);
+	}
 	
 	public void save(Device vehicle) {
 		if (!vehicle.getId().isPresent()) {
@@ -97,37 +102,14 @@ public class MemoryRepository {
 		}
 		return Optional.empty();
 	}
+
+	public Optional<DriverProfile> loadDriverProfile(UDriverId userId) {
+		DriverProfile profile = driverProfileRepository.get(userId);
+		if (profile != null) {
+			return Optional.of(profile);
+		}
+		return Optional.empty();
+	}
 	
 }
 
-class TrajectoryHistory {
-	List<TrajectoryEvaluator> history = new LinkedList<>();
-	
-	public Optional<TrajectoryEvaluator> getLatest() {
-		if (history.isEmpty()) {
-			return Optional.empty();
-		}
-		return Optional.of(history.get(history.size()-1));
-	}
-
-	public void replaceLatest(TrajectoryEvaluator trajectoryEval) {
-		if(!history.isEmpty()) {
-			history.remove(history.size()-1);
-			history.add(trajectoryEval);
-		}
-	}
-
-	public void add(TrajectoryEvaluator trajectoryEval) {
-		history.add(trajectoryEval);
-	}
-	
-
-	public Optional<TrajectoryEvaluator> findById(String id) {
-		return history.stream().filter(trajectoryEval -> trajectoryEval.getId().equals(id)).findFirst();	
-	}
-	
-	public int size() {
-		return history.size();
-	}
-	
-}

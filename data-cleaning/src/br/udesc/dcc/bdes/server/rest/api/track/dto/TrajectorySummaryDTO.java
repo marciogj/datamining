@@ -15,7 +15,7 @@ public class TrajectorySummaryDTO {
 	
 	public String maxDec; //= "2 m/s²";
 	public String maxAcc; //= "4 m/s²";
-
+	
 	//public List<String> streets = new ArrayList<>();
 	public String mainStreet;
 	

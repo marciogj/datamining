@@ -12,6 +12,7 @@ import br.udesc.dcc.bdes.analysis.AccelerationLimit;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.DriverProfile;
 import br.udesc.dcc.bdes.model.Speed;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
@@ -151,6 +152,16 @@ public class TrajectoryMapper {
 			dto.coordinates.add(toDto(coordinate));
 		}
 		
+		return dto;
+	}
+
+	public static DriverProfileDTO toDto(DriverProfile profile) {
+		DriverProfileDTO dto = new DriverProfileDTO();
+		dto.aggressiveIndex = profile.getAggressiveIndex();
+		dto.deviceId = profile.getDeviceId().getValue();
+		dto.driverId = profile.getDriverId().getValue();
+		dto.traveledDistance = profile.getTraveledDistance();
+		dto.traveledTime = profile.getTraveledTime();
 		return dto;
 	}
 

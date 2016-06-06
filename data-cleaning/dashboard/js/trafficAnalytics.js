@@ -5,8 +5,10 @@ var app = angular.module('trafficAnalytics', [
 var DBP_API = "http://localhost:9090/services";
 
 var weekDayMonth = function(date) {
-	var weekDays = [ 'Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-	var months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+	//var weekDays = [ 'Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+	//var months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+	var weekDays = [ 'Sunday', 'Monday', 'Tuesday', 'wednesday', 'Thursday', 'Friday', 'Saturday'];
+	var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 	var weekDay = weekDays[date.getDay()];
 	var month = months[date.getMonth()];
@@ -161,6 +163,12 @@ app.controller('driversCtrl',  ['$scope','$stateParams',  function($scope , $sta
 
 app.controller('driverProfileCtrl',  ['$scope','$stateParams', '$http',  function($scope , $stateParams, $http){
 	var self = this;
+	self.riskAlerts = 3;
+	self.agressiveIndex = 32;
+	self.traveledDistance = "3.020";
+	self.traveledTime = "00d 21:35";
+
+	console.log('888888');	
 
 	function requestAllTrajectoryById(id) {
 
@@ -201,9 +209,9 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 				maxAcc: data.maxAcc,
 				wheatherCondition: data.wheatherCondition,
 				trafficCondition: data.trafficCondition,
-				riskAlerts: data.riskAlerts,
+				riskAlerts: 4,//data.riskAlerts,
 				speedChanges: data.speedChanges,
-				agressiveIndex: "-",
+				agressiveIndex: 32,
 				overtakeCount: data.overtakeCount,
 				accEvaluation: data.accEvaluation,
 				mainStreet: data.mainStreet

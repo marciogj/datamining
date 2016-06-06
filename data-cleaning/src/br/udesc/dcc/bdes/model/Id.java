@@ -12,6 +12,7 @@ public class Id {
 	
 	public Id(String id) {
 		super();
+		if(id == null) throw new NullPointerException();
 		this.id = id;
 	}
 

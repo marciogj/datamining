@@ -18,7 +18,9 @@ import br.udesc.dcc.bdes.io.OpenWheatherDTOFileWriter;
 import br.udesc.dcc.bdes.io.TrackDTOCSVFileWriter;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.DeviceId;
+import br.udesc.dcc.bdes.model.DriverProfile;
 import br.udesc.dcc.bdes.model.Trajectory;
+import br.udesc.dcc.bdes.model.UDriverId;
 import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.repository.MemoryRepository;
@@ -90,6 +92,8 @@ public class TrackAPI {
 		TrajectoryEvaluator trajectoryEval = new TrajectoryEvaluator();
 		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
 		
+		
+		
 		//--------------------------------------------------------Cleaning noises
 		/*
 		DBScan<Coordinate> dbscan = new DBScan<>();
@@ -109,6 +113,15 @@ public class TrackAPI {
 		
 		//
 		//--------------------------------------------------------
+		
+		UDriverId driverId = new UDriverId(trackDto.userId);
+		Optional<DriverProfile> optDriverProfile = repository.loadDriverProfile(driverId);
+		if (!optDriverProfile.isPresent()) {
+			repository.save(new DriverProfile(driverId, new DeviceId(trackDto.deviceId)));
+			optDriverProfile = repository.loadDriverProfile(driverId);
+		}
+		DriverProfile driverProfile = optDriverProfile.get();
+		
 		
 		
 		Optional<TrajectoryEvaluator> dbTrajectory = repository.loadLatestTrajectoryEvaluationById(new DeviceId(trackDto.deviceId));
@@ -165,7 +178,7 @@ public class TrackAPI {
 			
 			
 			
-			boolean externalData = true; 
+			boolean externalData = false; 
 			
 			if (externalData) {
 				Optional<Coordinate> optCoord = subTrajectory.getFirstCoordintae();
@@ -195,6 +208,7 @@ public class TrackAPI {
 					repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
 					
 					
+					
 					//conn = DBPool.getConnection().orElseThrow( () -> new RuntimeException("Could not allocate db connection"));
 					//TrajectoryDAO dao = new TrajectoryDAO(conn);
 					//dao.add(trajectoryEval.getTrajectory());
@@ -209,7 +223,11 @@ public class TrackAPI {
 				repository.updateLatest(new DeviceId(trackDto.deviceId), trajectoryEval);
 				isNewTrajectory  = true; //the next trajectory is a new one from subtrajectories
 			}
-
+			
+			driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
+			driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
+			driverProfile.addAggressiveIndex(trajectoryEval.getAggressiveIndex());
+			
 			trajectoryEval = new TrajectoryEvaluator();
 		}
 		

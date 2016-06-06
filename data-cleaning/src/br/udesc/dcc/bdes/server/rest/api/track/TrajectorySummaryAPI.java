@@ -13,6 +13,8 @@ import javax.ws.rs.core.MediaType;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.model.DeviceId;
+import br.udesc.dcc.bdes.model.Distance;
+import br.udesc.dcc.bdes.model.Time;
 import br.udesc.dcc.bdes.repository.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.SpeedTelemetryDTO;
@@ -59,9 +61,21 @@ public class TrajectorySummaryAPI {
 	public List<TrajectorySummaryDTO> getTrajectoriesSummary(@PathParam("id") String deviceId) {
 		//logger.info("getTrajectoriesSummary " + deviceId);
 		List<TrajectoryEvaluator> evaluation = repository.loadTrajectoriesEvaluationById(new DeviceId(deviceId));
-				
+		double distance = 0;
+		long time = 0;
+		for (TrajectoryEvaluator eval : evaluation) {
+			distance += eval.getTotalDistance();
+			time += eval.getTotalTime();
+		}
+		Distance d = new Distance(distance);
+		System.out.println("Distância: " + d.getKilometers());
+		
+		Time t = new Time(time);
+		System.out.println("Tempo: " + t.getTime());
+ 		
 		//Fn.transform(evaluation, TrajectoryMapper::toDto);
-		return evaluation.stream().map(TrajectoryMapper::toDto).collect(Collectors.toList());
+		//return evaluation.stream().map(TrajectoryMapper::toDto).collect(Collectors.toList());
+		return evaluation.stream().map(eval -> TrajectoryMapper.toDto(eval)).filter(dto -> dto.coordinateCount > 10).collect(Collectors.toList());
 	}
 	
 	@GET

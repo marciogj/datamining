@@ -29,9 +29,9 @@ public class GPSReplay {
 	public static void main(String[] args) {
 		System.out.println("Simulating GPS coordinates from recorded files...");
 		//String dirPath = "C:\\Users\\marciogj\\SkyDrive\\gps-tracker-service\\001";
-		//String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\GPSTracker\\";
+		String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\GPSTracker\\";
 		Locale.setDefault(Locale.US);
-		String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\Evaluation\\";
+		//String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\Evaluation\\";
 		File dir = new File(baseDir);
 		
 		for (File subdir : dir.listFiles()) {
@@ -62,7 +62,7 @@ public class GPSReplay {
 			//TODO: Evaluate track changes 
 			//TODO: Evaluate important places like schools 
 			for (Coordinate coordinate : trajectory.getCoordinates()) {
-				System.out.println(coordinate);
+				//System.out.println(coordinate);
 
 				evaluator.evaluate(coordinate);
 				TrajectoryEvaluation telemetry = evaluator.getCurrentTelemetry();
@@ -112,6 +112,7 @@ public class GPSReplay {
 	}
 
 	public static void replayToService(Trajectory trajectory) {
+		if (trajectory.size() == 0) return;
 		healthCheck();
 		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target(SERVER_URL);
@@ -156,7 +157,7 @@ public class GPSReplay {
 				Trajectory subTrajectory = SeniorCSVFileReader.read(dirPath+"\\"+file);
 				trajectory.addAll(subTrajectory.getCoordinates());
 				trajectory.setDeviceId(subTrajectory.getDeviceId());
-				trajectory.setUserId(trajectory.getUserId());
+				trajectory.setUserId(subTrajectory.getUserId());
 			}
 		}
 

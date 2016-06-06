@@ -8,12 +8,13 @@
 	      <h3>{{vm.evaluation.trajectoryTime}}</h3>
 	      <p>{{vm.evaluation.startDateStr}}</p>
 	      <h2>{{vm.evaluation.timeInterval}}</h2>
-	      <p>{{vm.evaluation.hourClassification}}</p>
+	      <!-- <p>{{vm.evaluation.hourClassification}}</p> -->
+	      <p>Night</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-ios-stopwatch"></i>
 	    </div>
-	    <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+	    <a href="#" class="small-box-footer">Details <i class="fa fa-arrow-circle-right"></i></a>
 	  </div>
 	</div><!-- ./col -->
 	<div class="col-lg-3 col-xs-6">
@@ -21,14 +22,15 @@
 	  <div class="small-box bg-green">
 	    <div class="inner">
 	      <h3>{{vm.evaluation.totalDistance}}</sup></h3>
-	      <p>percorridos</p>
+	      <!-- <p>percorridos</p> -->
+	      <p>traveled</p>
 	      <h2>{{vm.evaluation.mainStreet}}</h2>
-	      <p>Trajeto Principal</p>
+	      <p>Main road</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-android-navigate"></i>
 	    </div>
-	    <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+	    <a href="#" class="small-box-footer">Details <i class="fa fa-arrow-circle-right"></i></a>
 	  </div>
 	</div><!-- ./col -->
 	<div class="col-lg-3 col-xs-6">
@@ -36,14 +38,14 @@
 	  <div class="small-box bg-yellow">
 	    <div class="inner">
 	      <h3>{{vm.evaluation.avgSpeed}}</h3>
-	      <p>Velocidade média</p>
+	      <p>Avg speed</p>
 	      <h2>{{vm.evaluation.maxSpeed}}</h2>
-	      <p>Velocidade Máxima</p>
+	      <p>Max speed</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-speedometer"></i>
 	    </div>
-	    <a ui-sref="trajectory-telemetry({id: vm.evaluation.evaluationId})" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+	    <a ui-sref="trajectory-telemetry({id: vm.evaluation.evaluationId})" class="small-box-footer">Details <i class="fa fa-arrow-circle-right"></i></a>
 	  </div>
 	</div><!-- ./col -->
 	<div class="col-lg-3 col-xs-6">
@@ -51,14 +53,14 @@
 	  <div class="small-box bg-red">
 	    <div class="inner">
 	      <h3>{{vm.evaluation.maxDec}}</h3>
-	      <p>Desaceleração Máxima</p>
+	      <p>Max deceleration</p>
 	      <h2>{{vm.evaluation.maxAcc}}</h2>
-	      <p>Aceleração Máxima</p>
+	      <p>Max acceleration</p>
 	    </div>
 	    <div class="icon">
-	      <i class="ion ion-ios-rainy"></i>
+	      <i class="ion ion-arrow-graph-up-right"></i>
 	    </div>
-	    <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+	    <a href="#" class="small-box-footer">Details <i class="fa fa-arrow-circle-right"></i></a>
 	  </div>
 	</div><!-- ./col -->
 </div><!-- /.row -->
@@ -70,12 +72,12 @@
 	  <div class="small-box bg-aqua">
 	    <div class="inner">
 	      <h3>{{vm.evaluation.riskAlerts}}</h3>
-	      <p>Alertas de risco</p>
+	      <p>Risk Alerts</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-alert-circled"></i>
 	    </div>
-	    <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+	    <a href="#" class="small-box-footer">Details <i class="fa fa-arrow-circle-right"></i></a>
 	  </div>
 	</div><!-- ./col -->
 	<div class="col-lg-3 col-xs-6">
@@ -83,12 +85,12 @@
 	  <div class="small-box bg-green">
 	    <div class="inner">
 	      <h3>{{vm.evaluation.speedChanges}}</sup></h3>
-	      <p>Oscilações da velocidade</p>
+	      <p>Acceleration changes</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-arrow-swap fa-rotate-90"></i>
 	    </div>
-	    <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+	    <a href="#" class="small-box-footer">Details <i class="fa fa-arrow-circle-right"></i></a>
 	  </div>
 	</div><!-- ./col -->
 	<div class="col-lg-3 col-xs-6">
@@ -96,12 +98,12 @@
 	  <div class="small-box bg-yellow">
 	    <div class="inner">
 	      <h3>{{vm.evaluation.agressiveIndex}}</h3>
-	      <p>Índice de Agressividade</p>
+	      <p>Aggressiveness Index</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-stats-bars"></i>
 	    </div>
-	    <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+	    <a href="#" class="small-box-footer">Details <i class="fa fa-arrow-circle-right"></i></a>
 	  </div>
 	</div><!-- ./col -->
 
@@ -111,14 +113,15 @@
 	    <div class="inner">
 	      <h3></h3>
 	      <p>{{vm.evaluation.wheatherCondition}}</p>
-		  <p>{{vm.evaluation.trafficCondition}}</p>
+		  <!-- <p>{{vm.evaluation.trafficCondition}}</p> -->
+		  <p>Normal Traffic</p>
 	    </div>
 	    <div class="icon">
-	      <i class="ion ion-ios-rainy"></i>
+	      <i class="ion ion-ios-cloudy-night"></i>
 	    </div>
-	    <a href="#" class="small-box-footer">Ver mais <i class="fa fa-arrow-circle-right"></i></a>
+	    <a href="#" class="small-box-footer">Details <i class="fa fa-arrow-circle-right"></i></a>
 	  </div>
 	</div><!-- ./col -->
 </div><!-- /.row -->
-<a ui-sref="trajectory-map({evaluationId: vm.evaluation.evaluationId})">Mapa</a>
-<a ui-sref="trajectory-coordinates({evaluationId: vm.evaluation.evaluationId})">Coordenadas</a>
+<a ui-sref="trajectory-map({evaluationId: vm.evaluation.evaluationId})">Map</a>
+<a ui-sref="trajectory-coordinates({evaluationId: vm.evaluation.evaluationId})">Coordinates</a>

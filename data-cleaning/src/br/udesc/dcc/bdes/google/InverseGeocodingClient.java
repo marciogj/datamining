@@ -21,14 +21,14 @@ public class InverseGeocodingClient {
 				.queryParam("latlng", latitude + "," + longitude)
 				.queryParam("key", apiKey)
 				.request(MediaType.APPLICATION_JSON).get();
-		
+		//System.out.println("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude+"&key="+apiKey);
 		GeocodeAddressDTO address = response.readEntity(GeocodeAddressDTO.class);
 		return Optional.of(address);
 	}
 	
 	public static Optional<GeocodeAddress> getAddresses(double latitude, double longitude, String apiKey) {
 		Optional<GeocodeAddressDTO> address = geAddress(latitude, longitude, apiKey);
-		if (address.isPresent()) {
+		if (address.isPresent() && !address.get().results.isEmpty()) {
 			return Optional.of(new GeocodeAddress(address.get()));
 		}
 		return Optional.empty();
