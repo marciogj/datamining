@@ -69,8 +69,8 @@ public class TrajectoryMapper {
 		dto.avgSpeed = String.format("%.2f km/h", telemetry.avgSpeed.getKmh());
 		dto.maxSpeed = String.format("%.2f km/h", telemetry.maxSpeed.getKmh());
 
-		dto.maxAcc = String.format("%.2f m/s²", telemetry.maxAcc.getMPerSec2()); 
-		dto.maxDec = String.format("%.2f m/s²", telemetry.maxDec.getMPerSec2());
+		dto.maxAcc = String.format("%.2f m/sÂ²", telemetry.maxAcc.getMPerSec2()); 
+		dto.maxDec = String.format("%.2f m/sÂ²", telemetry.maxDec.getMPerSec2());
 		
 		
 		dto.overtakeCount = "-";
@@ -83,6 +83,7 @@ public class TrajectoryMapper {
 		dto.trajectoryTime = telemetry.trajectoryTime.getTime();
 		dto.coordinateCount = evaluation.getTrajectory().size();
 		dto.accEvaluation = toDto(evaluation.getAccEvaluator());
+		dto.agressiveIndex = String.format("%.2f ", evaluation.getAggressiveIndex()); 
 		
 		//evaluation.getStreets().forEach( streetName -> dto.streets.add(streetName));
 		dto.mainStreet = evaluation.getMainStreet();

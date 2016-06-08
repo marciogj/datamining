@@ -19,6 +19,7 @@ import br.udesc.dcc.bdes.model.Time;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
+import br.udesc.dcc.bdes.server.rest.api.track.SpeedIndexEval;
 
 
 /**
@@ -59,8 +60,19 @@ public class TrajectoryEvaluator {
 	private double accSpeedSum;
 	private int accCoordinateCount;
 	
-	private Map<String, Double> streets = new HashMap();
+	private Map<String, Double> streets = new HashMap<>();
 	
+	
+	private SpeedIndexEval speedEvaluator = new SpeedIndexEval();
+	
+	private Distance segmentDistance = new Distance();
+	private List<Double> segmentSpeedIndexes = new LinkedList<>();
+	private List<Double> segmentAccelerationIndexes = new LinkedList<>();
+	//private List<Double> segmentDeccelerationIndexes = new LinkedList<>();
+	
+	private List<Double> trajectorySpeedIndexes = new LinkedList<>();
+	private List<Double> trajectoryAccelerationIndexes = new LinkedList<>();
+	//private List<Double> trajectoryDeccelerationIndexes = new LinkedList<>();
 	
 	private AccelerationEvaluator accEvaluator = new AccelerationEvaluator();
 	
@@ -109,6 +121,7 @@ public class TrajectoryEvaluator {
 			streets.put(streetName, previous + diffDistance);
 			Speed currentSpeedLimit = SpeedLimit.getSpeedByAddress(streetName);
 			MAX_ALLOWED_SPEED = currentSpeedLimit.getMs();
+			speedEvaluator.changeMax(new Speed(MAX_ALLOWED_SPEED));
 		}
 	}
 	
@@ -116,7 +129,7 @@ public class TrajectoryEvaluator {
 		LocalDateTime startTime = trajectory.getStart().get();
 		int hour = startTime.getHour();
 		if (hour > 7 && hour < 19 ) {
-			return "Horário Comercial";
+			return "HorÃ¡rio Comercial";
 		}
 		
 		if (hour > 0 && hour < 5 ) {
@@ -130,14 +143,14 @@ public class TrajectoryEvaluator {
 		LocalDateTime startTime = trajectory.getStart().get();
 		int hour = startTime.getHour();
 		if (hour > 7 && hour < 19 ) {
-			return "Trânsito Intenso";
+			return "TrÃ¢nsito Intenso";
 		}
 		
 		if (hour > 0 && hour < 5 ) {
-			return "Trânsito Livre";
+			return "TrÃ¢nsito Livre";
 		}
 		
-		return "Trânsito Tranquilo"; 
+		return "TrÃ¢nsito Tranquilo"; 
 	}
 	
 	public void evaluate(Collection<Coordinate> coordinates) {
@@ -193,12 +206,7 @@ public class TrajectoryEvaluator {
 		}
 		
 		if (maxSpeed > (120/3.6)) {
-			System.out.println("Que velocidade é essa? " + currentSpeed*3.6 + " km/h");
-			//for(Coordinate c : trajectory.getCoordinates()) {
-				
-			//	System.out.println(c);
-			//}
-			//System.err.println("...");
+			System.out.println("NOISE: " + currentSpeed*3.6 + " km/h");
 		}
 		
 		//Update max acceleration/deceleration 
@@ -239,10 +247,41 @@ public class TrajectoryEvaluator {
 			//	decelerationCount++;
 			//}
 		}
-		
 		previousCoordinate = currentCoordinate;
 		
+		segmentDistance.increase(distanceFromPrevious);
+		if (segmentDistance.getKilometers() >= 1) {
+			updateAggressiveIndex();
+			clearSegment();
+		} else {
+			segmentSpeedIndexes.add(speedEvaluator.evaluate(currentSpeed));
+			segmentAccelerationIndexes.add(accEvaluator.evaluate(currentAcceleration));
+			//segmentDeccelerationIndexes.add();
+		}
+		
 		return currentCoordinate;
+	}
+		
+	private double avgIndex(List<Double> list) {
+		if (list.size() == 0) return 0;
+		double sum = 0;
+		for (Double value : list) {
+			sum += value;
+		}
+		return sum/list.size();
+	}
+	
+	private void updateAggressiveIndex() {
+		trajectorySpeedIndexes.add(avgIndex(segmentSpeedIndexes));
+		trajectoryAccelerationIndexes.add(avgIndex(segmentAccelerationIndexes));
+		//trajectoryDeccelerationIndexes.add(avgIndex(segmentDeccelerationIndexes));
+	}
+	
+	private void clearSegment() {
+		segmentDistance.reset();
+		segmentSpeedIndexes.clear();
+		segmentAccelerationIndexes.clear();
+		//segmentDeccelerationIndexes.clear();
 	}
 			
 	private Coordinate updateMomentum(final Coordinate previousCoordinate, final Coordinate currentCoordinate) {
@@ -359,6 +398,11 @@ public class TrajectoryEvaluator {
 				subtrajectory.add(currentCoord);
 				continue;
 			}
+			
+			if (currentCoord.getDateTime().equals(LocalDateTime.of(2015, 11, 11, 10, 40,26)) ) {
+				System.out.println(currentCoord);
+				System.out.println(previousCoord);
+			}
 			long difference = currentCoord.getDateTimeInMillis() - previousCoord.getDateTimeInMillis();
 			if (difference <= timeToleranceMilis) {
 				subtrajectory.add(currentCoord);
@@ -389,8 +433,11 @@ public class TrajectoryEvaluator {
 	}
 
 	public double getAggressiveIndex() {
-		// TODO Auto-generated method stub
-		return 0;
+		double speedIndex = avgIndex(trajectorySpeedIndexes);
+		double accIndex = avgIndex(trajectoryAccelerationIndexes);
+		//double decIndex = avgIndex(trajectoryDeccelerationIndexes);
+		//return (speedIndex + accIndex + decIndex)/3;
+		return (speedIndex + accIndex)/2;
 	}
 	
 	

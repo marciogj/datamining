@@ -91,9 +91,7 @@ public class TrackAPI {
 	private void evaluateTrack(TrackDTO trackDto) {
 		TrajectoryEvaluator trajectoryEval = new TrajectoryEvaluator();
 		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
-		
-		
-		
+				
 		//--------------------------------------------------------Cleaning noises
 		/*
 		DBScan<Coordinate> dbscan = new DBScan<>();
@@ -136,7 +134,7 @@ public class TrackAPI {
 			
 			long lastTimePreviousCoord = receivedCoordinate.isPresent() ? receivedCoordinate.get().getDateTimeInMillis() : 0;
 			long firstTimeCurrentCoord = latestCoodrinate.isPresent() ? latestCoodrinate.get().getDateTimeInMillis() : 0;
-			long difference = firstTimeCurrentCoord - lastTimePreviousCoord;
+			long difference = lastTimePreviousCoord - firstTimeCurrentCoord;
 			//Evaluates whether it is the same trajectory or a new one
 			isNewTrajectory = difference > timeTolerance;
 			if (!isNewTrajectory) {
@@ -145,9 +143,9 @@ public class TrackAPI {
 		}
 		
 		//identificar o meio de transporte
-		//aceleração baixa
-		//velocidade média abaixo de 10km/h
-		//velocidade máxima abaixo de 20 km/h
+		//aceleraï¿½ï¿½o baixa
+		//velocidade mï¿½dia abaixo de 10km/h
+		//velocidade mï¿½xima abaixo de 20 km/h
 		
 		
 		List<Trajectory> subtrajectoriesByTime = trajectoryEval.subtrajectoriesByTime(receivedTrajectory, timeTolerance);
@@ -159,7 +157,7 @@ public class TrackAPI {
 		//}
 		
 		
-		//TODO: Avaliar se é necessário mesmo ordenar após a clusterização
+		//TODO: Avaliar se ï¿½ necessï¿½rio mesmo ordenar apï¿½s a clusterizaï¿½ï¿½o
 //		Collections.sort(subTrajectory.getCoordinates(), new Comparator<Coordinate>(){
 //			public int compare(Coordinate c1, Coordinate c2){
 //				return c1.getDateTime().compareTo(c2.getDateTime());
@@ -169,15 +167,10 @@ public class TrackAPI {
 		
 		
 		for (Trajectory subTrajectory : subtrajectoriesByTime) {
-			
 			//if (subtrajectoriesByTransport.get(subTrajectory) == TransportType.NON_MOTORIZED) {
 			//	System.out.println("Ignoring trajectory with " + subTrajectory.size() + " coordinates since it is no motorized");
 			//	continue;
 			//}
-			
-			
-			
-			
 			boolean externalData = false; 
 			
 			if (externalData) {
@@ -194,14 +187,7 @@ public class TrackAPI {
 			}
 			
 			
-			
-
 			if (isNewTrajectory) {
-				
-				//Trajetórias muito curtas 
-				//if (trajectoryEval.getCurrentTelemetry().trajectoryDistance.getKilometers() < 2) {
-				//	continue;
-				//}
 				
 				//Connection conn = null;
 				//try {

@@ -29,7 +29,9 @@ public class GPSReplay {
 	public static void main(String[] args) {
 		System.out.println("Simulating GPS coordinates from recorded files...");
 		//String dirPath = "C:\\Users\\marciogj\\SkyDrive\\gps-tracker-service\\001";
-		String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\GPSTracker\\";
+		
+		
+		String baseDir = "C:\\Users\\marcio.jasinski\\OneDrive\\gps-tracker-service";
 		Locale.setDefault(Locale.US);
 		//String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\Evaluation\\";
 		File dir = new File(baseDir);
@@ -73,8 +75,8 @@ public class GPSReplay {
 				System.out.println("AvgSpeed: " + String.format("%.2f km/h", telemetry.avgSpeed.getKmh()));
 				System.out.println("MaxSpeed: " + String.format("%.2f km/h", telemetry.maxSpeed.getKmh()));
 
-				System.out.println("MaxAcc: " + String.format("%.2f km/m²", telemetry.maxAcc.getKmPerMin2()));
-				System.out.println("MaxDec: " + String.format("%.2f km/m²", telemetry.maxDec.getKmPerMin2()));
+				System.out.println("MaxAcc: " + String.format("%.2f km/mï¿½", telemetry.maxAcc.getKmPerMin2()));
+				System.out.println("MaxDec: " + String.format("%.2f km/mï¿½", telemetry.maxDec.getKmPerMin2()));
 				System.out.println("AccCount: " + telemetry.accCount);
 				System.out.println("DecCount: " + telemetry.decCount);
 

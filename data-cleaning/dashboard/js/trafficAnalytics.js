@@ -211,7 +211,7 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 				trafficCondition: data.trafficCondition,
 				riskAlerts: 4,//data.riskAlerts,
 				speedChanges: data.speedChanges,
-				agressiveIndex: 32,
+				agressiveIndex: data.agressiveIndex,
 				overtakeCount: data.overtakeCount,
 				accEvaluation: data.accEvaluation,
 				mainStreet: data.mainStreet

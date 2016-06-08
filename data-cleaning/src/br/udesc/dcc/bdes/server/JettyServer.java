@@ -148,7 +148,7 @@ public class JettyServer {
 	public void startServer() {
 		logger.info("Initializing WebSocket server on port " + HTTP_PORT);
         
-		mySQLHealthCheck();		
+		//mySQLHealthCheck();		
 		
 		Server server = new Server();
         properties = loadServerProperties();

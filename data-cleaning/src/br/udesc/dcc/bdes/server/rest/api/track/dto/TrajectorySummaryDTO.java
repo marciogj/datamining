@@ -13,20 +13,20 @@ public class TrajectorySummaryDTO {
 	public String avgSpeed; //= "53 km/h";
 	public String maxSpeed; //= "153 km/h";
 	
-	public String maxDec; //= "2 m/s²";
-	public String maxAcc; //= "4 m/s²";
+	public String maxDec; //= "2 m/sï¿½";
+	public String maxAcc; //= "4 m/sï¿½";
 	
 	//public List<String> streets = new ArrayList<>();
 	public String mainStreet;
 	
 	
 	public String wheatherCondition; // "Chuva Forte";
-	public String trafficCondition; //= "Trânsito Intenso";
+	public String trafficCondition; //= "TrÃ¢nsito Intenso";
 	public String hourClassification; //= comercial, madrugada
 	public Integer riskAlerts; // = "3";
 	public Integer speedChanges; //= "455";
 	
-	public Integer agressiveIndex; //= "62";
+	public String agressiveIndex; //= "62";
 	public String overtakeCount; // = "15";
 	public Integer coordinateCount;
 	
