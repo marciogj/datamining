@@ -30,7 +30,7 @@
             </tr>
             <tr ng-repeat="driver in vm.drivers">
               <td>{{driver.id}}</td>
-              <td><a ui-sref="driver-profile({id: driver.id})">{{driver.name}}</a></td>
+              <td><a ui-sref="driver-profile({id: driver.id, userId: driver.userId})">{{driver.name}}</a></td>
               <td>{{driver.trajectories}}</td>
               <td><span class="label" ng-class="{
 		         'label-success': driver.profileIndex <= 49,

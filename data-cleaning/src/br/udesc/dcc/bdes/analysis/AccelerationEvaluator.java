@@ -1,12 +1,16 @@
 package br.udesc.dcc.bdes.analysis;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.math3.util.Pair;
 
+import br.udesc.dcc.bdes.server.rest.api.track.Alert;
+
 public class AccelerationEvaluator {
 	private List<AccelerationLimit> limits = new ArrayList<>();
+	private List<Alert> alerts = new LinkedList<>();
 	
 	public AccelerationEvaluator() {
 		//Definition according to Bagdadi and Varhelyi
@@ -26,6 +30,14 @@ public class AccelerationEvaluator {
 		double maxValue = limits.getFirst();
 		double maxPercentage = limits.getSecond();
 		double index = (Math.abs(acceleration) * maxPercentage)/maxValue;
+		
+		if (index >= 20 && index <= 50) {
+			alerts.add(Alert.severe("Aggressive Acceleration: " + acceleration + " m/s²"));
+		}
+		if (index > 50) {
+			alerts.add(Alert.verySevere("Very aggressive Acceleration: " + acceleration + " m/s²"));
+		}
+		
 		return index > 100 ? 100 : index;
 	}
 	
@@ -84,6 +96,14 @@ public class AccelerationEvaluator {
 	
 	public List<AccelerationLimit> getAccEval(){
 		return limits;
+	}
+
+	public List<Alert> getAlerts() {
+		return alerts;
+	}
+
+	public void clearAlerts() {
+		this.alerts.clear();
 	}
 }
 

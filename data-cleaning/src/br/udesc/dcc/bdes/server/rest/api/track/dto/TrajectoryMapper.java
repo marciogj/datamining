@@ -12,8 +12,10 @@ import br.udesc.dcc.bdes.analysis.AccelerationLimit;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.Distance;
 import br.udesc.dcc.bdes.model.DriverProfile;
 import br.udesc.dcc.bdes.model.Speed;
+import br.udesc.dcc.bdes.model.Time;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
@@ -74,7 +76,7 @@ public class TrajectoryMapper {
 		
 		
 		dto.overtakeCount = "-";
-		dto.riskAlerts = 0;
+		dto.riskAlerts = evaluation.getAlerts().size();
 		dto.speedChanges = telemetry.accCount + telemetry.decCount;
 		dto.totalDistance = String.format("%.2f km", telemetry.trajectoryDistance.getKilometers());
 		
@@ -161,8 +163,9 @@ public class TrajectoryMapper {
 		dto.aggressiveIndex = profile.getAggressiveIndex();
 		dto.deviceId = profile.getDeviceId().getValue();
 		dto.driverId = profile.getDriverId().getValue();
-		dto.traveledDistance = profile.getTraveledDistance();
-		dto.traveledTime = profile.getTraveledTime();
+		dto.traveledDistance = new Distance(profile.getTraveledDistance()).getKilometers();
+		dto.traveledTime = new Time(profile.getTraveledTime()).getTime();
+		dto.alerts = profile.getAlerts();
 		return dto;
 	}
 

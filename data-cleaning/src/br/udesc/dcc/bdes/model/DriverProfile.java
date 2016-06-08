@@ -3,8 +3,9 @@ package br.udesc.dcc.bdes.model;
 public class DriverProfile {
 	private UDriverId driverId;
 	private DeviceId deviceId;
-	private long traveledDistance = 0;
+	private double traveledDistance = 0;
 	private long traveledTime = 0;
+	private int alerts = 0;
 	private double aggressiveIndexSum = 0;
 	private double aggressiveIndexCount = 0;
 	
@@ -30,11 +31,11 @@ public class DriverProfile {
 		this.deviceId = deviceId;
 	}
 
-	public long getTraveledDistance() {
+	public double getTraveledDistance() {
 		return traveledDistance;
 	}
 
-	public void setTraveledDistance(long traveledDistance) {
+	public void setTraveledDistance(double traveledDistance) {
 		this.traveledDistance = traveledDistance;
 	}
 
@@ -62,6 +63,18 @@ public class DriverProfile {
 	
 	public double getAggressiveIndex() {
 		return aggressiveIndexSum/aggressiveIndexCount;
+	}
+
+	public int getAlerts() {
+		return alerts;
+	}
+
+	public void setAlerts(int alerts) {
+		this.alerts = alerts;
+	}
+
+	public void increaseAlerts(int size) {
+		this.alerts += alerts;
 	}
 	
 }

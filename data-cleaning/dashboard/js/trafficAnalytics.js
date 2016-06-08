@@ -48,7 +48,7 @@ app.config(function($locationProvider, $stateProvider, $urlRouterProvider) {
     })
 
     .state('driver-profile', {
-      url: "/driver-profile/{id}",
+      url: "/driver-profile?{id}&{userId}",
       templateUrl: "views/driver-profile.html",
       controller: 'driverProfileCtrl',
       controllerAs: 'vm'
@@ -152,9 +152,9 @@ app.controller('driversCtrl',  ['$scope','$stateParams',  function($scope , $sta
 	//moto-x
 	var listAllDrivers = function() {
 		return [
-			{id: 'moto-x', name: 'Marcio Jasinski', trajectories: 745, profileIndex: 25},
-			{id: '2', name: 'Anderson Torres', trajectories: 3, profileIndex: 51},
-			{id: '3', name: 'Taxi GTD-8912', trajectories: 1, profileIndex: 75}
+			{id: 'moto-x', userId: 'marcio.jasinski', name: 'Marcio Jasinski', trajectories: 745, profileIndex: 25},
+			{id: '2', userId: 'anderson.torres', name: 'Anderson Torres', trajectories: 3, profileIndex: 51},
+			{id: '3', userId: 'taxi.gtd8912', name: 'Taxi GTD-8912', trajectories: 1, profileIndex: 75}
 		];
 	};
 
@@ -164,11 +164,6 @@ app.controller('driversCtrl',  ['$scope','$stateParams',  function($scope , $sta
 app.controller('driverProfileCtrl',  ['$scope','$stateParams', '$http',  function($scope , $stateParams, $http){
 	var self = this;
 	self.riskAlerts = 3;
-	self.agressiveIndex = 32;
-	self.traveledDistance = "3.020";
-	self.traveledTime = "00d 21:35";
-
-	console.log('888888');	
 
 	function requestAllTrajectoryById(id) {
 
@@ -177,9 +172,20 @@ app.controller('driverProfileCtrl',  ['$scope','$stateParams', '$http',  functio
 			self.trajectories = [];
 			self.trajectories = data;
         });
+	};
+
+
+	function requestDriverProfile(driverId) {
+
+		$http.get(DBP_API + '/driver-profile/' + driverId).success(function(data) {			
+			self.driverProfile = data;
+			console.log(data);
+        });
 	}
 
+
 	requestAllTrajectoryById($stateParams.id);
+	requestDriverProfile($stateParams.userId);
 
 }]);
 
@@ -209,7 +215,7 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 				maxAcc: data.maxAcc,
 				wheatherCondition: data.wheatherCondition,
 				trafficCondition: data.trafficCondition,
-				riskAlerts: 4,//data.riskAlerts,
+				riskAlerts: data.riskAlerts,//data.riskAlerts,
 				speedChanges: data.speedChanges,
 				agressiveIndex: data.agressiveIndex,
 				overtakeCount: data.overtakeCount,

@@ -213,6 +213,7 @@ public class TrackAPI {
 			driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
 			driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
 			driverProfile.addAggressiveIndex(trajectoryEval.getAggressiveIndex());
+			driverProfile.increaseAlerts(trajectoryEval.getAlerts().size());
 			
 			trajectoryEval = new TrajectoryEvaluator();
 		}

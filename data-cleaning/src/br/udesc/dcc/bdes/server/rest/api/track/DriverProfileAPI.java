@@ -22,11 +22,11 @@ public class DriverProfileAPI {
 	private final Logger logger = Logger.getLogger("api");
 	
 	@GET
-	@Path("driver-profile/{driverId}")
+	@Path("{driverId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public DriverProfileDTO getDriverProfile(@PathParam("driverId") String driverId) {
 		logger.info("getDriverProfile " + driverId);
 		DriverProfile profile  = repository.loadDriverProfile(new UDriverId(driverId)).orElseThrow( () -> new NotFoundException());
 		return TrajectoryMapper.toDto(profile);
 	}
-	}
+}

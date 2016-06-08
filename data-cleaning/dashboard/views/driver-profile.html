@@ -5,7 +5,7 @@
 	  <!-- small box -->
 	  <div class="small-box bg-yellow">
 	    <div class="inner">
-	      <h3>{{vm.riskAlerts}}</h3>
+	      <h3>{{vm.driverProfile.alerts}}</h3>
 	      <p>Risk Alerts</p>
 	    </div>
 	    <div class="icon">
@@ -19,7 +19,7 @@
 	  <!-- small box -->
 	  <div class="small-box bg-yellow">
 	    <div class="inner">
-	      <h3>{{vm.agressiveIndex}}</h3>
+	      <h3>{{vm.driverProfile.aggressiveIndex | number : 2}}</h3>
 	      <p>Aggressiveness index</p>
 	    </div>
 	    <div class="icon">
@@ -36,7 +36,7 @@
 	  <!-- small box -->
 	  <div class="small-box bg-aqua">
 	    <div class="inner">
-	      <h3>{{vm.traveledTime}}</h3>
+	      <h3>{{vm.driverProfile.traveledTime}}</h3>
 	      <p>Traveled time</p>
 	    </div>
 	    <div class="icon">
@@ -49,7 +49,7 @@
 	  <!-- small box -->
 	  <div class="small-box bg-aqua">
 	    <div class="inner">
-	      <h3>{{vm.traveledDistance}} Km</sup></h3>
+	      <h3>{{vm.driverProfile.traveledDistance}} Km</sup></h3>
 	      <p>Traveled Distance</p>
 	    </div>
 	    <div class="icon">

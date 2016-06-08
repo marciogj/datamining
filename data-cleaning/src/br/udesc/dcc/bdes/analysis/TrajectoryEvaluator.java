@@ -19,6 +19,7 @@ import br.udesc.dcc.bdes.model.Time;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
+import br.udesc.dcc.bdes.server.rest.api.track.Alert;
 import br.udesc.dcc.bdes.server.rest.api.track.SpeedIndexEval;
 
 
@@ -61,6 +62,7 @@ public class TrajectoryEvaluator {
 	private int accCoordinateCount;
 	
 	private Map<String, Double> streets = new HashMap<>();
+	private List<Alert> alerts = new LinkedList<>();
 	
 	
 	private SpeedIndexEval speedEvaluator = new SpeedIndexEval();
@@ -250,14 +252,17 @@ public class TrajectoryEvaluator {
 		previousCoordinate = currentCoordinate;
 		
 		segmentDistance.increase(distanceFromPrevious);
+		segmentSpeedIndexes.add(speedEvaluator.evaluate(currentSpeed));
+		segmentAccelerationIndexes.add(accEvaluator.evaluate(currentAcceleration));
 		if (segmentDistance.getKilometers() >= 1) {
+			alerts.addAll(speedEvaluator.getAlerts());
+			alerts.addAll(accEvaluator.getAlerts());
+			speedEvaluator.clearAlerts();
+			accEvaluator.clearAlerts();
+			
 			updateAggressiveIndex();
 			clearSegment();
-		} else {
-			segmentSpeedIndexes.add(speedEvaluator.evaluate(currentSpeed));
-			segmentAccelerationIndexes.add(accEvaluator.evaluate(currentAcceleration));
-			//segmentDeccelerationIndexes.add();
-		}
+		} 
 		
 		return currentCoordinate;
 	}
@@ -438,6 +443,10 @@ public class TrajectoryEvaluator {
 		//double decIndex = avgIndex(trajectoryDeccelerationIndexes);
 		//return (speedIndex + accIndex + decIndex)/3;
 		return (speedIndex + accIndex)/2;
+	}
+
+	public List<Alert> getAlerts() {
+		return alerts;
 	}
 	
 	
