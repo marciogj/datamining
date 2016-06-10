@@ -17,6 +17,7 @@ import br.udesc.dcc.bdes.model.Distance;
 import br.udesc.dcc.bdes.model.Time;
 import br.udesc.dcc.bdes.repository.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
+import br.udesc.dcc.bdes.server.rest.api.track.dto.PenaltyAlertDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.SpeedTelemetryDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
@@ -47,12 +48,21 @@ public class TrajectorySummaryAPI {
 	}
 	
 	@GET
-	@Path("trajectory-evaluation-coordinates/{evaluationId}")
+	@Path("trajectory-evaluation/{evaluationId}/coordinates")
 	@Produces(MediaType.APPLICATION_JSON)
 	public TrajectoryDTO getTrajectoryEvaluationCoordinates(@PathParam("evaluationId") String evaluationId) {
 		logger.info("getTrajectoryEvaluationCoordinates " + evaluationId);
 		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(evaluationId).orElseThrow( () -> new NotFoundException());
 		return TrajectoryMapper.toDto(evaluation.getTrajectory());
+	}
+	
+	@GET
+	@Path("trajectory-evaluation/{evaluationId}/alerts")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<PenaltyAlertDTO> getTrajectoryEvaluationAlerts(@PathParam("evaluationId") String evaluationId) {
+		logger.info("getTrajectoryEvaluationCoordinates " + evaluationId);
+		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(evaluationId).orElseThrow( () -> new NotFoundException());
+		return evaluation.getAlerts().stream().map(alert ->  TrajectoryMapper.toDto(alert)).collect(Collectors.toList());
 	}
 	
 	@GET

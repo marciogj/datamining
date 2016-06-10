@@ -90,7 +90,7 @@ app.controller('trajectoryCoordinatesCtrl',  ['$scope','$stateParams', '$http', 
 	var self = this;
 	
 	function initialize(evaluationId) {
-		$http.get(DBP_API + '/summary/trajectory-evaluation-coordinates/' + evaluationId).success(function(data) {			
+		$http.get(DBP_API + '/summary/trajectory-evaluation/' + evaluationId + '/coordinates').success(function(data) {			
 			self.trajectory = data;
 			console.log(data);
         });		

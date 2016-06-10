@@ -172,6 +172,7 @@ public class TrackAPI {
 			//	continue;
 			//}
 			boolean externalData = false; 
+			//boolean externalData = true;
 			
 			if (externalData) {
 				Optional<Coordinate> optCoord = subTrajectory.getFirstCoordintae();

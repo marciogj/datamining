@@ -20,6 +20,8 @@ import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.openweather.dto.WeatherDTO;
+import br.udesc.dcc.bdes.server.rest.api.track.PenaltyAlert;
+import br.udesc.dcc.bdes.server.rest.api.track.PenaltyType;
 
 public class TrajectoryMapper {
 	
@@ -166,6 +168,26 @@ public class TrajectoryMapper {
 		dto.traveledDistance = new Distance(profile.getTraveledDistance()).getKilometers();
 		dto.traveledTime = new Time(profile.getTraveledTime()).getTime();
 		dto.alerts = profile.getAlerts();
+		return dto;
+	}
+	
+	public static PenaltyAlertDTO toDto(PenaltyAlert entity) {
+		PenaltyAlertDTO dto = new PenaltyAlertDTO();
+		dto.severity = entity.getSeverity().name();
+		dto.start = entity.getStart().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		dto.end = entity.getEnd().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		dto.distance = new Distance(entity.getDistance()).getKilometers();
+		dto.type = entity.getType().name();
+		if (entity.getType() == PenaltyType.SPEEDING) {
+			dto.initialValue = new Speed(entity.getInitialValue()).getKmh();
+			dto.finalValue = new Speed(entity.getFinalValue()).getKmh();
+			dto.maxValue = new Speed(entity.getMaxValue()).getKmh();
+		} else {
+			dto.initialValue = entity.getInitialValue();
+			dto.finalValue = entity.getFinalValue();
+			dto.maxValue = entity.getMaxValue();
+		}
+		
 		return dto;
 	}
 

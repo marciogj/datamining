@@ -1,5 +1,6 @@
 package br.udesc.dcc.bdes.openweather.dto;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  */
 public class OpenWeatherConditionDTO {
 	public CoordDTO coord;
-	public List<WeatherDTO> weather;
+	public List<WeatherDTO> weather = new LinkedList<>();
 	public String base;
 	public TemperatureDTO main;
 	public WindDTO wind;

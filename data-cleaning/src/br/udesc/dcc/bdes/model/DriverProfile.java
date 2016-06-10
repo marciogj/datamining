@@ -73,8 +73,8 @@ public class DriverProfile {
 		this.alerts = alerts;
 	}
 
-	public void increaseAlerts(int size) {
-		this.alerts += alerts;
+	public void increaseAlerts(int value) {
+		this.alerts += value;
 	}
 	
 }
