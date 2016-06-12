@@ -134,7 +134,7 @@ public class TrackAPI {
 			
 			long lastTimePreviousCoord = receivedCoordinate.isPresent() ? receivedCoordinate.get().getDateTimeInMillis() : 0;
 			long firstTimeCurrentCoord = latestCoodrinate.isPresent() ? latestCoodrinate.get().getDateTimeInMillis() : 0;
-			long difference = lastTimePreviousCoord - firstTimeCurrentCoord;
+			long difference = Math.abs(lastTimePreviousCoord - firstTimeCurrentCoord);
 			//Evaluates whether it is the same trajectory or a new one
 			isNewTrajectory = difference > timeTolerance;
 			if (!isNewTrajectory) {
@@ -214,7 +214,9 @@ public class TrackAPI {
 			driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
 			driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
 			driverProfile.addAggressiveIndex(trajectoryEval.getAggressiveIndex());
-			driverProfile.increaseAlerts(trajectoryEval.getAlerts().size());
+			driverProfile.increaseAlerts(trajectoryEval.getNewAlerts());
+			trajectoryEval.resetNewAlerts();
+			
 			
 			trajectoryEval = new TrajectoryEvaluator();
 		}

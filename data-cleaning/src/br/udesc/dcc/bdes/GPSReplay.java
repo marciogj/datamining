@@ -31,7 +31,9 @@ public class GPSReplay {
 		//String dirPath = "C:\\Users\\marciogj\\SkyDrive\\gps-tracker-service\\001";
 		
 		
-		String baseDir = "C:\\Users\\marcio.jasinski\\OneDrive\\gps-tracker-service";
+		//String baseDir = "C:\\Users\\marcio.jasinski\\OneDrive\\gps-tracker-service";
+		String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\GPSTrackerDEBUG";
+		
 		Locale.setDefault(Locale.US);
 		//String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\Evaluation\\";
 		File dir = new File(baseDir);
@@ -42,7 +44,7 @@ public class GPSReplay {
 				replayToService(trajectory);
 			}
 		}
-		
+		System.out.println("############ DONE ############");
 	}
 	
 	public static void replayToEvaluator(String[] dirPath) {

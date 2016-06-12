@@ -10,8 +10,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.print.attribute.standard.Severity;
-
 import br.udesc.dcc.bdes.google.GeocodeAddress;
 import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
@@ -86,7 +84,8 @@ public class TrajectoryEvaluator {
 
 	private Optional<PenaltyAlert> optSpeedAlert = Optional.empty();
 	private Optional<PenaltyAlert> optAccAlert = Optional.empty();
-
+	private int newAlertsCount = 0;
+	
 	public TrajectoryEvaluator() {
 		this.id = UUID.randomUUID().toString();
 	}
@@ -304,6 +303,7 @@ public class TrajectoryEvaluator {
 			alert.setInitialValue(value);
 			alert.setEnd(coordinate.getDateTime());
 			alerts.add(alert);
+			newAlertsCount++;
 			return Optional.of(alert);
 		}
 		return Optional.empty();
@@ -498,6 +498,14 @@ public class TrajectoryEvaluator {
 
 	public List<PenaltyAlert> getAlerts() {
 		return alerts;
+	}
+	
+	public int getNewAlerts() {
+		return newAlertsCount;
+	}
+	
+	public void resetNewAlerts() {
+		newAlertsCount = 0;
 	}
 
 

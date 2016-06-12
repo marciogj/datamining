@@ -78,7 +78,7 @@ public class TrajectorySummaryAPI {
 			time += eval.getTotalTime();
 		}
 		Distance d = new Distance(distance);
-		System.out.println("Dist√¢ncia: " + d.getKilometers());
+		System.out.println("Dist‚ncia: " + d.getKilometers());
 		
 		Time t = new Time(time);
 		System.out.println("Tempo: " + t.getTime());
