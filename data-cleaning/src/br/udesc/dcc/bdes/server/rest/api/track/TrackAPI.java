@@ -120,13 +120,14 @@ public class TrackAPI {
 		}
 		DriverProfile driverProfile = optDriverProfile.get();
 		
-		
-		
 		Optional<TrajectoryEvaluator> dbTrajectory = repository.loadLatestTrajectoryEvaluationById(new DeviceId(trackDto.deviceId));
 		long timeTolerance =  1000 * 60 * 30;//30 min
 		boolean isNewTrajectory = true;
 		
-		if (dbTrajectory.isPresent()) {
+		double initialDistance = 0;
+		long initialTime = 0;
+		
+		if (dbTrajectory.isPresent()) {	
 			//TODO: Break trajectories considering contextual information: stops and place
 			Trajectory previousTrajectory = dbTrajectory.get().getTrajectory();
 			Optional<Coordinate> latestCoodrinate = previousTrajectory.getLastestCoordinate();
@@ -139,15 +140,10 @@ public class TrackAPI {
 			isNewTrajectory = difference > timeTolerance;
 			if (!isNewTrajectory) {
 				trajectoryEval = dbTrajectory.get();
+				initialDistance = trajectoryEval.getTotalDistance();
+				initialTime = trajectoryEval.getTotalTime();
 			} 
 		}
-		
-		//identificar o meio de transporte
-		//acelera��o baixa
-		//velocidade m�dia abaixo de 10km/h
-		//velocidade m�xima abaixo de 20 km/h
-		
-		
 		List<Trajectory> subtrajectoriesByTime = trajectoryEval.subtrajectoriesByTime(receivedTrajectory, timeTolerance);
 		System.out.println("Subtrajectories: " + subtrajectoriesByTime.size());
 		
@@ -188,31 +184,27 @@ public class TrackAPI {
 			}
 			
 			
-			if (isNewTrajectory) {
-				
+			if (isNewTrajectory) {			
 				//Connection conn = null;
 				//try {
 					repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
-					
-					
-					
 					//conn = DBPool.getConnection().orElseThrow( () -> new RuntimeException("Could not allocate db connection"));
 					//TrajectoryDAO dao = new TrajectoryDAO(conn);
 					//dao.add(trajectoryEval.getTrajectory());
-					
-					
 				//} catch(Exception e) {
 				//	e.printStackTrace();
 				//} finally {
 				//	DBPool.release(conn);
 				//}
+				driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
+				driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
 			} else {
 				repository.updateLatest(new DeviceId(trackDto.deviceId), trajectoryEval);
 				isNewTrajectory  = true; //the next trajectory is a new one from subtrajectories
+				driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance() - initialDistance);
+				driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime() - initialTime);
 			}
 			
-			driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
-			driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
 			driverProfile.addAggressiveIndex(trajectoryEval.getAggressiveIndex());
 			driverProfile.increaseAlerts(trajectoryEval.getNewAlerts());
 			trajectoryEval.resetNewAlerts();
