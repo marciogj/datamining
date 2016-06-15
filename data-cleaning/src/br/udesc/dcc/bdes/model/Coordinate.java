@@ -108,7 +108,7 @@ public class Coordinate {
 
 	/**
 	 * 
-	 * This uses the ‘haversine’ formula to calculate the great-circle distance between two points – that is, the shortest distance over the earth’s surface – giving an ‘as-the-crow-flies’ distance between the points (ignoring any hills they fly over, of course!).
+	 * This uses the ï¿½haversineï¿½ formula to calculate the great-circle distance between two points ï¿½ that is, the shortest distance over the earthï¿½s surface ï¿½ giving an ï¿½as-the-crow-fliesï¿½ distance between the points (ignoring any hills they fly over, of course!).
 	 * http://www.movable-type.co.uk/scripts/latlong.html
 	 * Also avaliable in JavaScript: view-source:http://www.gpsvisualizer.com/calculators
 	 * 
@@ -116,8 +116,8 @@ public class Coordinate {
 	 * 
 	 */
 	public double distanceInMeters(Coordinate another) {
-		double equatorialRadius = 6378137.0; //Earth’s equatorial radius (mean radius = 6,371km)
-		double polarRadius = 6356752.0; //Earth’s polar radius (mean radius = 6,356km)
+		double equatorialRadius = 6378137.0; //Earthï¿½s equatorial radius (mean radius = 6,371km)
+		double polarRadius = 6356752.0; //Earthï¿½s polar radius (mean radius = 6,356km)
 
 		double latitude1 = Math.toRadians(latitude);
 		double latitude2 = Math.toRadians(another.getLatitude());
@@ -145,6 +145,12 @@ public class Coordinate {
 	
 	public static double distance(Coordinate coordinate, Coordinate another) {
 		return coordinate.distanceInMeters(another);
+	}
+
+	public double speedFrom(Coordinate previous) {
+		double distance = Math.abs(distanceInMeters(previous));
+		long time = Math.abs(getDateTimeInMillis() - previous.getDateTimeInMillis());
+		return distance/time;
 	}
 	
 }

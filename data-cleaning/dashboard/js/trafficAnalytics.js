@@ -105,7 +105,7 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 	
 	
 	function initialize(evaluationId) {
-		$http.get(DBP_API + '/summary/trajectory-evaluation-coordinates/' + evaluationId).success(function(data) {			
+		$http.get(DBP_API + '/summary/trajectory-evaluation/' + evaluationId + '/coordinates').success(function(data) {			
 			//http://stackoverflow.com/questions/29803045/how-to-clear-an-angular-array			
 			drawTrajectory(data.coordinates);
         });		

@@ -127,4 +127,16 @@ public class Trajectory {
 		this.id = trajectoryId;
 	}
 
+	public static Trajectory sub(Trajectory trajectory) {
+		Trajectory sub = new Trajectory();
+		sub.deviceId = trajectory.deviceId;
+		sub.sourceProvider = trajectory.sourceProvider;
+		sub.userId = trajectory.userId;
+		return sub;
+	}
+
+	public boolean isEmpty() {
+		return coordinates.isEmpty();
+	}
+
 }

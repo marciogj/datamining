@@ -1,6 +1,9 @@
 package br.udesc.dcc.bdes.server.rest.api.track;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,6 +15,7 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.analysis.TransportType;
 import br.udesc.dcc.bdes.google.GeocodeAddress;
 import br.udesc.dcc.bdes.google.InverseGeocodingClient;
 import br.udesc.dcc.bdes.io.OpenWheatherDTOFileWriter;
@@ -92,25 +96,7 @@ public class TrackAPI {
 		TrajectoryEvaluator trajectoryEval = new TrajectoryEvaluator();
 		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
 				
-		//--------------------------------------------------------Cleaning noises
-		/*
-		DBScan<Coordinate> dbscan = new DBScan<>();
-		DBScanResult<Coordinate> dbscaneResult = dbscan.evaluate(receivedTrajectory.getCoordinates(), 50.0, 5, Coordinate::distance);
-		Trajectory cleanTrajectory = new Trajectory();
-		dbscaneResult.getClusters().forEach( cluster -> cleanTrajectory.addAll(cluster.getElements()));
-		receivedTrajectory.setCoordinates(cleanTrajectory.getCoordinates());
-		*/
-		
-		/*
-		Collections.sort(receivedTrajectory.getCoordinates(), new Comparator<Coordinate>(){
-			public int compare(Coordinate c1, Coordinate c2){
-				return c1.getDateTime().compareTo(c2.getDateTime());
-			}
-		});
-		*/
-		
-		//
-		//--------------------------------------------------------
+		//noiseCleaning();
 		
 		UDriverId driverId = new UDriverId(trackDto.userId);
 		Optional<DriverProfile> optDriverProfile = repository.loadDriverProfile(driverId);
@@ -121,15 +107,15 @@ public class TrackAPI {
 		DriverProfile driverProfile = optDriverProfile.get();
 		
 		Optional<TrajectoryEvaluator> dbTrajectory = repository.loadLatestTrajectoryEvaluationById(new DeviceId(trackDto.deviceId));
-		long timeTolerance =  1000 * 60 * 30;//30 min
+		long timeTolerance =  1000 * 60 * 5;//5 min
 		boolean isNewTrajectory = true;
 		
 		double initialDistance = 0;
 		long initialTime = 0;
-		
+		Trajectory previousTrajectory = null;
 		if (dbTrajectory.isPresent()) {	
 			//TODO: Break trajectories considering contextual information: stops and place
-			Trajectory previousTrajectory = dbTrajectory.get().getTrajectory();
+			previousTrajectory = dbTrajectory.get().getTrajectory();
 			Optional<Coordinate> latestCoodrinate = previousTrajectory.getLastestCoordinate();
 			Optional<Coordinate> receivedCoordinate = receivedTrajectory.getFirstCoordintae();
 			
@@ -144,7 +130,9 @@ public class TrackAPI {
 				initialTime = trajectoryEval.getTotalTime();
 			} 
 		}
-		List<Trajectory> subtrajectoriesByTime = trajectoryEval.subtrajectoriesByTime(receivedTrajectory, timeTolerance);
+		
+		List<Trajectory> subtrajectoriesByTime = trajectoryEval.subtrajectoriesByStop(receivedTrajectory);
+		//List<Trajectory> subtrajectoriesByTime = trajectoryEval.subtrajectoriesByTime(receivedTrajectory, timeTolerance);
 		System.out.println("Subtrajectories: " + subtrajectoriesByTime.size());
 		
 		//Map<Trajectory,TransportType> subtrajectoriesByTransport = new HashMap<>();
@@ -153,7 +141,7 @@ public class TrackAPI {
 		//}
 		
 		
-		//TODO: Avaliar se � necess�rio mesmo ordenar ap�s a clusteriza��o
+		//TODO: Avaliar se e necessario mesmo ordenar apos a clusterizar
 //		Collections.sort(subTrajectory.getCoordinates(), new Comparator<Coordinate>(){
 //			public int compare(Coordinate c1, Coordinate c2){
 //				return c1.getDateTime().compareTo(c2.getDateTime());
@@ -161,46 +149,75 @@ public class TrackAPI {
 //		});
 		
 		
-		
+		Map<Trajectory, TransportType> trajectoriesByMeans = new HashMap<>();
 		for (Trajectory subTrajectory : subtrajectoriesByTime) {
-			//if (subtrajectoriesByTransport.get(subTrajectory) == TransportType.NON_MOTORIZED) {
-			//	System.out.println("Ignoring trajectory with " + subTrajectory.size() + " coordinates since it is no motorized");
-			//	continue;
-			//}
+			if (subTrajectory.isEmpty()) continue;
+			//System.out.println(subTrajectory.getStart() + " - " + subTrajectory.getEnd());
+			
+			Map<Trajectory, TransportType> tmp = trajectoryEval.subtrajectoriesByTransport(subTrajectory); 
+			trajectoriesByMeans.putAll(tmp);
+			/*for(Entry<Trajectory, TransportType> entry : trajectoriesByMeans.entrySet()) {
+				Trajectory t = entry.getKey();
+				System.out.println(entry.getValue().name());
+				System.out.println(t.getStart() + " - " + t.getEnd());
+			}*/
+		}
+		
+		
+		//for (Trajectory subTrajectory : subtrajectoriesByTime) {
+		System.out.println("Subtrajectories by Transport:" + trajectoriesByMeans.size());
+		for (Entry<Trajectory, TransportType> entry : trajectoriesByMeans.entrySet()) {
+			Trajectory subTrajectory = entry.getKey();
+			subTrajectory.setTransportMean(entry.getValue().name());
+			
+			System.out.println(subTrajectory.getStart() + " - " + subTrajectory.getEnd());
 			boolean externalData = false; 
 			//boolean externalData = true;
-			
+	
 			if (externalData) {
 				Optional<Coordinate> optCoord = subTrajectory.getFirstCoordintae();
 				if (optCoord.isPresent()) {
 					Coordinate coord = optCoord.get();
 					Optional<OpenWeatherConditionDTO> optWeather = getWeather(coord.getLatitude(), coord.getLongitude());
 					Optional<GeocodeAddress> optAddress = getAddress(coord.getLatitude(), coord.getLongitude());
-					trajectoryEval.evaluate(subTrajectory.getCoordinates(), optWeather, optAddress);
+					trajectoryEval.evaluate(subTrajectory, optWeather, optAddress);
 				}
-				
 			} else {
-				trajectoryEval.evaluate(subTrajectory.getCoordinates());
+				trajectoryEval.evaluate(subTrajectory);
 			}
 			
+			//long firstTimeCurrentCoord = subTrajectory.getFirstCoordintae().get().getDateTimeInMillis();
+			//long difference = Math.abs(lastTimePreviousCoord - firstTimeCurrentCoord);
+			//Evaluates whether it is the same trajectory or a new one
+			//if (lastTimePreviousCoord != -1) {
+			//	isNewTrajectory = difference > timeTolerance;
+			//}
 			
+			
+			boolean isSameMean = subTrajectory.getTransportMean().equals(previousTrajectory != null ? previousTrajectory.getTransportMean() : null);
+			
+				
 			if (isNewTrajectory) {			
-				//Connection conn = null;
-				//try {
-					repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
-					//conn = DBPool.getConnection().orElseThrow( () -> new RuntimeException("Could not allocate db connection"));
-					//TrajectoryDAO dao = new TrajectoryDAO(conn);
-					//dao.add(trajectoryEval.getTrajectory());
-				//} catch(Exception e) {
-				//	e.printStackTrace();
-				//} finally {
-				//	DBPool.release(conn);
-				//}
+				repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
+					
 				driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
 				driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
+			
+			} else if(!isSameMean) {
+				System.out.println(subTrajectory.getTransportMean());
+				System.out.println("'"+subTrajectory.getTransportMean()+"'");
+				System.out.println("'"+(previousTrajectory != null ? previousTrajectory.getTransportMean() : "null")+"'");
+				
+				repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
+				driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
+				driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
+
+				
 			} else {
 				repository.updateLatest(new DeviceId(trackDto.deviceId), trajectoryEval);
 				isNewTrajectory  = true; //the next trajectory is a new one from subtrajectories
+				//lastTimePreviousCoord = subTrajectory.getFirstCoordintae().get().getDateTimeInMillis();
+				
 				driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance() - initialDistance);
 				driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime() - initialTime);
 			}
@@ -209,7 +226,7 @@ public class TrackAPI {
 			driverProfile.increaseAlerts(trajectoryEval.getNewAlerts());
 			trajectoryEval.resetNewAlerts();
 			
-			
+			//previousTrajectory = trajectoryEval.getTrajectory();
 			trajectoryEval = new TrajectoryEvaluator();
 		}
 		
@@ -237,6 +254,26 @@ public class TrackAPI {
 		});
 	}
 	
-	
+//	public void noiseCleaing() {
+//		//--------------------------------------------------------Cleaning noises
+//				
+//				DBScan<Coordinate> dbscan = new DBScan<>();
+//				DBScanResult<Coordinate> dbscaneResult = dbscan.evaluate(receivedTrajectory.getCoordinates(), 50.0, 5, Coordinate::distance);
+//				Trajectory cleanTrajectory = new Trajectory();
+//				dbscaneResult.getClusters().forEach( cluster -> cleanTrajectory.addAll(cluster.getElements()));
+//				receivedTrajectory.setCoordinates(cleanTrajectory.getCoordinates());
+//				
+//				
+//				
+//				Collections.sort(receivedTrajectory.getCoordinates(), new Comparator<Coordinate>(){
+//					public int compare(Coordinate c1, Coordinate c2){
+//						return c1.getDateTime().compareTo(c2.getDateTime());
+//					}
+//				});
+//				
+//				
+//				//
+//				//--------------------------------------------------------
+//	}
 	
 } 

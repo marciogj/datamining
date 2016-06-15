@@ -85,7 +85,7 @@ public class TrajectoryEvaluator {
 	private Optional<PenaltyAlert> optSpeedAlert = Optional.empty();
 	private Optional<PenaltyAlert> optAccAlert = Optional.empty();
 	private int newAlertsCount = 0;
-	
+
 	public TrajectoryEvaluator() {
 		this.id = UUID.randomUUID().toString();
 	}
@@ -134,6 +134,7 @@ public class TrajectoryEvaluator {
 	}
 
 	public String getTimeInfo() {
+		if (trajectory.isEmpty()) return "-";
 		LocalDateTime startTime = trajectory.getStart().get();
 		int hour = startTime.getHour();
 		if (hour > 7 && hour < 19 ) {
@@ -148,6 +149,7 @@ public class TrajectoryEvaluator {
 	}
 
 	public String getTrafficInfo() {
+		if (trajectory.isEmpty()) return "-";
 		LocalDateTime startTime = trajectory.getStart().get();
 		int hour = startTime.getHour();
 		if (hour > 7 && hour < 19 ) {
@@ -267,7 +269,7 @@ public class TrajectoryEvaluator {
 			updateAggressiveIndex();
 			clearSegment();
 		}
-	
+
 		Optional<PenaltyAlert> newSpeedAlert = evaluatePenalty(PenaltyType.SPEEDING, aggressiveSpeedIndex);
 		optSpeedAlert = updateEvaluationPenalties(newSpeedAlert, optSpeedAlert, coordinate, distanceFromPrevious, currentSpeed);
 
@@ -288,14 +290,14 @@ public class TrajectoryEvaluator {
 			PenaltySeverity newSeverity = newAlert.get().getSeverity();
 			alert.setSeverity(alert.getSeverity().getValue() > newSeverity.getValue() ? alert.getSeverity() : newSeverity);
 			return Optional.of(alert);
-		//case 2. There's no new previous alert. Close the current one
+			//case 2. There's no new previous alert. Close the current one
 		} else if (currentAlert.isPresent() && !newAlert.isPresent()){
 			PenaltyAlert alert = currentAlert.get();
 			alert.increaseDistance(distanceFromPrevious);
 			alert.setEnd(coordinate.getDateTime());
 			alert.setFinalValue(value);
 			return Optional.empty();
-		//case 3. There's no previous alert but this coordinate rise one. Create a new alert.
+			//case 3. There's no previous alert but this coordinate rise one. Create a new alert.
 		} else if (newAlert.isPresent()) {
 			PenaltyAlert alert = newAlert.get();
 			alert.setStart(coordinate.getDateTime());
@@ -390,16 +392,156 @@ public class TrajectoryEvaluator {
 		return trajectory;
 	}
 
+
+
+	public List<Trajectory> subtrajectoriesByStop(Trajectory trajectory) {
+		List<Trajectory> subTrajectories = new LinkedList<>();
+		double distance = 0;
+		double speedSum = 0;
+		long time = 0;
+		int count = 0;
+		Coordinate previous = null;
+
+
+		long fiveMinutesMiliSecs = 5 * 60 * 1000;
+		double stopSpeedAvg = 1; //3,6 kmh -> 1 ms
+		double stopDistance = 300; //300 meters in 300 seconds
+		List<Coordinate> stopCoords = new LinkedList<>();
+		List<Coordinate> moveCoords = new LinkedList<>();
+		List<Coordinate> tmpCoords = new LinkedList<>();
+
+		for(Coordinate coord : trajectory.getCoordinates()) {
+			tmpCoords.add(coord);
+			if (previous == null) {
+				previous = coord;
+				continue;
+			}
+			
+			distance += Math.abs(coord.distanceInMeters(previous));
+			time += coord.getDateTimeInMillis() - previous.getDateTimeInMillis();
+			speedSum += coord.getSpeed().isPresent() ? coord.getSpeed().get() : coord.speedFrom(previous);
+			count++;
+
+			//usually 10 coordinates of moving should be provided at max 50 seconds interval
+			if (count == 10) {
+				boolean stopDetectedByTime = time > fiveMinutesMiliSecs;
+				boolean stopDetectedBySpeed = (speedSum/count) < stopSpeedAvg;
+				boolean stopDetectedByDistance = time > fiveMinutesMiliSecs && distance < stopDistance;
+
+				if(stopDetectedByTime || stopDetectedBySpeed || stopDetectedByDistance) {
+					stopCoords.addAll(tmpCoords);
+				} else {
+					moveCoords.addAll(tmpCoords);
+				}
+				tmpCoords.clear();
+				distance = 0;
+				time = 0;
+				speedSum = 0;
+				count = 0;
+			}
+			previous = coord;
+		}
+
+		//Prepare a list of subtrajectories
+		Trajectory subTrajectory = Trajectory.sub(trajectory);
+		previous = null;
+		for (Coordinate coord : moveCoords) {
+			if (previous == null) {
+				previous = coord;
+				subTrajectory.add(coord);
+				continue;
+			}
+			long timeDiff = coord.getDateTimeInMillis() - previous.getDateTimeInMillis();
+			if (timeDiff > fiveMinutesMiliSecs) {
+				subTrajectories.add(subTrajectory);
+				subTrajectory = Trajectory.sub(trajectory);
+			} else {
+				subTrajectory.add(coord);
+			}
+
+		}
+		if (!subTrajectory.isEmpty()) {
+			subTrajectories.add(subTrajectory);
+		}
+
+		return subTrajectories;
+	}
+
+	/**
+	 * 
+	 * - Consider the acceleration mean?
+	 * - Max Speed under 15 km/h 
+	 * 
+	 * @param trajectory
+	 * @return
+	 */
+	public Map<Trajectory, TransportType> subtrajectoriesByTransport(Trajectory trajectory) {
+		Map<Trajectory, TransportType> subTrajectories = new HashMap<>();
+		double speedSum = 0;
+		int count = 0;
+		Coordinate previous = null;
+
+		double walkingSpeedMaxAvg = 10/3.6;
+		List<Coordinate> walkingCoords = new LinkedList<>();
+		List<Coordinate> motorizedCoords = new LinkedList<>();
+		List<Coordinate> tmpCoords = new LinkedList<>();
+
+		for(Coordinate coord : trajectory.getCoordinates()) {
+			tmpCoords.add(coord);
+			if (previous == null) {
+				previous = coord;
+				continue;
+			}
+			speedSum += coord.getSpeed().isPresent() ? coord.getSpeed().get() : coord.speedFrom(previous);
+			count++;
+
+			if (count == 20) {
+				boolean walkingDetectedBySpeed = (speedSum/count) < walkingSpeedMaxAvg;
+
+				if(walkingDetectedBySpeed) {
+					walkingCoords.addAll(tmpCoords);
+				} else {
+					motorizedCoords.addAll(tmpCoords);
+				}
+				tmpCoords.clear();
+				speedSum = 0;
+				count = 0;
+			}
+			previous = coord;
+		}
+
+		Trajectory motorizedTrajectory = Trajectory.sub(trajectory);
+		motorizedTrajectory.addAll(motorizedCoords);
+		motorizedTrajectory.setTransportMean(TransportType.MOTORIZED.name());
+		
+		Trajectory walkTrajectory = Trajectory.sub(trajectory);
+		walkTrajectory.addAll(walkingCoords);
+		walkTrajectory.setTransportMean(TransportType.NON_MOTORIZED.name());
+		
+		if (!motorizedTrajectory.isEmpty()) {
+			subTrajectories.put(motorizedTrajectory, TransportType.MOTORIZED);
+		}
+		
+		if (!walkTrajectory.isEmpty()) {
+			subTrajectories.put(walkTrajectory, TransportType.NON_MOTORIZED);
+		}
+		
+		return subTrajectories;
+	}
+
 	/*
 	public Map<Trajectory, TransportType> subtrajectoriesByTransport(Trajectory trajectory) {
 		Map<Trajectory, TransportType> trajectories = new HashMap<>();
 		DBScan<Coordinate> dbscan = new DBScan<>();
 
 		BiFunction<Coordinate, Coordinate, Double> distanceInSpeed = (c1,c2) -> {
-			return new Double(Math.abs((c1.getSpeed() - c2.getSpeed())));
+			double speed1 = c1.getSpeed().isPresent() ? c1.getSpeed().get() : 0;
+			double speed2 = c2.getSpeed().isPresent() ? c1.getSpeed().get() : 0;
+			return new Double(Math.abs(speed1 - speed2));
 		};
 		double speed = 10/3.6; //10 km/h in m/s
-		DBScanResult<Coordinate> result = dbscan.evaluate(trajectory.getCoordinates(), speed, 5, distanceInSpeed);
+		int minPoints = 5;
+		DBScanResult<Coordinate> result = dbscan.evaluate(trajectory.getCoordinates(), speed, minPoints, distanceInSpeed);
 
 		Collection<Cluster<Coordinate>> clusters = result.getClusters();
 		for(Cluster<Coordinate> cluster : clusters) {
@@ -472,12 +614,12 @@ public class TrajectoryEvaluator {
 		return subtrajectories;
 	}
 
-	public String getStartDate() {
-		return trajectory.getStart().map(o -> o.toString()).orElse("");
+	public Optional<LocalDateTime> getStartDate() {
+		return trajectory.getStart();
 	}
 
-	public String getEndDate() {
-		return trajectory.getEnd().map(o -> o.toString()).orElse("");
+	public Optional<LocalDateTime> getEndDate() {
+		return trajectory.getEnd();
 	}
 
 	public double getTotalDistance() {
@@ -499,13 +641,29 @@ public class TrajectoryEvaluator {
 	public List<PenaltyAlert> getAlerts() {
 		return alerts;
 	}
-	
+
 	public int getNewAlerts() {
 		return newAlertsCount;
 	}
-	
+
 	public void resetNewAlerts() {
 		newAlertsCount = 0;
+	}
+
+	public void evaluate(Trajectory t) {
+		trajectory.setSourceProvider(t.getSourceProvider());
+		trajectory.setDeviceId(t.getDeviceId());
+		trajectory.setTransportMean(t.getTransportMean());
+		trajectory.setUserId(t.getUserId());
+		evaluate(t.getCoordinates());
+	}
+
+	public void evaluate(Trajectory t, Optional<OpenWeatherConditionDTO> optWeather, Optional<GeocodeAddress> optAddress) {
+		trajectory.setSourceProvider(t.getSourceProvider());
+		trajectory.setDeviceId(t.getDeviceId());
+		trajectory.setTransportMean(t.getTransportMean());
+		trajectory.setUserId(t.getUserId());
+		evaluate(t.getCoordinates(), optWeather, optAddress);		
 	}
 
 
