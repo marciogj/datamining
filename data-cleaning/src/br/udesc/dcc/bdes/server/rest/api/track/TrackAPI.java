@@ -169,6 +169,9 @@ public class TrackAPI {
 		for (Entry<Trajectory, TransportType> entry : trajectoriesByMeans.entrySet()) {
 			Trajectory subTrajectory = entry.getKey();
 			subTrajectory.setTransportMean(entry.getValue().name());
+			boolean isSameMean = subTrajectory.getTransportMean().equals(previousTrajectory != null ? previousTrajectory.getTransportMean() : null);
+			boolean isMotorized = subTrajectory.getTransportMean().equals(TransportType.MOTORIZED.name());
+			
 			
 			System.out.println(subTrajectory.getStart() + " - " + subTrajectory.getEnd());
 			boolean externalData = false; 
@@ -182,7 +185,7 @@ public class TrackAPI {
 					Optional<GeocodeAddress> optAddress = getAddress(coord.getLatitude(), coord.getLongitude());
 					trajectoryEval.evaluate(subTrajectory, optWeather, optAddress);
 				}
-			} else {
+			} else if (isMotorized) {
 				trajectoryEval.evaluate(subTrajectory);
 			}
 			
@@ -194,7 +197,6 @@ public class TrackAPI {
 			//}
 			
 			
-			boolean isSameMean = subTrajectory.getTransportMean().equals(previousTrajectory != null ? previousTrajectory.getTransportMean() : null);
 			
 				
 			if (isNewTrajectory) {			
@@ -203,14 +205,14 @@ public class TrackAPI {
 				driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
 				driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
 			
-			} else if(!isSameMean) {
-				System.out.println(subTrajectory.getTransportMean());
-				System.out.println("'"+subTrajectory.getTransportMean()+"'");
-				System.out.println("'"+(previousTrajectory != null ? previousTrajectory.getTransportMean() : "null")+"'");
-				
-				repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
-				driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
-				driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
+//			} else if(!isSameMean) {
+//				System.out.println(subTrajectory.getTransportMean());
+//				System.out.println("'"+subTrajectory.getTransportMean()+"'");
+//				System.out.println("'"+(previousTrajectory != null ? previousTrajectory.getTransportMean() : "null")+"'");
+//				
+//				repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
+//				driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
+//				driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
 
 				
 			} else {

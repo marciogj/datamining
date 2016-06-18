@@ -66,8 +66,8 @@ public class TrajectoryMapper {
 		dto.evaluationId = evaluation.getId();
 		
 		TrajectoryEvaluation telemetry = evaluation.getCurrentTelemetry();
-		dto.startDateTime = evaluation.getStartDate().get().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-		dto.endDateTime = evaluation.getEndDate().get().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		dto.startDateTime = evaluation.getStartDate().isPresent() ? evaluation.getStartDate().get().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) : "";
+		dto.endDateTime = evaluation.getEndDate().isPresent() ? evaluation.getEndDate().get().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) : "";
 		
 		dto.avgSpeed = String.format("%.2f km/h", telemetry.avgSpeed.getKmh());
 		dto.maxSpeed = String.format("%.2f km/h", telemetry.maxSpeed.getKmh());
