@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.server.rest.api.track;
+package br.udesc.dcc.bdes.model;
 
 public enum PenaltyType {
 	SPEEDING,

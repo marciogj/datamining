@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import br.udesc.dcc.bdes.analysis.TransportType;
+
 public class Trajectory {
 	protected TrajectoryId id;
 	protected List<Coordinate> coordinates = new LinkedList<>();
@@ -13,6 +15,7 @@ public class Trajectory {
 	protected String userId; //taxi id, user
 	protected String deviceId; 
 	protected String transportMean;
+	protected TransportType transportType;
 	
 	public Trajectory() {
 		this.id = new TrajectoryId();
@@ -137,6 +140,14 @@ public class Trajectory {
 
 	public boolean isEmpty() {
 		return coordinates.isEmpty();
+	}
+
+	public TransportType getTransportType() {
+		return transportType;
+	}
+
+	public void setTransportType(TransportType transportType) {
+		this.transportType = transportType;
 	}
 
 }

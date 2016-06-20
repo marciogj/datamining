@@ -1,6 +1,5 @@
-package br.udesc.dcc.bdes.server.rest.api.track;
+package br.udesc.dcc.bdes.model;
 
-import br.udesc.dcc.bdes.model.Speed;
 
 public class SpeedIndexEval {
 	private double max;

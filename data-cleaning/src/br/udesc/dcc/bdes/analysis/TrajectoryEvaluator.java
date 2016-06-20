@@ -14,14 +14,14 @@ import br.udesc.dcc.bdes.google.GeocodeAddress;
 import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.Distance;
+import br.udesc.dcc.bdes.model.PenaltyAlert;
+import br.udesc.dcc.bdes.model.PenaltyType;
 import br.udesc.dcc.bdes.model.Speed;
+import br.udesc.dcc.bdes.model.SpeedIndexEval;
 import br.udesc.dcc.bdes.model.Time;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
-import br.udesc.dcc.bdes.server.rest.api.track.PenaltyAlert;
-import br.udesc.dcc.bdes.server.rest.api.track.PenaltyType;
-import br.udesc.dcc.bdes.server.rest.api.track.SpeedIndexEval;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.PenaltySeverity;
 
 
@@ -466,124 +466,7 @@ public class TrajectoryEvaluator {
 
 		return subTrajectories;
 	}
-
-	/**
-	 * 
-	 * - Consider the acceleration mean?
-	 * - Max Speed under 15 km/h 
-	 * 
-	 * @param trajectory
-	 * @return
-	 */
-	public Map<Trajectory, TransportType> subtrajectoriesByTransport(Trajectory trajectory) {
-		Map<Trajectory, TransportType> subTrajectories = new HashMap<>();
-		double speedSum = 0;
-		int count = 0;
-		Coordinate previous = null;
-
-		double walkingSpeedMaxAvg = 10/3.6;
-		List<Coordinate> walkingCoords = new LinkedList<>();
-		List<Coordinate> motorizedCoords = new LinkedList<>();
-		List<Coordinate> tmpCoords = new LinkedList<>();
-
-		for(Coordinate coord : trajectory.getCoordinates()) {
-			tmpCoords.add(coord);
-			if (previous == null) {
-				previous = coord;
-				continue;
-			}
-			speedSum += coord.getSpeed().isPresent() ? coord.getSpeed().get() : coord.speedFrom(previous);
-			count++;
-
-			if (count == 20) {
-				boolean walkingDetectedBySpeed = (speedSum/count) < walkingSpeedMaxAvg;
-
-				if(walkingDetectedBySpeed) {
-					walkingCoords.addAll(tmpCoords);
-				} else {
-					motorizedCoords.addAll(tmpCoords);
-				}
-				tmpCoords.clear();
-				speedSum = 0;
-				count = 0;
-			}
-			previous = coord;
-		}
-
-		Trajectory motorizedTrajectory = Trajectory.sub(trajectory);
-		motorizedTrajectory.addAll(motorizedCoords);
-		motorizedTrajectory.setTransportMean(TransportType.MOTORIZED.name());
-		
-		Trajectory walkTrajectory = Trajectory.sub(trajectory);
-		walkTrajectory.addAll(walkingCoords);
-		walkTrajectory.setTransportMean(TransportType.NON_MOTORIZED.name());
-		
-		if (!motorizedTrajectory.isEmpty()) {
-			subTrajectories.put(motorizedTrajectory, TransportType.MOTORIZED);
-		}
-		
-		if (!walkTrajectory.isEmpty()) {
-			subTrajectories.put(walkTrajectory, TransportType.NON_MOTORIZED);
-		}
-		
-		return subTrajectories;
-	}
-
-	/*
-	public Map<Trajectory, TransportType> subtrajectoriesByTransport(Trajectory trajectory) {
-		Map<Trajectory, TransportType> trajectories = new HashMap<>();
-		DBScan<Coordinate> dbscan = new DBScan<>();
-
-		BiFunction<Coordinate, Coordinate, Double> distanceInSpeed = (c1,c2) -> {
-			double speed1 = c1.getSpeed().isPresent() ? c1.getSpeed().get() : 0;
-			double speed2 = c2.getSpeed().isPresent() ? c1.getSpeed().get() : 0;
-			return new Double(Math.abs(speed1 - speed2));
-		};
-		double speed = 10/3.6; //10 km/h in m/s
-		int minPoints = 5;
-		DBScanResult<Coordinate> result = dbscan.evaluate(trajectory.getCoordinates(), speed, minPoints, distanceInSpeed);
-
-		Collection<Cluster<Coordinate>> clusters = result.getClusters();
-		for(Cluster<Coordinate> cluster : clusters) {
-			int motorizedChance = 0;
-			int nonMotorizedChance = 0;
-			Trajectory t = new Trajectory();
-			t.addAll(cluster.getElements());
-
-			TrajectoryEvaluator evaluator = new TrajectoryEvaluator();
-			evaluator.evaluate(t.getCoordinates());
-
-
-			if ( evaluator.getCurrentTelemetry().maxSpeed.getKmh() > 30 ) {
-				motorizedChance++;
-			} else {
-				nonMotorizedChance++;
-			}
-
-			if ( evaluator.getCurrentTelemetry().avgSpeed.getKmh() > 20 ) {
-				motorizedChance++;
-			} else {
-				nonMotorizedChance++;
-			}
-
-			if ( evaluator.getCurrentTelemetry().maxAcc.getMPerSec2() > 1 ) {
-				motorizedChance++;
-			} else {
-				nonMotorizedChance++;
-			}
-
-			if (motorizedChance > nonMotorizedChance) {
-				trajectories.put(t, TransportType.MOTORIZED);
-			} else {
-				trajectories.put(t, TransportType.NON_MOTORIZED);
-			}
-
-		}
-
-		return trajectories;
-	}
-	 */
-
+	
 	public List<Trajectory> subtrajectoriesByTime(Trajectory trajectory, long timeToleranceMilis) {
 		Trajectory subtrajectory = new Trajectory();
 		List<Trajectory> subtrajectories = new LinkedList<>();

@@ -14,14 +14,14 @@ import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.Distance;
 import br.udesc.dcc.bdes.model.DriverProfile;
+import br.udesc.dcc.bdes.model.PenaltyAlert;
+import br.udesc.dcc.bdes.model.PenaltyType;
 import br.udesc.dcc.bdes.model.Speed;
 import br.udesc.dcc.bdes.model.Time;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.openweather.dto.WeatherDTO;
-import br.udesc.dcc.bdes.server.rest.api.track.PenaltyAlert;
-import br.udesc.dcc.bdes.server.rest.api.track.PenaltyType;
 
 public class TrajectoryMapper {
 	

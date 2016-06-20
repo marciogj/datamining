@@ -1,9 +1,7 @@
 package br.udesc.dcc.bdes.server.rest.api.track;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,6 +12,7 @@ import javax.ws.rs.Path;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 
+import br.udesc.dcc.bdes.analysis.MeanTransportSplitter;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.analysis.TransportType;
 import br.udesc.dcc.bdes.google.GeocodeAddress;
@@ -149,13 +148,11 @@ public class TrackAPI {
 //		});
 		
 		
-		Map<Trajectory, TransportType> trajectoriesByMeans = new HashMap<>();
+		List<Trajectory> trajectoriesByMeans = new ArrayList<>();
 		for (Trajectory subTrajectory : subtrajectoriesByTime) {
 			if (subTrajectory.isEmpty()) continue;
 			//System.out.println(subTrajectory.getStart() + " - " + subTrajectory.getEnd());
-			
-			Map<Trajectory, TransportType> tmp = trajectoryEval.subtrajectoriesByTransport(subTrajectory); 
-			trajectoriesByMeans.putAll(tmp);
+			trajectoriesByMeans.addAll(MeanTransportSplitter.subBySpeed(subTrajectory));
 			/*for(Entry<Trajectory, TransportType> entry : trajectoriesByMeans.entrySet()) {
 				Trajectory t = entry.getKey();
 				System.out.println(entry.getValue().name());
@@ -166,11 +163,10 @@ public class TrackAPI {
 		
 		//for (Trajectory subTrajectory : subtrajectoriesByTime) {
 		System.out.println("Subtrajectories by Transport:" + trajectoriesByMeans.size());
-		for (Entry<Trajectory, TransportType> entry : trajectoriesByMeans.entrySet()) {
-			Trajectory subTrajectory = entry.getKey();
-			subTrajectory.setTransportMean(entry.getValue().name());
-			boolean isSameMean = subTrajectory.getTransportMean().equals(previousTrajectory != null ? previousTrajectory.getTransportMean() : null);
-			boolean isMotorized = subTrajectory.getTransportMean().equals(TransportType.MOTORIZED.name());
+		for (Trajectory subTrajectory : trajectoriesByMeans) {
+			
+			//boolean isSameMean = subTrajectory.getTransportMean().equals(previousTrajectory != null ? previousTrajectory.getTransportMean() : null);
+			boolean isMotorized = subTrajectory.getTransportType() == TransportType.MOTORIZED;
 			
 			
 			System.out.println(subTrajectory.getStart() + " - " + subTrajectory.getEnd());

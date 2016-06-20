@@ -32,6 +32,10 @@ public class Coordinate {
 		this.dateTime = dateTime;
 	}
 
+	public Coordinate(Speed speed) {
+		this.speed = speed.getMs();
+	}
+
 	public double getLatitude() {
 		return latitude;
 	}
@@ -72,7 +76,7 @@ public class Coordinate {
 	public Optional<Double> getSpeed() {
 		return Optional.ofNullable(speed);
 	}
-
+	
 	public void setSpeed(double speed) {
 		this.speed = speed;
 	}
