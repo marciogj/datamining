@@ -9,12 +9,12 @@ public class TrajectorySummaryDTO {
 	
 	
 	public String trajectoryTime; //= "6:28";
-	public String totalDistance; // "317 km";
-	public String avgSpeed; //= "53 km/h";
-	public String maxSpeed; //= "153 km/h";
+	public Double totalDistance; // "317 km";
+	public Double avgSpeed; //= "53 km/h";
+	public Double maxSpeed; //= "153 km/h";
 	
-	public String maxDec; //= "2 m/s�";
-	public String maxAcc; //= "4 m/s�";
+	public Double maxDec; //= "2 m/s²";
+	public Double maxAcc; //= "4 m/s²";
 	
 	//public List<String> streets = new ArrayList<>();
 	public String mainStreet;
@@ -26,7 +26,7 @@ public class TrajectorySummaryDTO {
 	public Integer riskAlerts; // = "3";
 	public Integer speedChanges; //= "455";
 	
-	public String agressiveIndex; //= "62";
+	public Double agressiveIndex; //= "62";
 	public String overtakeCount; // = "15";
 	public Integer coordinateCount;
 	

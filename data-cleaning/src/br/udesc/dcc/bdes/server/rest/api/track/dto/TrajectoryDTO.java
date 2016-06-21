@@ -9,6 +9,6 @@ public class TrajectoryDTO {
 	public String sourceProvider; 
 	public String userId;
 	public String deviceId; 
-	public String transportMean;
+	public String transportType;
 	
 }

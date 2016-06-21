@@ -68,29 +68,23 @@ public class TrajectoryMapper {
 		TrajectoryEvaluation telemetry = evaluation.getCurrentTelemetry();
 		dto.startDateTime = evaluation.getStartDate().isPresent() ? evaluation.getStartDate().get().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) : "";
 		dto.endDateTime = evaluation.getEndDate().isPresent() ? evaluation.getEndDate().get().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) : "";
-		
-		dto.avgSpeed = String.format("%.2f km/h", telemetry.avgSpeed.getKmh());
-		dto.maxSpeed = String.format("%.2f km/h", telemetry.maxSpeed.getKmh());
-
-		dto.maxAcc = String.format("%.2f m/s²", telemetry.maxAcc.getMPerSec2()); 
-		dto.maxDec = String.format("%.2f m/s²", telemetry.maxDec.getMPerSec2());
-		
+		dto.avgSpeed = telemetry.avgSpeed.getKmh();
+		dto.maxSpeed = telemetry.maxSpeed.getKmh();
+		dto.maxAcc = telemetry.maxAcc.getMPerSec2(); 
+		dto.maxDec = telemetry.maxDec.getMPerSec2();
 		dto.overtakeCount = "-";
 		dto.riskAlerts = evaluation.getAlerts().size();
 		dto.speedChanges = telemetry.accCount + telemetry.decCount;
-		dto.totalDistance = String.format("%.2f km", telemetry.trajectoryDistance.getKilometers());
-		
+		dto.totalDistance = telemetry.trajectoryDistance.getKilometers();
 		dto.trafficCondition = evaluation.getTrafficInfo();
 		dto.hourClassification = evaluation.getTimeInfo();
 		dto.trajectoryTime = telemetry.trajectoryTime.getTime();
 		dto.coordinateCount = evaluation.getTrajectory().size();
 		dto.accEvaluation = toDto(evaluation.getAccEvaluator());
-		dto.agressiveIndex = String.format("%.2f ", evaluation.getAggressiveIndex()); 
-		
-		//evaluation.getStreets().forEach( streetName -> dto.streets.add(streetName));
+		dto.agressiveIndex = evaluation.getAggressiveIndex(); 
 		dto.mainStreet = evaluation.getMainStreet();
-		
 		dto.wheatherCondition = "-";
+		
 		Optional<OpenWeatherConditionDTO> weatherData = evaluation.getCurrentWeather();
 		if(weatherData.isPresent()) {
 			Optional<WeatherDTO> weather = weatherData.get().weather.isEmpty() ? Optional.empty() : Optional.of(weatherData.get().weather.get(0));
@@ -149,7 +143,9 @@ public class TrajectoryMapper {
 		dto.deviceId = trajectory.getDeviceId();
 		dto.id = trajectory.getId().getValue();
 		dto.sourceProvider = trajectory.getSourceProvider();
-		dto.transportMean = trajectory.getTransportMean();
+		if (trajectory.getTransportType() != null) {
+			dto.transportType = trajectory.getTransportType().name();
+		}
 		dto.userId = trajectory.getUserId();
 		for(Coordinate coordinate : trajectory.getCoordinates()) {
 			dto.coordinates.add(toDto(coordinate));
@@ -161,10 +157,13 @@ public class TrajectoryMapper {
 	public static DriverProfileDTO toDto(DriverProfile profile) {
 		DriverProfileDTO dto = new DriverProfileDTO();
 		dto.aggressiveIndex = profile.getAggressiveIndex();
+		dto.maxAggressiveIndex = profile.getMaxAggressiveIndex();
 		dto.deviceId = profile.getDeviceId().getValue();
 		dto.driverId = profile.getDriverId().getValue();
 		dto.traveledDistance = new Distance(profile.getTraveledDistance()).getKilometers();
 		dto.traveledTime = new Time(profile.getTraveledTime()).getTime();
+		dto.traveledTimeSeconds = new Time(profile.getTraveledTime()).getSeconds();
+		dto.trajectoryCount = profile.getTrajectoryCount();
 		dto.alerts = profile.getAlerts();
 		return dto;
 	}

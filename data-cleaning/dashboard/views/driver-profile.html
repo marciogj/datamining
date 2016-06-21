@@ -5,8 +5,10 @@
 	  <!-- small box -->
 	  <div class="small-box bg-yellow">
 	    <div class="inner">
-	      <h3>{{vm.driverProfile.alerts}}</h3>
-	      <p>Risk Alerts</p>
+	      <h3>{{vm.driverProfile.alerts/vm.driverProfile.traveledDistance | number:2}}</h3>
+	      <p>Alerts per Km</p>
+	      <h2>{{vm.driverProfile.alerts}}</h2>
+	      <p>Total alerts</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-alert-circled"></i>
@@ -20,7 +22,9 @@
 	  <div class="small-box bg-yellow">
 	    <div class="inner">
 	      <h3>{{vm.driverProfile.aggressiveIndex | number : 2}}</h3>
-	      <p>Aggressiveness index</p>
+	      <p>Avg Aggressive index</p>
+	      <h2>{{vm.driverProfile.maxAggressiveIndex | number: 2}}</h2>
+	      <p>Max Aggressive Index</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-stats-bars"></i>
@@ -36,7 +40,10 @@
 	  <!-- small box -->
 	  <div class="small-box bg-aqua">
 	    <div class="inner">
-	      <h3>{{vm.driverProfile.traveledTime}}</h3>
+	      <h3>{{ (vm.driverProfile.traveledTimeSeconds/60)/vm.driverProfile.trajectoryCount | number: 2}} min</h3>
+	      <p>Trajectory average time</p>
+
+	      <h2>{{vm.driverProfile.traveledTime}}</h2>
 	      <p>Traveled time</p>
 	    </div>
 	    <div class="icon">
@@ -49,7 +56,9 @@
 	  <!-- small box -->
 	  <div class="small-box bg-aqua">
 	    <div class="inner">
-	      <h3>{{vm.driverProfile.traveledDistance}} Km</sup></h3>
+	      <h3>{{vm.driverProfile.traveledDistance / vm.driverProfile.trajectoryCount | number: 2}} Km</h3>
+	      <p>Trajectory average distance</p>
+	      <h2>{{vm.driverProfile.traveledDistance | number: 2}} Km</h2>
 	      <p>Traveled Distance</p>
 	    </div>
 	    <div class="icon">
@@ -67,20 +76,22 @@
 			<td>Id</td>
 			<td>Start</td>
 			<td>End</td>
-			<td>Distance</td>
+			<td>Distance (km)</td>
 			<td>Total Time</td>
 			<td>Coordinates</td>
-			<td>Avg Speed</td>
+			<td>Avg Speed (Km/h)</td>
+			<td>Aggressive Index</td>
 		</tr>
 		
 		<tr ng-repeat="trajectory in vm.trajectories">
 			<td><a ui-sref="trajectory-evaluation({id: trajectory.evaluationId})">{{$index + 1}}</a></td>
 			<td>{{trajectory.startDateTime | date:'d MMM HH:mm:ss'}}</td>
 			<td>{{trajectory.endDateTime | date:'d MMM HH:mm:ss'}}</td>
-			<td>{{trajectory.totalDistance}}</td>
+			<td>{{trajectory.totalDistance | number:2}}</td>
 			<td>{{trajectory.trajectoryTime}}</td>
 			<td>{{trajectory.coordinateCount}}</td>
-			<td><a ui-sref="trajectory-telemetry({id: trajectory.evaluationId})">{{trajectory.avgSpeed}}</a></td>
+			<td><a ui-sref="trajectory-telemetry({id: trajectory.evaluationId})">{{trajectory.avgSpeed | number:2}}</a></td>
+			<td>{{trajectory.agressiveIndex | number:2}}</td>
 		</tr>
 	</table>
 </div>

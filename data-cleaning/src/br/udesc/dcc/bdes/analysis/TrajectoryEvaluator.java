@@ -537,6 +537,7 @@ public class TrajectoryEvaluator {
 		trajectory.setSourceProvider(t.getSourceProvider());
 		trajectory.setDeviceId(t.getDeviceId());
 		trajectory.setTransportMean(t.getTransportMean());
+		trajectory.setTransportType(t.getTransportType());
 		trajectory.setUserId(t.getUserId());
 		evaluate(t.getCoordinates());
 	}

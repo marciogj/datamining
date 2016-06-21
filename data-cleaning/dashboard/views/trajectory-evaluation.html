@@ -21,7 +21,7 @@
 	  <!-- small box -->
 	  <div class="small-box bg-green">
 	    <div class="inner">
-	      <h3>{{vm.evaluation.totalDistance}}</sup></h3>
+	      <h3>{{vm.evaluation.totalDistance | number:2}} Km</sup></h3>
 	      <!-- <p>percorridos</p> -->
 	      <p>traveled</p>
 	      <h2>{{vm.evaluation.mainStreet}}</h2>
@@ -37,9 +37,9 @@
 	  <!-- small box -->
 	  <div class="small-box bg-yellow">
 	    <div class="inner">
-	      <h3>{{vm.evaluation.avgSpeed}}</h3>
+	      <h3>{{vm.evaluation.avgSpeed | number:2}} km/h</h3>
 	      <p>Avg speed</p>
-	      <h2>{{vm.evaluation.maxSpeed}}</h2>
+	      <h2>{{vm.evaluation.maxSpeed | number:2}} km/h</h2>
 	      <p>Max speed</p>
 	    </div>
 	    <div class="icon">
@@ -52,9 +52,9 @@
 	  <!-- small box -->
 	  <div class="small-box bg-red">
 	    <div class="inner">
-	      <h3>{{vm.evaluation.maxDec}}</h3>
+	      <h3>{{vm.evaluation.maxDec | number:2}} m/s²</h3>
 	      <p>Max deceleration</p>
-	      <h2>{{vm.evaluation.maxAcc}}</h2>
+	      <h2>{{vm.evaluation.maxAcc | number:2}} m/s²</h2>
 	      <p>Max acceleration</p>
 	    </div>
 	    <div class="icon">
@@ -71,8 +71,10 @@
 	  <!-- small box -->
 	  <div class="small-box bg-aqua">
 	    <div class="inner">
-	      <h3>{{vm.evaluation.riskAlerts}}</h3>
-	      <p>Risk Alerts</p>
+	      <h3>{{vm.evaluation.riskAlerts/vm.evaluation.totalDistance | number:2}}</h3>
+	      <p>Alerts per Km</p>
+	      <h2>{{vm.evaluation.riskAlerts}}</h2>
+	      <p>Total alerts</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-alert-circled"></i>
@@ -84,8 +86,10 @@
 	  <!-- small box -->
 	  <div class="small-box bg-green">
 	    <div class="inner">
-	      <h3>{{vm.evaluation.speedChanges}}</sup></h3>
-	      <p>Acceleration changes</p>
+	      <h3>{{vm.evaluation.speedChanges/vm.evaluation.totalDistance | number:2}}</sup></h3>
+	      <p>Acceleration changes per Km</p>
+	       <h2>{{vm.evaluation.speedChanges}}</h2>
+	      <p>Total changes</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-arrow-swap fa-rotate-90"></i>
@@ -97,7 +101,7 @@
 	  <!-- small box -->
 	  <div class="small-box bg-yellow">
 	    <div class="inner">
-	      <h3>{{vm.evaluation.agressiveIndex}}</h3>
+	      <h3>{{vm.evaluation.agressiveIndex | number:2}}</h3>
 	      <p>Aggressiveness Index</p>
 	    </div>
 	    <div class="icon">
@@ -113,8 +117,7 @@
 	    <div class="inner">
 	      <h3></h3>
 	      <p>{{vm.evaluation.wheatherCondition}}</p>
-		  <!-- <p>{{vm.evaluation.trafficCondition}}</p> -->
-		  <p>Normal Traffic</p>
+		  <p>{{vm.evaluation.trafficCondition}}</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-ios-cloudy-night"></i>

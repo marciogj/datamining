@@ -5,12 +5,13 @@ import java.util.List;
 
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.Trajectory;
+import br.udesc.dcc.bdes.model.TransportType;
 
 public class MeanTransportSplitter {
 	public static final double WALKING_SPEED_MS = 10/3.6; 
 	public static final int TRAJECTORY_SEGMENT_SIZE = 20;
 	
-	public static final int WALKING_TRESHOLD = 15;
+	public static final int WALKING_TRESHOLD = 10;
 	public static final int MOTOR_TRESHOLD = 3;
 	
 	
@@ -68,24 +69,25 @@ public class MeanTransportSplitter {
 		return subTrajectories;
 	}
 
-	
 	public static List<Trajectory> subBySpeed(Trajectory trajectory) {
+		return subBySpeed(trajectory, WALKING_SPEED_MS, WALKING_TRESHOLD, MOTOR_TRESHOLD);
+	}
+	
+	public static List<Trajectory> subBySpeed(Trajectory trajectory, double walkingSpeedMs, int walkingThreshold, int motorThreshold) {
 		List<Trajectory> subTrajectories = new LinkedList<>();
 		List<Coordinate> walkingCoords = new LinkedList<>();
 		List<Coordinate> motorizedCoords = new LinkedList<>();
 		List<Coordinate> tmpCoords = new LinkedList<>();
 		double currentSpeed = 0;
-		
 		boolean isWalkTreshold = false;
 		boolean isMotorTreshold = false;
-		
 		TransportType previousGuess = null;
 		
 		Coordinate previous = null;
 		for(Coordinate coord : trajectory.getCoordinates()) {
 			tmpCoords.add(coord);
 			currentSpeed = coord.getSpeed().isPresent() ? coord.getSpeed().get() : previous == null ? 0 : coord.speedFrom(previous);
-			boolean isWalking = currentSpeed <= WALKING_SPEED_MS;
+			boolean isWalking = currentSpeed <= walkingSpeedMs;
 
 			if (isWalking) {
 				walkingCoords.add(coord);
@@ -97,8 +99,8 @@ public class MeanTransportSplitter {
 				previous = coord;
 				continue;
 			}
-			isWalkTreshold = walkingCoords.size() >= WALKING_TRESHOLD;
-			isMotorTreshold = motorizedCoords.size() >= MOTOR_TRESHOLD;
+			isWalkTreshold = walkingCoords.size() >= walkingThreshold;
+			isMotorTreshold = motorizedCoords.size() >= motorThreshold;
 			
 			if (isWalkTreshold && previousGuess == null) {
 				previousGuess = TransportType.NON_MOTORIZED;
@@ -118,7 +120,7 @@ public class MeanTransportSplitter {
 			
 			//Atingiu indicação de caminhada, mas havia uma trajetória motorizada antes
 			if (isWalkTreshold && isMotorTreshold && previousGuess == TransportType.MOTORIZED) {
-				Trajectory motorized = new Trajectory();
+				Trajectory motorized = Trajectory.sub(trajectory);
 				motorized.addAll(motorizedCoords);
 				motorized.setTransportType(TransportType.MOTORIZED);
 				subTrajectories.add(motorized);
@@ -131,7 +133,7 @@ public class MeanTransportSplitter {
 			
 			//Atingiu indicação de motorizado, mas havia uma trajetória caminhada antes
 			if (isMotorTreshold && isWalkTreshold && previousGuess == TransportType.NON_MOTORIZED) {
-				Trajectory walk = new Trajectory();
+				Trajectory walk = Trajectory.sub(trajectory);
 				walk.addAll(walkingCoords);
 				walk.setTransportType(TransportType.NON_MOTORIZED);
 				subTrajectories.add(walk);
@@ -146,12 +148,12 @@ public class MeanTransportSplitter {
 		}
 
 		if(isMotorTreshold || motorizedCoords.size() > walkingCoords.size()){
-			Trajectory motor = new Trajectory();
-			motor.addAll(tmpCoords);
+			Trajectory motor = Trajectory.sub(trajectory);
+			motor.addAll(tmpCoords);	
 			motor.setTransportType(TransportType.MOTORIZED);
 			subTrajectories.add(motor);
 		} else {
-			Trajectory walk = new Trajectory();
+			Trajectory walk = Trajectory.sub(trajectory);
 			walk.addAll(tmpCoords);
 			walk.setTransportType(TransportType.NON_MOTORIZED);
 			subTrajectories.add(walk);

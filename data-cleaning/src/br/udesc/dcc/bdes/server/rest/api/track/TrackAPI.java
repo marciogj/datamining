@@ -14,7 +14,6 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import br.udesc.dcc.bdes.analysis.MeanTransportSplitter;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
-import br.udesc.dcc.bdes.analysis.TransportType;
 import br.udesc.dcc.bdes.google.GeocodeAddress;
 import br.udesc.dcc.bdes.google.InverseGeocodingClient;
 import br.udesc.dcc.bdes.io.OpenWheatherDTOFileWriter;
@@ -23,6 +22,7 @@ import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.DriverProfile;
 import br.udesc.dcc.bdes.model.Trajectory;
+import br.udesc.dcc.bdes.model.TransportType;
 import br.udesc.dcc.bdes.model.UDriverId;
 import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
@@ -164,7 +164,7 @@ public class TrackAPI {
 		//for (Trajectory subTrajectory : subtrajectoriesByTime) {
 		System.out.println("Subtrajectories by Transport:" + trajectoriesByMeans.size());
 		for (Trajectory subTrajectory : trajectoriesByMeans) {
-			
+			if (subTrajectory.getTransportType() == TransportType.NON_MOTORIZED) continue;
 			//boolean isSameMean = subTrajectory.getTransportMean().equals(previousTrajectory != null ? previousTrajectory.getTransportMean() : null);
 			boolean isMotorized = subTrajectory.getTransportType() == TransportType.MOTORIZED;
 			
@@ -184,35 +184,16 @@ public class TrackAPI {
 			} else if (isMotorized) {
 				trajectoryEval.evaluate(subTrajectory);
 			}
-			
-			//long firstTimeCurrentCoord = subTrajectory.getFirstCoordintae().get().getDateTimeInMillis();
-			//long difference = Math.abs(lastTimePreviousCoord - firstTimeCurrentCoord);
-			//Evaluates whether it is the same trajectory or a new one
-			//if (lastTimePreviousCoord != -1) {
-			//	isNewTrajectory = difference > timeTolerance;
-			//}
-			
-			
-			
 				
 			if (isNewTrajectory) {			
-				repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
-					
+				repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);					
 				driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
 				driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
-			
-//			} else if(!isSameMean) {
-//				System.out.println(subTrajectory.getTransportMean());
-//				System.out.println("'"+subTrajectory.getTransportMean()+"'");
-//				System.out.println("'"+(previousTrajectory != null ? previousTrajectory.getTransportMean() : "null")+"'");
-//				
-//				repository.save(new DeviceId(trackDto.deviceId), trajectoryEval);
-//				driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
-//				driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
-
-				
+				driverProfile.increaseTrajectory();
 			} else {
 				repository.updateLatest(new DeviceId(trackDto.deviceId), trajectoryEval);
+				
+				//TODO: Review why it is considerede a new trajetcory
 				isNewTrajectory  = true; //the next trajectory is a new one from subtrajectories
 				//lastTimePreviousCoord = subTrajectory.getFirstCoordintae().get().getDateTimeInMillis();
 				
@@ -222,6 +203,9 @@ public class TrackAPI {
 			
 			driverProfile.addAggressiveIndex(trajectoryEval.getAggressiveIndex());
 			driverProfile.increaseAlerts(trajectoryEval.getNewAlerts());
+			driverProfile.updateMaxAggressiveIndex(trajectoryEval.getAggressiveIndex());
+			
+			
 			trajectoryEval.resetNewAlerts();
 			
 			//previousTrajectory = trajectoryEval.getTrajectory();

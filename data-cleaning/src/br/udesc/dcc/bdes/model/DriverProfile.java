@@ -8,6 +8,8 @@ public class DriverProfile {
 	private int alerts = 0;
 	private double aggressiveIndexSum = 0;
 	private double aggressiveIndexCount = 0;
+	private double maxAggressiveIndex = 0;
+	private int trajectoryCount = 0;
 	
 	public DriverProfile(UDriverId driverId, DeviceId deviceId) {
 		super();
@@ -75,6 +77,28 @@ public class DriverProfile {
 
 	public void increaseAlerts(int value) {
 		this.alerts += value;
+	}
+
+	public void updateMaxAggressiveIndex(double aggressiveIndex) {
+		if (aggressiveIndex > maxAggressiveIndex) {
+			maxAggressiveIndex = aggressiveIndex;
+		}
+	}
+
+	public double getMaxAggressiveIndex() {
+		return maxAggressiveIndex;
+	}
+
+	public void setMaxAggressiveIndex(double maxAggressiveIndex) {
+		this.maxAggressiveIndex = maxAggressiveIndex;
+	}
+
+	public int getTrajectoryCount() {
+		return trajectoryCount;
+	}
+	
+	public void increaseTrajectory() {
+		trajectoryCount++;
 	}
 	
 }

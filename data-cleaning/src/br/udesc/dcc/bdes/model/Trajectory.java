@@ -6,8 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import br.udesc.dcc.bdes.analysis.TransportType;
-
 public class Trajectory {
 	protected TrajectoryId id;
 	protected List<Coordinate> coordinates = new LinkedList<>();
