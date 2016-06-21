@@ -1,0 +1,14 @@
+{
+  "name": "rest-websocket-server",
+  "version": "0.0.1",
+  "description": "",
+  "dependencies": { 
+	"restify": "2.6.0",
+	"promisify-node": "0.1.5",
+	"websocket": "1.0.22",
+	"serve-static": "1.10.0",
+	"connect": "3.4.0",
+	"graceful-fs": "2.0.1"
+   },
+  "engine": "node 0.6.x"
+}
