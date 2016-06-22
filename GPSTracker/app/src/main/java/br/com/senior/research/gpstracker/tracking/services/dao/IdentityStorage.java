@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import br.com.senior.research.gpstracker.tracking.services.TrackedIdentity;
+import br.com.senior.research.gpstracker.tracking.services.model.TrackedIdentity;
 
 public class IdentityStorage extends SQLiteOpenHelper {
     private static String TAG = IdentityStorage.class.getName();
@@ -76,6 +76,21 @@ public class IdentityStorage extends SQLiteOpenHelper {
         }
     }
 
+    public void update(TrackedIdentity identity) {
+        Log.d(TAG, "save");
+        SQLiteDatabase database = this.getWritableDatabase();
+        try {
+            ContentValues values = new ContentValues();
+            values.put("userId", identity.getUserId());
+            values.put("tenantId", identity.getTenantId());
+            values.put("username", identity.getUsername());
+            values.put("email", identity.getEmail());
+            database.update(TABLE_NAME, values, "deviceId = ?", new String[] {identity.getDeviceId()});
+        } finally {
+            close(database);
+        }
+    }
+
     public TrackedIdentity load() {
         Log.d(TAG, "load");
         SQLiteDatabase database = this.getWritableDatabase();
@@ -132,5 +147,6 @@ public class IdentityStorage extends SQLiteOpenHelper {
             database.close();
         }
     }
+
 
 }

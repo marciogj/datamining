@@ -17,7 +17,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,10 +30,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import br.com.senior.research.gpstracker.tracking.IdentityProvider;
 import br.com.senior.research.gpstracker.tracking.services.LocationSensorTrackService;
-import br.com.senior.research.gpstracker.tracking.services.TrackedIdentity;
 import br.com.senior.research.gpstracker.tracking.services.dao.IdentityStorage;
 import br.com.senior.research.gpstracker.tracking.services.dao.LocationStorage;
+import br.com.senior.research.gpstracker.tracking.services.model.TrackedIdentity;
 
 public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
@@ -68,19 +68,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void registerIdentity() {
+        IdentityProvider identityProvider = new IdentityProvider(getApplicationContext());
         IdentityStorage identityStorage = IdentityStorage.getInstance(getApplicationContext());
         if (identityStorage.count() == 0 ) {
             TrackedIdentity identity = new TrackedIdentity();
             identity.setTenantId("senior");
-            identity.setDeviceId(loadDeviceId(getApplicationContext()));
-            identity.setUserId(loadDeviceId(getApplicationContext()));
+            identity.setDeviceId(identityProvider.getDeviceId());
+            identity.setUserId(identityProvider.getUsername());
+            identity.setEmail(identityProvider.getEmail());
+            identity.setUsername(identityProvider.getUsername());
             identityStorage.save(identity);
         }
     }
 
-    public static String loadDeviceId(Context context) {
-        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-    }
+
 
     private void runThread() {
 

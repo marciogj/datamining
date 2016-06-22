@@ -18,6 +18,7 @@ import java.util.Date;
 
 import br.com.senior.research.gpstracker.tracking.services.dao.IdentityStorage;
 import br.com.senior.research.gpstracker.tracking.services.dao.LocationStorage;
+import br.com.senior.research.gpstracker.tracking.services.model.TrackedIdentity;
 
 /**
  * Created by marcio.jasinski on 10/11/2015.
