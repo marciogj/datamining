@@ -8,4 +8,6 @@ public class TrackDTO {
 	public String userId;
 	public List<CoordinateDTO> coordinates = new LinkedList<>();
 	
+	public TrackDTO() {}
+	
 }

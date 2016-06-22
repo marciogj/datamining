@@ -7,7 +7,11 @@ public class CoordinateDTO {
 	public double altitude;
 	public String speed;
 	public String acceleration;
+	
+	//Both types of date are supported for input/output in order to keep backward compatibility
 	public String dateTime;
+	public Long timestamp;
+	
 	public String accuracy;
 	public String bearing;
 		

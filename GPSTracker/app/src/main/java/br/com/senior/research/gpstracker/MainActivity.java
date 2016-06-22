@@ -30,8 +30,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import br.com.senior.research.gpstracker.tracking.IdentityProvider;
 import br.com.senior.research.gpstracker.tracking.services.LocationSensorTrackService;
+import br.com.senior.research.gpstracker.tracking.services.dao.IdentityStorage;
 import br.com.senior.research.gpstracker.tracking.services.dao.LocationStorage;
+import br.com.senior.research.gpstracker.tracking.services.model.TrackedIdentity;
 
 public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
 
+        registerIdentity();
         Log.e("MAIN", "Initializing my intent....");
         Intent i = new Intent(this.getApplicationContext(), LocationSensorTrackService.class);
         bindService(i, myConnection, Context.BIND_AUTO_CREATE);
@@ -62,6 +66,21 @@ public class MainActivity extends AppCompatActivity {
 
         runThread();
     }
+
+    private void registerIdentity() {
+        IdentityProvider identityProvider = new IdentityProvider(getApplicationContext());
+        IdentityStorage identityStorage = IdentityStorage.getInstance(getApplicationContext());
+        if (identityStorage.count() == 0 ) {
+            TrackedIdentity identity = new TrackedIdentity();
+            identity.setTenantId("senior");
+            identity.setDeviceId(identityProvider.getDeviceId());
+            identity.setUserId(identityProvider.getUsername());
+            identity.setEmail(identityProvider.getEmail());
+            identity.setUsername(identityProvider.getUsername());
+            identityStorage.save(identity);
+        }
+    }
+
 
 
     private void runThread() {
@@ -170,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
     private class MyLocationListener implements LocationListener {
         private Location lastLocation;
         private double distance;
-        private long FIVE_MIN_MILIS = 5 + 60 * 1000;
+        private long FIVE_MIN_MILIS = 5 * 60 * 1000;
 
         @Override
         public void onLocationChanged(Location loc) {
@@ -207,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
             //localeTxt.setText("Local: " + getLocale(loc));
 
             TextView statusTxt = (TextView) findViewById(R.id.status);
-            statusTxt.setText("Status: " + loc.getExtras().get("satellites") + " Satelites");
+            statusTxt.setText("Status: " + loc.getExtras().get("satellites") + " Satélites");
 
             TextView accuracyTxt = (TextView) findViewById(R.id.accuracy);
             accuracyTxt.setText("Precisão: " + loc.getAccuracy() + " m");

@@ -8,7 +8,9 @@ public class InverseGeocodingResultDTO {
 	public String formatted_address;
 	public List<String> types = new LinkedList<>();
 	public List<AddressComponentDTO> address_components = new LinkedList<>();
-	public List<GeometryDTO> geometry = new LinkedList<>();
+	//Seems that geometry is not an array anymore...
+	//public List<GeometryDTO> geometry = new LinkedList<>();
+	public GeometryDTO geometry;
 	
 	
 	

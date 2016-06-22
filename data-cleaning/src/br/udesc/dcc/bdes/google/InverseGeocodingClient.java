@@ -22,6 +22,7 @@ public class InverseGeocodingClient {
 				.queryParam("key", apiKey)
 				.request(MediaType.APPLICATION_JSON).get();
 		//System.out.println("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude+"&key="+apiKey);
+		//System.out.println(response.readEntity(String.class));
 		GeocodeAddressDTO address = response.readEntity(GeocodeAddressDTO.class);
 		return Optional.of(address);
 	}

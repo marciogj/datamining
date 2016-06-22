@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import br.com.senior.research.gpstracker.tracking.AndroidUtil;
-import br.com.senior.research.gpstracker.tracking.services.TrackedIdentity;
 
 public class LocationStorage extends SQLiteOpenHelper {
     private static String TAG = LocationStorage.class.getName();
@@ -21,6 +20,7 @@ public class LocationStorage extends SQLiteOpenHelper {
 	private static final int DATABASE_VERSION = 2;
 	private static final String TABLE_NAME = "location_history";
     private static LocationStorage instance = null;
+    private Context context;
 
     public static LocationStorage getInstance(Context ctx) {
         if (instance == null) {
@@ -29,9 +29,9 @@ public class LocationStorage extends SQLiteOpenHelper {
         return instance;
     }
 
-
 	private LocationStorage(Context context) {
         super(context, TABLE_NAME, null, DATABASE_VERSION);
+        this.context = context;
 	}
 
 	@Override
@@ -160,11 +160,6 @@ public class LocationStorage extends SQLiteOpenHelper {
          ");";
 
         return query;
-    }
-
-    public TrackedIdentity loadIdentity() {
-        //TODO: Add implementation to save and load phone identity
-        return new TrackedIdentity();
     }
 
     private void close(Cursor cursor) {

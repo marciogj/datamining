@@ -81,6 +81,7 @@ public class TrajectorySummaryAPI {
 		Time t = new Time(time);
 		System.out.println("Tempo: " + t.getTime());
 		System.out.println("Trajetorias: " + evaluation.size());
+		System.out.println("Distancia: " + d.getKilometers() + " km");
  		
 		//Fn.transform(evaluation, TrajectoryMapper::toDto);
 		//return evaluation.stream().map(TrajectoryMapper::toDto).collect(Collectors.toList());

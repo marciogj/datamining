@@ -4,16 +4,21 @@ import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.Response;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.Date;
 
+import br.com.senior.research.gpstracker.tracking.services.dao.IdentityStorage;
 import br.com.senior.research.gpstracker.tracking.services.dao.LocationStorage;
+import br.com.senior.research.gpstracker.tracking.services.model.TrackedIdentity;
 
 /**
  * Created by marcio.jasinski on 10/11/2015.
@@ -22,22 +27,28 @@ import br.com.senior.research.gpstracker.tracking.services.dao.LocationStorage;
  */
 public class LocationRESTClient {
     public final String TAG = LocationRESTClient.class.getName();
+    private final ISO8601DateFormat iso8601 = new ISO8601DateFormat();
     public final int BATCH_SIZE = 50;
-    public final String POST_TRACK_SERVICE_URL = "http://ec2-54-207-45-157.sa-east-1.compute.amazonaws.com:9999/track/marciogj";
-    public final String PING_TRACK_SERVICE_URL = "http://ec2-54-207-45-157.sa-east-1.compute.amazonaws.com:9999/ping";
+    //public final String NODE_POST_TRACK_SERVICE_URL = "http://ec2-54-207-45-157.sa-east-1.compute.amazonaws.com:9999/track/marciogj";
+    //public final String NODE_PING_TRACK_SERVICE_URL = "http://ec2-54-207-45-157.sa-east-1.compute.amazonaws.com:9999/ping";
+
+    public final String  POST_TRACK_SERVICE_URL = "http://ec2-54-207-45-157.sa-east-1.compute.amazonaws.com:9999/services/track/v1/save";
+    public final String PING_TRACK_SERVICE_URL = "http://ec2-54-207-45-157.sa-east-1.compute.amazonaws.com:9999/services/ping";
 
     private Context context;
-    private LocationStorage storage;
+    private LocationStorage locationStorage;
+    private IdentityStorage identityStorage;
 
     LocationRESTClient(Context context) {
         this.context = context;
-        storage = LocationStorage.getInstance(context);
+        locationStorage = LocationStorage.getInstance(context);
+        identityStorage = IdentityStorage.getInstance(context);
     }
 
     public void sendPendingCoordinates() {
         Log.d(TAG, "sendPendingCoordinates");
 
-        int pendingCoordinates = storage.count();
+        int pendingCoordinates = locationStorage.count();
         int offset = -1;
         Log.d(TAG, "Pending coordinates " + pendingCoordinates);
         int batch = 1;
@@ -50,19 +61,22 @@ public class LocationRESTClient {
     }
 
     private void sendCoordinateBatch(int offset, int count) {
-        final Collection<Location> locations = storage.load(offset, count);
-        TrackedIdentity identity = storage.loadIdentity();
+        final Collection<Location> locations = locationStorage.load(offset, count);
+        TrackedIdentity identity = identityStorage.load();
         JsonObject jsonPackage = toJson(identity, locations);
 
         Ion.with(context)
                 .load(POST_TRACK_SERVICE_URL)
                 .setJsonObjectBody(jsonPackage)
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
+                //.asJsonObject()
+                .asString()
+                .withResponse()
+                .setCallback(new FutureCallback<Response<String>>() {
                     @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        if (result != null && "success".equals(result.get("status").getAsString())) {
-                            storage.remove(locations);
+                    public void onCompleted(Exception e, Response<String> response) {
+                        boolean isSuccess = response != null && (response.getHeaders().code() == 200 || response.getHeaders().code() == 201);
+                        if (isSuccess) {
+                            locationStorage.remove(locations);
                         }
                         if (e != null) {
                             Log.d(TAG, "Error: " + e.getMessage());
@@ -109,6 +123,7 @@ public class LocationRESTClient {
     private JsonObject toJson(Location location) {
         JsonObject json = new JsonObject();
         json.addProperty("timestamp", location.getTime());
+        json.addProperty("dateTime", iso8601.format(new Date(location.getTime())));
         json.addProperty("longitude", location.getLongitude());
         json.addProperty("latitude", location.getLatitude());
         json.addProperty("altitude", location.getAltitude());
