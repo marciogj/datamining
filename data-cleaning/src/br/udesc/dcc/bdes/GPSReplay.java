@@ -18,12 +18,13 @@ import br.udesc.dcc.bdes.io.SeniorCSVFileReader;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
+import br.udesc.dcc.bdes.server.JettyServer;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
 
 
 public class GPSReplay {
-	public static final String SERVER_URL = "http://localhost:9090";
+	public static final String SERVER_URL = "http://localhost:" + JettyServer.HTTP_PORT;
 	private static final Logger logger = Logger.getLogger("GPSReplay");
 
 	public static void main(String[] args) {

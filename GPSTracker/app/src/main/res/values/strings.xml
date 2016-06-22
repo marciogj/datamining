@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">GPSTracker</string>
     <string name="action_settings">Settings</string>
-    <string name="main_title">GPS Tracker</string>
+    <string name="main_title">GPS Tracker v0.1</string>
 </resources>

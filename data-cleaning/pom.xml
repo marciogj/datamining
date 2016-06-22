@@ -1,154 +1,209 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>data-cleaning</groupId>
-    <artifactId>data-cleaning</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
-        <jetty-version>9.2.7.v20150116</jetty-version>
-        <jersey-version>2.7</jersey-version>
-        <!-- Jersey new version (not working properly yet with Jetty 9.2.7   
-        <jersey-version>2.22</jersey-version> 
-         -->
-    </properties>
-    
-    <dependencies>
-        
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.5</version>
-        </dependency>
-    
-		<!-- REST Client -->    
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${jersey-version}</version>
-        </dependency>
-        
-        <!-- REST Server -->
-        <!-- Based on https://nikolaygrozev.wordpress.com/2014/10/16/rest-with-embedded-jetty-and-jersey-in-a-single-jar-step-by-step/ -->
-		  <dependency>
-		    <groupId>org.eclipse.jetty</groupId>
-		    <artifactId>jetty-server</artifactId>
-		    <version>${jetty-version}</version>
-		  </dependency>
-		  <dependency>
-		    <groupId>org.eclipse.jetty</groupId>
-		    <artifactId>jetty-servlet</artifactId>
-		    <version>${jetty-version}</version>
-		  </dependency>
-		  <dependency>
-		    <groupId>org.glassfish.jersey.core</groupId>
-		    <artifactId>jersey-server</artifactId>
-		    <version>${jersey-version}</version>
-		  </dependency>
-		  <dependency>
-		    <groupId>org.glassfish.jersey.containers</groupId>
-		    <artifactId>jersey-container-servlet-core</artifactId>
-		    <version>${jersey-version}</version>
-		  </dependency>
-		  <dependency>
-		    <groupId>org.glassfish.jersey.containers</groupId>
-		    <artifactId>jersey-container-jetty-http</artifactId>
-		    <version>${jersey-version}</version>
-		  </dependency>
-		  <dependency>
-		    <groupId>org.glassfish.jersey.media</groupId>
-		    <artifactId>jersey-media-moxy</artifactId>
-		    <version>${jersey-version}</version>
-		  </dependency>
-		  <dependency>
-		    <groupId>org.eclipse.jetty</groupId>
-		    <artifactId>jetty-servlets</artifactId>
-		    <version>${jetty-version}</version>
-		  </dependency>
-                            
-        <!-- WEBSOCKETS -->                
-        <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-api</artifactId>
-            <version>${jetty-version}</version>
-        </dependency>
-        
-        <!-- To run websockets in embedded server -->
-        <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-server</artifactId>
-            <version>${jetty-version}</version>
-        </dependency>
-        
-        <!-- To run websockets client --> 
-        <dependency>
-           <groupId>org.eclipse.jetty.websocket</groupId>
-           <artifactId>websocket-client</artifactId>
-           <version>${jetty-version}</version>
-        </dependency>                                         
-        
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-        </dependency>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>data-cleaning</groupId>
+	<artifactId>data-cleaning</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.5</version>
-        </dependency>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<jetty-version>9.2.7.v20150116</jetty-version>
+		<jersey-version>2.7</jersey-version>
+		<!-- Jersey new version (not working properly yet with Jetty 9.2.7 <jersey-version>2.22</jersey-version> -->
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.5</version>
+		</dependency>
+
+		<!-- REST Client -->
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>${jersey-version}</version>
+		</dependency>
+
+		<!-- REST Server -->
+		<!-- Based on https://nikolaygrozev.wordpress.com/2014/10/16/rest-with-embedded-jetty-and-jersey-in-a-single-jar-step-by-step/ -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${jetty-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>${jetty-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>${jersey-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet-core</artifactId>
+			<version>${jersey-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-jetty-http</artifactId>
+			<version>${jersey-version}</version>
+		</dependency>
+
+		
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-moxy</artifactId>
+			<version>${jersey-version}</version>
+		</dependency>
+		
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlets</artifactId>
+			<version>${jetty-version}</version>
+		</dependency>
+		<!-- REST Server -->
+
+		<!-- https://mvnrepository.com/artifact/com.owlike/genson -->
+<dependency>
+    <groupId>com.owlike</groupId>
+    <artifactId>genson</artifactId>
+    <version>1.4</version>
+</dependency>
 
 
-        <dependency>
-            <groupId>br.udesc</groupId>
-            <artifactId>cluster</artifactId>
-            <version>0.0.1</version>
-        </dependency>
-        
-        <dependency>
+		<!-- 
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+			<version>2.22</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+			<version>2.4.1</version>
+		</dependency>
+		
+		 -->
+
+		<!-- WEBSOCKETS -->
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-api</artifactId>
+			<version>${jetty-version}</version>
+		</dependency>
+
+		<!-- To run websockets in embedded server -->
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-server</artifactId>
+			<version>${jetty-version}</version>
+		</dependency>
+
+		<!-- To run websockets client -->
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-client</artifactId>
+			<version>${jetty-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>br.udesc</groupId>
+			<artifactId>cluster</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../cluster/target/cluster-0.0.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.6</version>
 		</dependency>
-		        
+
 		<!-- http://mvnrepository.com/artifact/org.mongodb/mongo-java-driver -->
 		<dependency>
-		    <groupId>org.mongodb</groupId>
-		    <artifactId>mongo-java-driver</artifactId>
-		    <version>3.2.2</version>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>3.2.2</version>
 		</dependency>
-		
+
 		<!-- http://mvnrepository.com/artifact/org.jongo/jongo -->
 		<dependency>
-		    <groupId>org.jongo</groupId>
-		    <artifactId>jongo</artifactId>
-		    <version>1.3.0</version>
+			<groupId>org.jongo</groupId>
+			<artifactId>jongo</artifactId>
+			<version>1.3.0</version>
 		</dependency>
-		
-	    <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-releasetrain</artifactId>
-            <version>Hopper-SR1</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-    
-				
-    </dependencies>
-    <build>
-        <sourceDirectory>src</sourceDirectory>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-releasetrain</artifactId>
+			<version>Hopper-SR1</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
+
+
+	</dependencies>
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>br.udesc.dcc.bdes.server.JettyServer</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

@@ -66,7 +66,7 @@ var json2csv = function (jsonMessage) {
 	var deviceId = jsonMessage.deviceId,
 	    userId = jsonMessage.userId,
 	    coordinates = jsonMessage.coordinates;
-		
+	
 	var startTime = jsonMessage.coordinates[0].timestamp;	
 	var filename = userId + '_' + startTime + '_' + fileCount + '.csv';
 	
@@ -140,7 +140,7 @@ restServer.get("/ping", function (req, res, next) {
 });
 
 
-restServer.listen(9999, function() {
+restServer.listen(9191, function() {
   log('==============================================');
   log('REST Service v1 ' + restServer.name + ' listening at ' + restServer.url);
   log('==============================================\n\n');
@@ -160,9 +160,9 @@ var webSocketServer = http.createServer(function(request, response) {
 	response.end();
 });
 
-webSocketServer.listen(9090, function() {
+webSocketServer.listen(9292, function() {
   log('##############################################');
-  log('WebSocket Service listening at port 9090');
+  log('WebSocket Service listening at port 9292');
   log('##############################################\n\n');
 });
  
@@ -223,9 +223,9 @@ var connect = require('connect');
 var serveStatic = require('serve-static');
 
 
-connect().use(serveStatic(__dirname)).listen(8080, function() {
+connect().use(serveStatic(__dirname)).listen(9393, function() {
   log('_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-');
-  log('HTTP Static Server listening on port 8080');  
+  log('HTTP Static Server listening on port 9393');  
   log('_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-\n\n');
   
 });

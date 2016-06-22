@@ -17,6 +17,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.Locale;
 
 import br.com.senior.research.gpstracker.tracking.services.LocationSensorTrackService;
+import br.com.senior.research.gpstracker.tracking.services.TrackedIdentity;
+import br.com.senior.research.gpstracker.tracking.services.dao.IdentityStorage;
 import br.com.senior.research.gpstracker.tracking.services.dao.LocationStorage;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
 
+        registerIdentity();
         Log.e("MAIN", "Initializing my intent....");
         Intent i = new Intent(this.getApplicationContext(), LocationSensorTrackService.class);
         bindService(i, myConnection, Context.BIND_AUTO_CREATE);
@@ -63,6 +67,20 @@ public class MainActivity extends AppCompatActivity {
         runThread();
     }
 
+    private void registerIdentity() {
+        IdentityStorage identityStorage = IdentityStorage.getInstance(getApplicationContext());
+        if (identityStorage.count() == 0 ) {
+            TrackedIdentity identity = new TrackedIdentity();
+            identity.setTenantId("senior");
+            identity.setDeviceId(loadDeviceId(getApplicationContext()));
+            identity.setUserId(loadDeviceId(getApplicationContext()));
+            identityStorage.save(identity);
+        }
+    }
+
+    public static String loadDeviceId(Context context) {
+        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
 
     private void runThread() {
 
@@ -170,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
     private class MyLocationListener implements LocationListener {
         private Location lastLocation;
         private double distance;
-        private long FIVE_MIN_MILIS = 5 + 60 * 1000;
+        private long FIVE_MIN_MILIS = 5 * 60 * 1000;
 
         @Override
         public void onLocationChanged(Location loc) {
@@ -207,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
             //localeTxt.setText("Local: " + getLocale(loc));
 
             TextView statusTxt = (TextView) findViewById(R.id.status);
-            statusTxt.setText("Status: " + loc.getExtras().get("satellites") + " Satelites");
+            statusTxt.setText("Status: " + loc.getExtras().get("satellites") + " Satélites");
 
             TextView accuracyTxt = (TextView) findViewById(R.id.accuracy);
             accuracyTxt.setText("Precisão: " + loc.getAccuracy() + " m");

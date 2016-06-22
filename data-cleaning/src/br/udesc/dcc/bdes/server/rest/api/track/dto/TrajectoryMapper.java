@@ -1,5 +1,7 @@
 package br.udesc.dcc.bdes.server.rest.api.track.dto;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,8 +32,14 @@ public class TrajectoryMapper {
 		coordinate.setLatitude(dto.latitude);
 		coordinate.setLongitude(dto.longitude);
 		coordinate.setAltitude(dto.altitude);
-		coordinate.setAcceleration(Double.parseDouble(dto.acceleration));	
-		coordinate.setDateTime(ZonedDateTime.parse(dto.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDateTime());
+		coordinate.setAcceleration(Double.parseDouble(dto.acceleration));
+		if (dto.timestamp != null) {
+			coordinate.setDateTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(dto.timestamp), ZoneId.systemDefault()));
+		}
+		if (dto.dateTime != null) {
+			coordinate.setDateTime(ZonedDateTime.parse(dto.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDateTime());
+		}
+		
 		coordinate.setSpeed(Double.parseDouble(dto.speed));
 		coordinate.setAccuracy(Double.parseDouble(dto.accuracy));
 		coordinate.setBearing(Double.parseDouble(dto.bearing));
@@ -45,6 +53,7 @@ public class TrajectoryMapper {
 		dto.altitude = entity.getAltitude();
 		dto.acceleration = String.format("%.2f", new Acceleration(entity.getAcceleration()).getMPerSec2());
 		dto.dateTime = entity.getDateTime().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		dto.timestamp =  entity.getDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		dto.speed = entity.getSpeed().isPresent() ? String.format("%.2f", new Speed(entity.getSpeed().get()).getKmh()) : "-";
 		dto.accuracy = String.format("%.2f", entity.getAccuracy());
 		dto.bearing = String.format("%.2f", entity.getBearing());
