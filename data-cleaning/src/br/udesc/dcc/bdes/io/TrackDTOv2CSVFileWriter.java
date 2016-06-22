@@ -10,11 +10,11 @@ public class TrackDTOv2CSVFileWriter {
 	public static void write(TrackDTO trackDto, String filename) {
 		try (PrintWriter writer = new PrintWriter(filename, "UTF-8");) {
 			writer.println(trackDto.userId + "@" + trackDto.deviceId);
-			writer.println("timestamp,longitude,latitude,altitude,accuracy,bearing,speed");
+			writer.println("dateTime,longitude,latitude,altitude,accuracy,bearing,speed");
 			
 			for (CoordinateDTO coordinate : trackDto.coordinates) {
 				writer.println(
-						coordinate.timestamp + ", " +
+						coordinate.dateTime + ", " +
 						coordinate.longitude + ", " + 
 						coordinate.latitude + ", " + 
 						coordinate.accuracy + ", " +

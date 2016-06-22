@@ -14,7 +14,7 @@ public class TrackDTOCSVFileWriter {
 			
 			for (CoordinateDTO coordinate : trackDto.coordinates) {
 				writer.println(
-						coordinate.dateTime + ", " +
+						coordinate.timestamp + ", " +
 						coordinate.longitude + ", " + 
 						coordinate.latitude + ", " + 
 						coordinate.accuracy + ", " +

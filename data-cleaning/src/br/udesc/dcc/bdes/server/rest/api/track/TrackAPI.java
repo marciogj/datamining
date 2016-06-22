@@ -21,6 +21,7 @@ import br.udesc.dcc.bdes.google.InverseGeocodingClient;
 import br.udesc.dcc.bdes.io.GeocodeAddressDTOFileWriter;
 import br.udesc.dcc.bdes.io.OpenWheatherDTOFileWriter;
 import br.udesc.dcc.bdes.io.TrackDTOCSVFileWriter;
+import br.udesc.dcc.bdes.io.TrackDTOv2CSVFileWriter;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.DriverProfile;
@@ -72,18 +73,8 @@ public class TrackAPI {
 		String datetime = "" + firstCoord.timestamp;
 		String filename = trackDto.userId + "_" + trackDto.deviceId + "_" + datetime;
 		TrackDTOCSVFileWriter.write(trackDto, filename + ".csv");
+		saveSemanticEnrichment(firstCoord.latitude, firstCoord.longitude, filename);
 		
-		/*
-		Optional<OpenWeatherConditionDTO> optWheather = getWeather(firstCoord.latitude, firstCoord.longitude);
-		if (optWheather.isPresent()) {
-			OpenWheatherDTOFileWriter.write(optWheather.get(), filename + "_weather.json");
-		}
-		
-		Optional<GeocodeAddress> optAddress = getAddress(firstCoord.latitude, firstCoord.longitude);
-		if (optAddress.isPresent()) {
-			GeocodeAddressDTOFileWriter.write(optAddress.get(), filename + "_address.json");
-		}
-		*/
 		return Response.status(Status.CREATED).build();
     }
 	
@@ -92,19 +83,18 @@ public class TrackAPI {
 	 */
 	@POST
 	@Path("/v2/save")
-    public void save(TrackDTO trackDto) {
+    public Response save(TrackDTO trackDto) {
 		System.out.println("Evaluate Source: " + trackDto.deviceId + "@" + trackDto.userId+ " - Coordinates: " + trackDto.coordinates.size());
-		if (trackDto.coordinates.isEmpty()) return;
+		if (trackDto.coordinates.isEmpty()) {
+			return Response.noContent().build();
+		}
 		CoordinateDTO firstCoord = trackDto.coordinates.get(0);
 		String datetime = removeInvalidFilenameChars(firstCoord.dateTime);
 		String filename = trackDto.userId + "_" + trackDto.deviceId + "_" + datetime;
+		TrackDTOv2CSVFileWriter.write(trackDto, filename + ".csv");
+		saveSemanticEnrichment(firstCoord.latitude, firstCoord.longitude, filename);
 		
-		TrackDTOCSVFileWriter.write(trackDto, filename + ".csv");
-		
-		Optional<OpenWeatherConditionDTO> optWheather = getWeather(firstCoord.latitude, firstCoord.longitude);
-		if (optWheather.isPresent()) {
-			OpenWheatherDTOFileWriter.write(optWheather.get(), filename + "_weather.json");
-		}
+		return Response.status(Status.CREATED).build();
     }
 	
 	@POST
@@ -118,6 +108,25 @@ public class TrackAPI {
 		
 		evaluate(trackDto);
     }
+	
+	private void saveSemanticEnrichment(double latitude, double longitude, String fileprefix) {
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		executor.submit(() -> {
+			try {
+				Optional<OpenWeatherConditionDTO> optWheather = getWeather(latitude, longitude);
+				if (optWheather.isPresent()) {
+					OpenWheatherDTOFileWriter.write(optWheather.get(), fileprefix + "_weather.json");
+				}
+				
+				Optional<GeocodeAddress> optAddress = getAddress(latitude, longitude);
+				if (optAddress.isPresent()) {
+					GeocodeAddressDTOFileWriter.write(optAddress.get(), fileprefix + "_address.json");
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		});
+	}
 	
 	private static String removeInvalidFilenameChars(String isoDatetime) {
 		System.err.println(isoDatetime);
