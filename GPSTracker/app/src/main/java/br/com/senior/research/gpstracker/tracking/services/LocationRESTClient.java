@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.Response;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -66,11 +67,14 @@ public class LocationRESTClient {
         Ion.with(context)
                 .load(POST_TRACK_SERVICE_URL)
                 .setJsonObjectBody(jsonPackage)
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
+                //.asJsonObject()
+                .asString()
+                .withResponse()
+                .setCallback(new FutureCallback<Response<String>>() {
                     @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        if (result != null && "success".equals(result.get("status").getAsString())) {
+                    public void onCompleted(Exception e, Response<String> response) {
+                        boolean isSuccess = response != null && (response.getHeaders().code() == 200 || response.getHeaders().code() == 201);
+                        if (isSuccess) {
                             locationStorage.remove(locations);
                         }
                         if (e != null) {
