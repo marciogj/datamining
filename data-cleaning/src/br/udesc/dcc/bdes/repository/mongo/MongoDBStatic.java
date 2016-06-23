@@ -22,7 +22,7 @@ public abstract class MongoDBStatic {
 	static {
 		DB_HOST = "localhost";
 		DB_PORT = 27017;
-		DB_NAME = "driver-profile";
+		DB_NAME = "driver-profile-analytics";
 
 		DB_USER = System.getProperty("DB_USER");
 		if (DB_USER == null) {

@@ -10,8 +10,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import br.udesc.dcc.bdes.model.DriverProfile;
-import br.udesc.dcc.bdes.model.UDriverId;
-import br.udesc.dcc.bdes.repository.MemoryRepository;
+import br.udesc.dcc.bdes.model.DriverId;
+import br.udesc.dcc.bdes.repository.memory.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.DriverProfileDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
@@ -26,7 +26,7 @@ public class DriverProfileAPI {
 	@Produces(MediaType.APPLICATION_JSON)
 	public DriverProfileDTO getDriverProfile(@PathParam("driverId") String driverId) {
 		logger.info("getDriverProfile " + driverId);
-		DriverProfile profile  = repository.loadDriverProfile(new UDriverId(driverId)).orElseThrow( () -> new NotFoundException());
+		DriverProfile profile  = repository.loadDriverProfile(new DriverId(driverId)).orElseThrow( () -> new NotFoundException());
 		return TrajectoryMapper.toDto(profile);
 	}
 }

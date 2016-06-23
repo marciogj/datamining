@@ -1,24 +1,24 @@
 package br.udesc.dcc.bdes.model;
 
-public class UDriver {
-	protected UDriverId id;
+public class Driver {
+	protected DriverId id;
 	protected String name;
 	protected DeviceId deviceId;
 	
-	public UDriver(String name, DeviceId deviceId) {
-		this.id = new UDriverId();
+	public Driver(String name, DeviceId deviceId) {
+		this.id = new DriverId();
 		this.name = name;
 		this.deviceId = deviceId;
 	}
 
-	public UDriver() {
+	public Driver() {
 	}
 
-	public UDriverId getId() {
+	public DriverId getId() {
 		return id;
 	}
 
-	public void setId(UDriverId id) {
+	public void setId(DriverId id) {
 		this.id = id;
 	}
 

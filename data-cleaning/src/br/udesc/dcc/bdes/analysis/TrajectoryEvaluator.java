@@ -10,10 +10,14 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.jongo.marshall.jackson.oid.MongoId;
+
 import br.udesc.dcc.bdes.google.GeocodeAddress;
 import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.Distance;
+import br.udesc.dcc.bdes.model.DriverId;
 import br.udesc.dcc.bdes.model.PenaltyAlert;
 import br.udesc.dcc.bdes.model.PenaltyType;
 import br.udesc.dcc.bdes.model.Speed;
@@ -36,10 +40,16 @@ import br.udesc.dcc.bdes.server.rest.api.track.dto.PenaltySeverity;
  *
  */
 public class TrajectoryEvaluator {
-	private String id;
+	@MongoId
+	private String _id;
+	private String deviceId;
+	private String driverId;
+	//Used for sorting and helping to get latest evaluation from database
+	private long latestTimestamp;
+	
 	private final Trajectory trajectory = new Trajectory();
 	private Coordinate previousCoordinate = null;
-
+	
 	private double MAX_ALLOWED_SPEED = 13.89; //50 km/h
 
 	private double totalDistance;
@@ -86,14 +96,40 @@ public class TrajectoryEvaluator {
 	private Optional<PenaltyAlert> optAccAlert = Optional.empty();
 	private int newAlertsCount = 0;
 
-	public TrajectoryEvaluator() {
-		this.id = UUID.randomUUID().toString();
+	public TrajectoryEvaluator(){
+		this._id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+	}
+	
+	public TrajectoryEvaluator(DeviceId deviceId, DriverId driverId) {
+		this();
+		this.deviceId = deviceId.getValue();
+		this.driverId = driverId.getValue();
+	}
+	
+	public DeviceId getDeviceId() {
+		return new DeviceId(deviceId);
 	}
 
-	public String getId() {
-		return id;
+	public void setDeviceId(DeviceId deviceId) {
+		this.deviceId = deviceId.getValue();
 	}
 
+	public DriverId getDriverId() {
+		return new DriverId(driverId);
+	}
+
+	public void setDriverId(DriverId driverId) {
+		this.driverId = driverId.getValue();
+	}
+
+	public TrajectoryEvaluatorId getId() {
+		return new TrajectoryEvaluatorId(_id);
+	}
+
+	public long getLatestTimestamp() {
+		return latestTimestamp;
+	}
+	
 	public String getMainStreet() {
 		double max = 0;
 		String mainStreet = "";
@@ -186,7 +222,7 @@ public class TrajectoryEvaluator {
 	public Coordinate evaluate(final Coordinate coordinate, Optional<OpenWeatherConditionDTO> weather) {
 		trajectory.add(coordinate);
 		currentWeather = weather;
-
+		latestTimestamp = coordinate.getDateTimeInMillis();
 		accCoordinateCount++;
 		if (previousCoordinate == null) {
 			previousCoordinate = coordinate;
@@ -604,7 +640,5 @@ class AccInterval {
 	public void setTime(long time) {
 		this.time = time;
 	}
-
-
 
 }

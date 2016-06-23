@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 import br.udesc.dcc.bdes.model.DeviceId;
-import br.udesc.dcc.bdes.model.UDriver;
-import br.udesc.dcc.bdes.model.UDriverId;
+import br.udesc.dcc.bdes.model.Driver;
+import br.udesc.dcc.bdes.model.DriverId;
 
 public class UDriverDAO extends Repository {
 	
@@ -18,7 +18,7 @@ public class UDriverDAO extends Repository {
 		super(conn);
 	}
 	
-	public void add(UDriver driver) throws SQLException {
+	public void add(Driver driver) throws SQLException {
 		String query = "INSERT INTO drivers (id, name, deviceId) VALUES (?, ?, ?)";
 		PreparedStatement pst = null;
 		try {
@@ -34,10 +34,10 @@ public class UDriverDAO extends Repository {
 		}
 	}
 	
-	public List<UDriver> loadAll() throws SQLException {
+	public List<Driver> loadAll() throws SQLException {
 		String query = "SELECT id, name, deviceId FROM drivers";
 		PreparedStatement pst = null;
-		List<UDriver> all = new LinkedList<>();
+		List<Driver> all = new LinkedList<>();
 		try {
 			pst = conn.prepareStatement(query);
 			ResultSet rs = pst.executeQuery(query);
@@ -52,10 +52,10 @@ public class UDriverDAO extends Repository {
 		return all;
 	}
 	
-	public Optional<UDriver> loadById(UDriverId id) throws SQLException {
+	public Optional<Driver> loadById(DriverId id) throws SQLException {
 		String query = "SELECT id, name, deviceId FROM drivers WHERE id = ?";
 		PreparedStatement pst = null;
-		UDriver driver = null;
+		Driver driver = null;
 		try {
 			pst = conn.prepareStatement(query);
 			pst.setString(1, id.getValue());
@@ -71,9 +71,9 @@ public class UDriverDAO extends Repository {
 		return Optional.ofNullable(driver);
 	}
 	
-	private UDriver toObject(ResultSet rs) throws SQLException {
-		UDriver obj = new UDriver();
-		obj.setId(new UDriverId(rs.getString("id")));
+	private Driver toObject(ResultSet rs) throws SQLException {
+		Driver obj = new Driver();
+		obj.setId(new DriverId(rs.getString("id")));
 		obj.setName(rs.getString("name"));
 		obj.setDeviceId(new DeviceId(rs.getString("deviceId")));
 		return obj;

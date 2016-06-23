@@ -1,13 +1,15 @@
 package br.udesc.dcc.bdes.model;
 
-import java.util.Optional;
+import org.jongo.marshall.jackson.oid.MongoObjectId;
+
 
 /**
  * Device represents the source of GPS data.
  * It might be associated within a vehicle (embeeded device) or a smarphone (external device)
  */
 public class Device {
-	private DeviceId id;
+	@MongoObjectId
+	private String _id;
 	private String model;
 	
 	public Device() {
@@ -16,23 +18,21 @@ public class Device {
 	
 	public Device(DeviceId id) {
 		super();
-		this.id = id;
+		this._id = id.id;
 	}
 
 	public Device(DeviceId id,String model) {
 		super();
-		this.id = id;
+		this._id = id.id;
 		this.model = model;
 	}
 
-
-
-	public Optional<DeviceId> getId() {
-		return id == null ? Optional.empty() : Optional.of(id);
+	public DeviceId getId() {
+		return new DeviceId(_id);
 	}
 	
 	public void setId(DeviceId id) {
-		this.id = id;
+		this._id = id.id;
 	}
 	
 	public String getModel() {

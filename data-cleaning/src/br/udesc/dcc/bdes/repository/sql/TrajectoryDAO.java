@@ -11,7 +11,7 @@ import java.util.Optional;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryId;
-import br.udesc.dcc.bdes.model.UDriverId;
+import br.udesc.dcc.bdes.model.DriverId;
 
 public class TrajectoryDAO extends Repository {
 	
@@ -42,7 +42,7 @@ public class TrajectoryDAO extends Repository {
 		}
 	}
 	
-	public List<Trajectory> loadAllByDriverId(UDriverId driverId) throws SQLException {
+	public List<Trajectory> loadAllByDriverId(DriverId driverId) throws SQLException {
 		String query = "SELECT id, source, driverId FROM trajectories WHERE driverId = ?";
 		PreparedStatement pst = null;
 		List<Trajectory> all = new LinkedList<>();
@@ -61,7 +61,7 @@ public class TrajectoryDAO extends Repository {
 		return all;
 	}
 	
-	public Optional<Trajectory> loadAllById(UDriverId driverId) throws SQLException {
+	public Optional<Trajectory> loadAllById(DriverId driverId) throws SQLException {
 		String query = "SELECT id, source, driverId FROM trajectories WHERE driverId = ?";
 		PreparedStatement pst = null;
 		Trajectory trajectory = null;

@@ -15,9 +15,9 @@ public class AutoStart extends BroadcastReceiver {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             //alarm.schedule(context, 5000);
 
-            //Intent serviceIntent = new Intent(context, LocationSensorTrackService.class);
+            //Intent serviceIntent = new Intent(context , LocationSensorTrackService.class);
             //context.startService(serviceIntent);
-            Toast.makeText(context, "On Boot from GPS Tracker", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "GPS Tracker Started", Toast.LENGTH_LONG).show();
         }
     }
 }
