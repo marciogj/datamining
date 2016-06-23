@@ -90,10 +90,10 @@ public class TrajectoryEvaluator {
 
 	private AccelerationEvaluator accEvaluator = new AccelerationEvaluator();
 
-	private Optional<OpenWeatherConditionDTO> currentWeather = Optional.empty(); 
+	private OpenWeatherConditionDTO currentWeather = null; 
 
-	private Optional<PenaltyAlert> optSpeedAlert = Optional.empty();
-	private Optional<PenaltyAlert> optAccAlert = Optional.empty();
+	private PenaltyAlert speedAlert = null;
+	private PenaltyAlert accAlert = null;
 	private int newAlertsCount = 0;
 
 	public TrajectoryEvaluator(){
@@ -221,7 +221,7 @@ public class TrajectoryEvaluator {
 
 	public Coordinate evaluate(final Coordinate coordinate, Optional<OpenWeatherConditionDTO> weather) {
 		trajectory.add(coordinate);
-		currentWeather = weather;
+		currentWeather = weather.isPresent() ? weather.get() : null;
 		latestTimestamp = coordinate.getDateTimeInMillis();
 		accCoordinateCount++;
 		if (previousCoordinate == null) {
@@ -307,10 +307,12 @@ public class TrajectoryEvaluator {
 		}
 
 		Optional<PenaltyAlert> newSpeedAlert = evaluatePenalty(PenaltyType.SPEEDING, aggressiveSpeedIndex);
-		optSpeedAlert = updateEvaluationPenalties(newSpeedAlert, optSpeedAlert, coordinate, distanceFromPrevious, currentSpeed);
-
+		Optional<PenaltyAlert> optSpeedAlert = updateEvaluationPenalties(newSpeedAlert, Optional.ofNullable(speedAlert), coordinate, distanceFromPrevious, currentSpeed);
+		speedAlert = optSpeedAlert.isPresent() ? optSpeedAlert.get() : null;
+		
 		Optional<PenaltyAlert> newAccAlert = evaluatePenalty(PenaltyType.ACCELERATING, aggressiveAccIndex);
-		optAccAlert = updateEvaluationPenalties(newAccAlert, optAccAlert, coordinate, distanceFromPrevious, currentAcceleration);
+		Optional<PenaltyAlert> optAccAlert = updateEvaluationPenalties(newAccAlert, Optional.ofNullable(accAlert), coordinate, distanceFromPrevious, currentAcceleration);
+		accAlert = optAccAlert.isPresent() ? optAccAlert.get() : null;
 
 		return currentCoordinate;
 	}
@@ -421,7 +423,7 @@ public class TrajectoryEvaluator {
 	}
 
 	public Optional<OpenWeatherConditionDTO> getCurrentWeather() {
-		return currentWeather;
+		return Optional.ofNullable(currentWeather);
 	}
 
 	public Trajectory getTrajectory(){

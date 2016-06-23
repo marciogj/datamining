@@ -2,7 +2,16 @@ package br.udesc.dcc.bdes.repository.mongo;
 
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
+import org.jongo.marshall.jackson.JacksonMapper;
+//import org.jongo.marshall.jackson.Builder;
 
+import org.jongo.marshall.jackson.JacksonMapper.Builder;
+
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 
@@ -36,8 +45,18 @@ public abstract class MongoDBStatic {
 
 		try {
 			mongoClient = new MongoClient(DB_HOST, DB_PORT);
+			
+			
+			Builder tmpMapper = new JacksonMapper.Builder();
+	        for (Module module : ObjectMapper.findModules()) {
+	            tmpMapper.registerModule(module);
+	        }
+	        tmpMapper.enable(MapperFeature.AUTO_DETECT_GETTERS);
+	        tmpMapper.registerModule(new JSR310Module()).registerModule(new Jdk8Module());
+			
 			db = mongoClient.getDB(DB_NAME);
-			jongo = new Jongo(db);
+			//jongo = new Jongo(db);
+			jongo = new Jongo(db, tmpMapper.build());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
