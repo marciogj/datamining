@@ -2,7 +2,7 @@ package br.udesc.dcc.bdes.io;
 
 import java.io.PrintWriter;
 
-import br.udesc.dcc.bdes.google.GeocodeAddress;
+import br.udesc.dcc.bdes.google.geocoding.GeocodeAddress;
 
 import com.google.gson.Gson;
 

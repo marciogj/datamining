@@ -15,7 +15,6 @@ import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.DriverId;
-import br.udesc.dcc.bdes.model.Speed;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.repository.mongo.MongoDBStatic;
 import br.udesc.dcc.bdes.repository.mongo.TrajectoryEvaluationRepository;
@@ -34,7 +33,7 @@ public class TrajectoryEvaluatorRepositoryTest {
 	}
 	
 	@Test
-	public void itShouldInsertANewDataAndSaveChanges() {
+	public void itShouldInsertAndLoad() {
 		TrajectoryEvaluator evaluation = new TrajectoryEvaluator(new DeviceId("abc"), new DriverId("123"));
 		Trajectory trajectory = new Trajectory();
 		trajectory.add(randomCoordinate());
@@ -44,16 +43,7 @@ public class TrajectoryEvaluatorRepositoryTest {
 		
 		Optional<TrajectoryEvaluator> optEvaluation = repository.load(evaluation.getId());
 		assertTrue(optEvaluation.isPresent());
-		assertEquals(1, optEvaluation.get().getTrajectory().size());
-//		
-//		DriverProfile profileChanged = new DriverProfile(new DriverId("123"), new DeviceId("abc"));
-//		profileChanged.setAlerts(25);
-//		repository.save(profileChanged);
-//		assertEquals(1, repository.count());
-//		
-//		optProfile = repository.load(profile.getDriverId());
-//		assertEquals(profileChanged.getAlerts(), optProfile.get().getAlerts());
-		
+		assertEquals(1, optEvaluation.get().getTrajectory().size()); 
 	}
 	
 	private Coordinate randomCoordinate() {

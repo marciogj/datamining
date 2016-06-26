@@ -16,8 +16,8 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import br.udesc.dcc.bdes.analysis.MeanTransportSplitter;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
-import br.udesc.dcc.bdes.google.GeocodeAddress;
-import br.udesc.dcc.bdes.google.InverseGeocodingClient;
+import br.udesc.dcc.bdes.google.geocoding.GeocodeAddress;
+import br.udesc.dcc.bdes.google.geocoding.InverseGeocodingClient;
 import br.udesc.dcc.bdes.io.GeocodeAddressDTOFileWriter;
 import br.udesc.dcc.bdes.io.OpenWheatherDTOFileWriter;
 import br.udesc.dcc.bdes.io.TrackDTOCSVFileWriter;

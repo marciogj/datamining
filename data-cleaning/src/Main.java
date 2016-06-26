@@ -1,22 +1,29 @@
 import java.util.Optional;
+import java.util.Properties;
 
 import org.jongo.MongoCollection;
 
+import com.google.gson.Gson;
+
 import br.udesc.dcc.bdes.analysis.AccelerationEvaluator;
-import br.udesc.dcc.bdes.google.GeocodeAddress;
-import br.udesc.dcc.bdes.google.InverseGeocodingClient;
-import br.udesc.dcc.bdes.google.dto.GeocodeAddressDTO;
+import br.udesc.dcc.bdes.google.geocoding.GeocodeAddress;
+import br.udesc.dcc.bdes.google.geocoding.InverseGeocodingClient;
+import br.udesc.dcc.bdes.google.geocoding.dto.GeocodeAddressDTO;
+import br.udesc.dcc.bdes.google.places.PlacesClient;
+import br.udesc.dcc.bdes.google.places.dto.PlacesDTO;
 import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.DriverId;
 import br.udesc.dcc.bdes.model.DriverProfile;
 import br.udesc.dcc.bdes.repository.mongo.DriverProfileRepository;
 import br.udesc.dcc.bdes.repository.mongo.MongoDBStatic;
+import br.udesc.dcc.bdes.server.JettyServer;
 
 
 public class Main {
 
 	public static void main(String[] args) {
-		mongoDB();
+		//mongoDB();
+		placesEval();
 	}
 	
 	public static void mongoDB() {
@@ -70,13 +77,27 @@ public class Main {
 		//double lon = -49.39019279;
 		double lat = -26.94951323;
 		double lon = -49.36797419;
-
-
-		Optional<GeocodeAddressDTO> address = InverseGeocodingClient.geAddress(lat, lon, "key");
+		Properties properties = JettyServer.loadServerProperties();
+		Optional<GeocodeAddressDTO> address = InverseGeocodingClient.getAddress(lat, lon,  properties.getProperty("google-key"));
 		if(address.isPresent()) {
 			GeocodeAddress geoAddress = new GeocodeAddress(address.get());
 			System.out.println(geoAddress.getStreetAddress());
 
+		} else {
+			System.err.println("Did not work :(");
+		}
+
+	}
+	
+	public static void placesEval() {
+		double lat = -33.8670522;
+		double lon = 151.1957362;
+		Properties properties = JettyServer.loadServerProperties();
+		int radiusMeters = 1000;
+		Optional<PlacesDTO> places = PlacesClient.getPlaces(lat, lon, radiusMeters, properties.getProperty("google-key"));
+		if(places.isPresent()) {
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(places));
 		} else {
 			System.err.println("Did not work :(");
 		}

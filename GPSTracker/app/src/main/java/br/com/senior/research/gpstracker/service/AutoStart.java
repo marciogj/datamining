@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
+import br.com.senior.research.gpstracker.tracking.services.LocationSensorTrackService;
 import br.com.senior.research.gpstracker.tracking.services.SenderAlarm;
 
 public class AutoStart extends BroadcastReceiver {   
@@ -15,8 +16,8 @@ public class AutoStart extends BroadcastReceiver {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             //alarm.schedule(context, 5000);
 
-            //Intent serviceIntent = new Intent(context , LocationSensorTrackService.class);
-            //context.startService(serviceIntent);
+            Intent serviceIntent = new Intent(context , LocationSensorTrackService.class);
+            context.startService(serviceIntent);
             Toast.makeText(context, "GPS Tracker Started", Toast.LENGTH_LONG).show();
         }
     }

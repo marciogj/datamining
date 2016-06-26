@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import org.jongo.marshall.jackson.oid.MongoId;
 
-import br.udesc.dcc.bdes.google.GeocodeAddress;
+import br.udesc.dcc.bdes.google.geocoding.GeocodeAddress;
 import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.DeviceId;
@@ -236,7 +236,7 @@ public class TrajectoryEvaluator {
 		double currentSpeed = currentCoordinate.getSpeed().isPresent() ? currentCoordinate.getSpeed().get() : 0;
 		double currentAcceleration = currentCoordinate.getAcceleration();
 		double previousAcceleration = previousCoordinate.getAcceleration();
-
+		
 		totalTime += elapsedTime;
 		totalDistance += distanceFromPrevious;
 		speedSum += currentSpeed;
