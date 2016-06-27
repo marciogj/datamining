@@ -78,6 +78,13 @@ public class MainActivity extends AppCompatActivity {
             identity.setEmail(identityProvider.getEmail());
             identity.setUsername(identityProvider.getUsername());
             identityStorage.save(identity);
+        } else {
+            TrackedIdentity identity = new TrackedIdentity();
+            identity.setTenantId("senior");
+            //identity.setUserId(identityProvider.getUsername());
+            identity.setEmail(identityProvider.getEmail());
+            identity.setUsername(identityProvider.getUsername());
+            identityStorage.update(identity);
         }
     }
 

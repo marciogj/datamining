@@ -1,7 +1,7 @@
-package br.udesc.dcc.bdes.google;
+package br.udesc.dcc.bdes.google.geocoding;
 
-import br.udesc.dcc.bdes.google.dto.GeocodeAddressDTO;
-import br.udesc.dcc.bdes.google.dto.InverseGeocodingResultDTO;
+import br.udesc.dcc.bdes.google.geocoding.dto.GeocodeAddressDTO;
+import br.udesc.dcc.bdes.google.geocoding.dto.InverseGeocodingResultDTO;
 
 public class GeocodeAddress {
 	private String street_address;

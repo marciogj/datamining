@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.google.dto;
+package br.udesc.dcc.bdes.google.geocoding.dto;
 
 public class LatLngDTO {
 	public double lat;

@@ -15,7 +15,7 @@ import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.Distance;
 import br.udesc.dcc.bdes.model.Time;
-import br.udesc.dcc.bdes.repository.MemoryRepository;
+import br.udesc.dcc.bdes.repository.memory.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.PenaltyAlertDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.SpeedTelemetryDTO;

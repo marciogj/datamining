@@ -7,6 +7,8 @@ public class AccelerationLimit {
 	protected int count = 0;
 	protected double weight = 0;
 	
+	public AccelerationLimit() {}
+	
 	public AccelerationLimit(double limit, String desc, double weight) {
 		this.description = desc;
 		this.limit = limit;

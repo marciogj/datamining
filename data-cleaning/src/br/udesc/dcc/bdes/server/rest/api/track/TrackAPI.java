@@ -16,8 +16,8 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import br.udesc.dcc.bdes.analysis.MeanTransportSplitter;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
-import br.udesc.dcc.bdes.google.GeocodeAddress;
-import br.udesc.dcc.bdes.google.InverseGeocodingClient;
+import br.udesc.dcc.bdes.google.geocoding.GeocodeAddress;
+import br.udesc.dcc.bdes.google.geocoding.InverseGeocodingClient;
 import br.udesc.dcc.bdes.io.GeocodeAddressDTOFileWriter;
 import br.udesc.dcc.bdes.io.OpenWheatherDTOFileWriter;
 import br.udesc.dcc.bdes.io.TrackDTOCSVFileWriter;
@@ -27,10 +27,10 @@ import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.DriverProfile;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TransportType;
-import br.udesc.dcc.bdes.model.UDriverId;
+import br.udesc.dcc.bdes.model.DriverId;
 import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
-import br.udesc.dcc.bdes.repository.MemoryRepository;
+import br.udesc.dcc.bdes.repository.memory.MemoryRepository;
 import br.udesc.dcc.bdes.server.JettyServer;
 import br.udesc.dcc.bdes.server.rest.APIPath;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.CoordinateDTO;
@@ -38,9 +38,6 @@ import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @Path(APIPath.TRACK)
 public class TrackAPI {
@@ -137,12 +134,12 @@ public class TrackAPI {
 	}
 	
 	private void evaluateTrack(TrackDTO trackDto) {
-		TrajectoryEvaluator trajectoryEval = new TrajectoryEvaluator();
+		TrajectoryEvaluator trajectoryEval = new TrajectoryEvaluator(new DeviceId(trackDto.deviceId), new DriverId(trackDto.userId));
 		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
 				
 		//noiseCleaning();
 		
-		UDriverId driverId = new UDriverId(trackDto.userId);
+		DriverId driverId = new DriverId(trackDto.userId);
 		Optional<DriverProfile> optDriverProfile = repository.loadDriverProfile(driverId);
 		if (!optDriverProfile.isPresent()) {
 			repository.save(new DriverProfile(driverId, new DeviceId(trackDto.deviceId)));
@@ -254,7 +251,7 @@ public class TrackAPI {
 			trajectoryEval.resetNewAlerts();
 			
 			//previousTrajectory = trajectoryEval.getTrajectory();
-			trajectoryEval = new TrajectoryEvaluator();
+			trajectoryEval =new TrajectoryEvaluator(new DeviceId(trackDto.deviceId), new DriverId(trackDto.userId));
 		}
 		
 	}

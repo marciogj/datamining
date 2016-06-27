@@ -72,7 +72,7 @@ public class TrajectoryMapper {
 		//TODO: Map all parameters from telemetry
 		TrajectorySummaryDTO dto = new TrajectorySummaryDTO();
 		dto.trajectoryId = evaluation.getTrajectory().getId().getValue();
-		dto.evaluationId = evaluation.getId();
+		dto.evaluationId = evaluation.getId().getValue();
 		
 		TrajectoryEvaluation telemetry = evaluation.getCurrentTelemetry();
 		dto.startDateTime = evaluation.getStartDate().isPresent() ? evaluation.getStartDate().get().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) : "";

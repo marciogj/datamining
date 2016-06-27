@@ -6,8 +6,8 @@ import java.util.List;
 
 import br.udesc.dcc.bdes.model.Device;
 import br.udesc.dcc.bdes.model.DeviceId;
-import br.udesc.dcc.bdes.model.UDriver;
-import br.udesc.dcc.bdes.repository.MemoryRepository;
+import br.udesc.dcc.bdes.model.Driver;
+import br.udesc.dcc.bdes.repository.memory.MemoryRepository;
 import br.udesc.dcc.bdes.repository.sql.DBPool;
 import br.udesc.dcc.bdes.repository.sql.UDriverDAO;
 
@@ -25,7 +25,7 @@ public class InitialSetup {
 			//repository.add(new UDriver("Anderson Torres", new DeviceId("123")));
 			//repository.add(new UDriver("Taxi 547", new DeviceId("121")));
 			
-			List<UDriver> all = repository.loadAll();
+			List<Driver> all = repository.loadAll();
 			System.out.println(all.size());
 			
 			DBPool.release(conn);

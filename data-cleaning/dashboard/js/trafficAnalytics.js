@@ -2,7 +2,7 @@ var app = angular.module('trafficAnalytics', [
 'ui.router'
 ]); 
 
-var DBP_API = "http://localhost:9090/services";
+var DBP_API = "http://localhost:9999/services";
 
 var weekDayMonth = function(date) {
 	//var weekDays = [ 'Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];

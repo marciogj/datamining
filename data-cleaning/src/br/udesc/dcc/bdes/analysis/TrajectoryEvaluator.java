@@ -10,10 +10,14 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 
-import br.udesc.dcc.bdes.google.GeocodeAddress;
+import org.jongo.marshall.jackson.oid.MongoId;
+
+import br.udesc.dcc.bdes.google.geocoding.GeocodeAddress;
 import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
+import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.Distance;
+import br.udesc.dcc.bdes.model.DriverId;
 import br.udesc.dcc.bdes.model.PenaltyAlert;
 import br.udesc.dcc.bdes.model.PenaltyType;
 import br.udesc.dcc.bdes.model.Speed;
@@ -36,10 +40,16 @@ import br.udesc.dcc.bdes.server.rest.api.track.dto.PenaltySeverity;
  *
  */
 public class TrajectoryEvaluator {
-	private String id;
+	@MongoId
+	private String _id;
+	private String deviceId;
+	private String driverId;
+	//Used for sorting and helping to get latest evaluation from database
+	private long latestTimestamp;
+	
 	private final Trajectory trajectory = new Trajectory();
 	private Coordinate previousCoordinate = null;
-
+	
 	private double MAX_ALLOWED_SPEED = 13.89; //50 km/h
 
 	private double totalDistance;
@@ -80,20 +90,46 @@ public class TrajectoryEvaluator {
 
 	private AccelerationEvaluator accEvaluator = new AccelerationEvaluator();
 
-	private Optional<OpenWeatherConditionDTO> currentWeather = Optional.empty(); 
+	private OpenWeatherConditionDTO currentWeather = null; 
 
-	private Optional<PenaltyAlert> optSpeedAlert = Optional.empty();
-	private Optional<PenaltyAlert> optAccAlert = Optional.empty();
+	private PenaltyAlert speedAlert = null;
+	private PenaltyAlert accAlert = null;
 	private int newAlertsCount = 0;
 
-	public TrajectoryEvaluator() {
-		this.id = UUID.randomUUID().toString();
+	public TrajectoryEvaluator(){
+		this._id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+	}
+	
+	public TrajectoryEvaluator(DeviceId deviceId, DriverId driverId) {
+		this();
+		this.deviceId = deviceId.getValue();
+		this.driverId = driverId.getValue();
+	}
+	
+	public DeviceId getDeviceId() {
+		return new DeviceId(deviceId);
 	}
 
-	public String getId() {
-		return id;
+	public void setDeviceId(DeviceId deviceId) {
+		this.deviceId = deviceId.getValue();
 	}
 
+	public DriverId getDriverId() {
+		return new DriverId(driverId);
+	}
+
+	public void setDriverId(DriverId driverId) {
+		this.driverId = driverId.getValue();
+	}
+
+	public TrajectoryEvaluatorId getId() {
+		return new TrajectoryEvaluatorId(_id);
+	}
+
+	public long getLatestTimestamp() {
+		return latestTimestamp;
+	}
+	
 	public String getMainStreet() {
 		double max = 0;
 		String mainStreet = "";
@@ -185,8 +221,8 @@ public class TrajectoryEvaluator {
 
 	public Coordinate evaluate(final Coordinate coordinate, Optional<OpenWeatherConditionDTO> weather) {
 		trajectory.add(coordinate);
-		currentWeather = weather;
-
+		currentWeather = weather.isPresent() ? weather.get() : null;
+		latestTimestamp = coordinate.getDateTimeInMillis();
 		accCoordinateCount++;
 		if (previousCoordinate == null) {
 			previousCoordinate = coordinate;
@@ -200,7 +236,7 @@ public class TrajectoryEvaluator {
 		double currentSpeed = currentCoordinate.getSpeed().isPresent() ? currentCoordinate.getSpeed().get() : 0;
 		double currentAcceleration = currentCoordinate.getAcceleration();
 		double previousAcceleration = previousCoordinate.getAcceleration();
-
+		
 		totalTime += elapsedTime;
 		totalDistance += distanceFromPrevious;
 		speedSum += currentSpeed;
@@ -271,10 +307,12 @@ public class TrajectoryEvaluator {
 		}
 
 		Optional<PenaltyAlert> newSpeedAlert = evaluatePenalty(PenaltyType.SPEEDING, aggressiveSpeedIndex);
-		optSpeedAlert = updateEvaluationPenalties(newSpeedAlert, optSpeedAlert, coordinate, distanceFromPrevious, currentSpeed);
-
+		Optional<PenaltyAlert> optSpeedAlert = updateEvaluationPenalties(newSpeedAlert, Optional.ofNullable(speedAlert), coordinate, distanceFromPrevious, currentSpeed);
+		speedAlert = optSpeedAlert.isPresent() ? optSpeedAlert.get() : null;
+		
 		Optional<PenaltyAlert> newAccAlert = evaluatePenalty(PenaltyType.ACCELERATING, aggressiveAccIndex);
-		optAccAlert = updateEvaluationPenalties(newAccAlert, optAccAlert, coordinate, distanceFromPrevious, currentAcceleration);
+		Optional<PenaltyAlert> optAccAlert = updateEvaluationPenalties(newAccAlert, Optional.ofNullable(accAlert), coordinate, distanceFromPrevious, currentAcceleration);
+		accAlert = optAccAlert.isPresent() ? optAccAlert.get() : null;
 
 		return currentCoordinate;
 	}
@@ -385,7 +423,7 @@ public class TrajectoryEvaluator {
 	}
 
 	public Optional<OpenWeatherConditionDTO> getCurrentWeather() {
-		return currentWeather;
+		return Optional.ofNullable(currentWeather);
 	}
 
 	public Trajectory getTrajectory(){
@@ -604,7 +642,5 @@ class AccInterval {
 	public void setTime(long time) {
 		this.time = time;
 	}
-
-
 
 }

@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.analysis.test;
+package br.udesc.dcc.bdes.analysis.test.analysis;
 
 import static org.junit.Assert.*;
 

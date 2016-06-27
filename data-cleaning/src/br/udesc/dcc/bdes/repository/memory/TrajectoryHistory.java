@@ -1,4 +1,4 @@
-package br.udesc.dcc.bdes.repository;
+package br.udesc.dcc.bdes.repository.memory;
 
 import java.util.LinkedList;
 import java.util.List;
