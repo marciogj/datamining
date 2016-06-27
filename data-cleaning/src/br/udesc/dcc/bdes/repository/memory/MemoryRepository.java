@@ -8,17 +8,18 @@ import java.util.Map;
 import java.util.Optional;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.analysis.TrajectoryEvaluatorId;
 import br.udesc.dcc.bdes.model.Device;
 import br.udesc.dcc.bdes.model.DeviceId;
-import br.udesc.dcc.bdes.model.DriverProfile;
 import br.udesc.dcc.bdes.model.DriverId;
+import br.udesc.dcc.bdes.model.DriverProfile;
 
 
 public class MemoryRepository {
 	//private static Map<String, TrajectoryTelemetry> telemetryRepository = new HashMap<>();
-	private static Map<DeviceId, TrajectoryHistory> evaluationRepository = new HashMap<>();
-	private static Map<DeviceId, Device> deviceRepository = new HashMap<>();
-	private static Map<DriverId, DriverProfile> driverProfileRepository = new HashMap<>();
+	private final static Map<DeviceId, TrajectoryHistory> evaluationRepository = new HashMap<>();
+	private final static Map<DeviceId, Device> deviceRepository = new HashMap<>();
+	private final static Map<DriverId, DriverProfile> driverProfileRepository = new HashMap<>();
 	
 	private static MemoryRepository instance = new MemoryRepository();
 	
@@ -83,7 +84,7 @@ public class MemoryRepository {
 		trajectoryHistory.replaceLatest(trajectoryEval);	
 	}
 
-	public Optional<TrajectoryEvaluator> loadTrajectoryEvaluationById(String evaluationId) {
+	public Optional<TrajectoryEvaluator> loadTrajectoryEvaluationById(TrajectoryEvaluatorId evaluationId) {
 		for(TrajectoryHistory history : evaluationRepository.values() ) {
 			Optional<TrajectoryEvaluator> eval = history.findById(evaluationId);
 			if (eval.isPresent()) {

@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.analysis.TrajectoryEvaluatorId;
 import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.Distance;
 import br.udesc.dcc.bdes.model.Time;
@@ -43,7 +44,7 @@ public class TrajectorySummaryAPI {
 	@Produces(MediaType.APPLICATION_JSON)
 	public TrajectorySummaryDTO getTrajectoryEvaluation(@PathParam("evaluationId") String evaluationId) {
 		logger.info("getTrajectoryEvaluation " + evaluationId);
-		TrajectoryEvaluator evaluator = repository.loadTrajectoryEvaluationById(evaluationId).orElseThrow( () -> new NotFoundException());
+		TrajectoryEvaluator evaluator = repository.loadTrajectoryEvaluationById(new TrajectoryEvaluatorId(evaluationId)).orElseThrow( () -> new NotFoundException());
 		return TrajectoryMapper.toDto(evaluator);
 	}
 	
@@ -52,7 +53,7 @@ public class TrajectorySummaryAPI {
 	@Produces(MediaType.APPLICATION_JSON)
 	public TrajectoryDTO getTrajectoryEvaluationCoordinates(@PathParam("evaluationId") String evaluationId) {
 		logger.info("getTrajectoryEvaluationCoordinates " + evaluationId);
-		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(evaluationId).orElseThrow( () -> new NotFoundException());
+		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(new TrajectoryEvaluatorId(evaluationId)).orElseThrow( () -> new NotFoundException());
 		return TrajectoryMapper.toDto(evaluation.getTrajectory());
 	}
 	
@@ -61,7 +62,7 @@ public class TrajectorySummaryAPI {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<PenaltyAlertDTO> getTrajectoryEvaluationAlerts(@PathParam("evaluationId") String evaluationId) {
 		logger.info("getTrajectoryEvaluationCoordinates " + evaluationId);
-		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(evaluationId).orElseThrow( () -> new NotFoundException());
+		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(new TrajectoryEvaluatorId(evaluationId)).orElseThrow( () -> new NotFoundException());
 		return evaluation.getAlerts().stream().map(alert ->  TrajectoryMapper.toDto(alert)).collect(Collectors.toList());
 	}
 	
@@ -93,7 +94,7 @@ public class TrajectorySummaryAPI {
 	@Produces(MediaType.APPLICATION_JSON)
 	public SpeedTelemetryDTO getTrajectoriesSpeedTelemetry(@PathParam("trajectoryEvaluationId") String trajectoryEvaluationId) {
 		logger.info("getTrajectoriesSpeedTelemetry " + trajectoryEvaluationId);
-		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(trajectoryEvaluationId).orElseThrow( () -> new NotFoundException());
+		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(new TrajectoryEvaluatorId(trajectoryEvaluationId)).orElseThrow( () -> new NotFoundException());
 		return TrajectoryMapper.toDto(evaluation.getTrajectory().getCoordinates());
 	}
 }

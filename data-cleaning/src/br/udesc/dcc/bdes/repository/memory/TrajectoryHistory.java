@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.analysis.TrajectoryEvaluatorId;
 
 public class TrajectoryHistory {
 	List<TrajectoryEvaluator> history = new LinkedList<>();
@@ -28,7 +29,7 @@ public class TrajectoryHistory {
 	}
 	
 
-	public Optional<TrajectoryEvaluator> findById(String id) {
+	public Optional<TrajectoryEvaluator> findById(TrajectoryEvaluatorId id) {
 		return history.stream().filter(trajectoryEval -> trajectoryEval.getId().equals(id)).findFirst();	
 	}
 	
