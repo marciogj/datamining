@@ -1,16 +1,15 @@
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
 import org.jongo.MongoCollection;
 
-import com.google.gson.Gson;
-
 import br.udesc.dcc.bdes.analysis.AccelerationEvaluator;
 import br.udesc.dcc.bdes.google.geocoding.GeocodeAddress;
 import br.udesc.dcc.bdes.google.geocoding.InverseGeocodingClient;
 import br.udesc.dcc.bdes.google.geocoding.dto.GeocodeAddressDTO;
-import br.udesc.dcc.bdes.google.places.PlacesClient;
-import br.udesc.dcc.bdes.google.places.dto.PlacesDTO;
+import br.udesc.dcc.bdes.google.places.ImportantPlace;
+import br.udesc.dcc.bdes.google.places.ImportantPlacesClient;
 import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.DriverId;
 import br.udesc.dcc.bdes.model.DriverProfile;
@@ -82,7 +81,6 @@ public class Main {
 		if(address.isPresent()) {
 			GeocodeAddress geoAddress = new GeocodeAddress(address.get());
 			System.out.println(geoAddress.getStreetAddress());
-
 		} else {
 			System.err.println("Did not work :(");
 		}
@@ -90,18 +88,20 @@ public class Main {
 	}
 	
 	public static void placesEval() {
-		double lat = -33.8670522;
-		double lon = 151.1957362;
+		//double lat = -33.8670522;
+		//double lon = 151.1957362;
+		
+		double lat = -26.9059024;
+		double lon = -49.2466274;
 		Properties properties = JettyServer.loadServerProperties();
 		int radiusMeters = 1000;
-		Optional<PlacesDTO> places = PlacesClient.getPlaces(lat, lon, radiusMeters, properties.getProperty("google-key"));
-		if(places.isPresent()) {
-			Gson gson = new Gson();
-			System.out.println(gson.toJson(places));
-		} else {
-			System.err.println("Did not work :(");
+		
+		List<ImportantPlace> places = ImportantPlacesClient.getPlaces(lat, lon, radiusMeters, properties.getProperty("google-key"));
+		for(ImportantPlace place : places) {
+			System.out.println(place.getName() + ". Type  " + place.getType() + ". Address: " + place.getAddress());
 		}
-
+		//	Gson gson = new Gson();
+		//	System.out.println(gson.toJson(places));
 	}
 
 }
