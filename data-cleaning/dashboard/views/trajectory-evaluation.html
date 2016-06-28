@@ -52,10 +52,10 @@
 	  <!-- small box -->
 	  <div class="small-box bg-red">
 	    <div class="inner">
-	      <h3>{{vm.evaluation.maxDec | number:2}} m/s²</h3>
-	      <p>Max deceleration</p>
-	      <h2>{{vm.evaluation.maxAcc | number:2}} m/s²</h2>
-	      <p>Max acceleration</p>
+	      <h3>{{vm.evaluation.avgAcc | number:2}} m/s²</h3>
+	      <p>Avg Acceleration</p>	
+	      <h4>{{vm.evaluation.maxAcc | number:2}} m/s² | {{vm.evaluation.maxDec | number:2}} m/s²</h4>
+	      <p>Max acceleration | deceleration</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-arrow-graph-up-right"></i>
@@ -88,7 +88,7 @@
 	    <div class="inner">
 	      <h3>{{vm.evaluation.speedChanges/vm.evaluation.totalDistance | number:2}}</sup></h3>
 	      <p>Acceleration changes per Km</p>
-	       <h2>{{vm.evaluation.speedChanges}}</h2>
+	      <h2>{{vm.evaluation.speedChanges}}</h2>
 	      <p>Total changes</p>
 	    </div>
 	    <div class="icon">
@@ -102,7 +102,9 @@
 	  <div class="small-box bg-yellow">
 	    <div class="inner">
 	      <h3>{{vm.evaluation.agressiveIndex | number:2}}</h3>
-	      <p>Aggressiveness Index</p>
+	      <p>Aggressive Index</p>
+	      <h2>{{vm.evaluation.maxAgressiveIndex | number:2}}</h2>
+	      <p>Max Aggressive Index</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-stats-bars"></i>
@@ -118,6 +120,8 @@
 	      <h3></h3>
 	      <p>{{vm.evaluation.wheatherCondition}}</p>
 		  <p>{{vm.evaluation.trafficCondition}}</p>
+		  <h4>{{vm.evaluation.speedAgressiveIndex | number:2}} | {{vm.evaluation.accAgressiveIndex | number:2}}</h4>
+	      <p>Speed Index | Acc Index</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-ios-cloudy-night"></i>
@@ -126,5 +130,21 @@
 	  </div>
 	</div><!-- ./col -->
 </div><!-- /.row -->
+
+<strong>Distribuição da Velocidade:</strong>
+Dentro do limite: {{vm.evaluation.speedUnderLimitCount}}<br/>
+De 10% até 20%: {{vm.evaluation.speed10To20LimitCount}}<br/>
+De 20% até 50%: {{vm.evaluation.speed21UpTo50LimitCount}}<br/>
+Acima de 50%: {{vm.evaluation.speed51UpLimitCount}}<br/><br/>
+
+<strong>Distribuição da Aceleração (Avg: {{vm.evaluation.accEvaluation.fullAvg | number: 2}} | Acc Avg: {{vm.evaluation.accEvaluation.accAvg | number: 2}} | Dec Avg: {{vm.evaluation.accEvaluation.desaccAvg | number: 2}}):</strong>
+
+<ul class="list-unstyled" ng-repeat="accLimit in vm.evaluation.accEvaluation.limitCount">
+<li>{{accLimit.description}}: {{accLimit.count}} - AVG({{accLimit.avg | number: 2}})</li>
+</ul>
+
+
+<hr>
+
 <a ui-sref="trajectory-map({evaluationId: vm.evaluation.evaluationId})">Map</a>
 <a ui-sref="trajectory-coordinates({evaluationId: vm.evaluation.evaluationId})">Coordinates</a>

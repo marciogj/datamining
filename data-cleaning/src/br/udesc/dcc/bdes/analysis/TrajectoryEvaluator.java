@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.jongo.marshall.jackson.oid.MongoId;
 
@@ -82,11 +81,16 @@ public class TrajectoryEvaluator {
 	private Distance segmentDistance = new Distance();
 	private List<Double> segmentSpeedIndexes = new LinkedList<>();
 	private List<Double> segmentAccelerationIndexes = new LinkedList<>();
+	
+	private double speedIndexSum = 0.0;
+	private double accIndexSum = 0.0;
+	
 	//private List<Double> segmentDeccelerationIndexes = new LinkedList<>();
 
-	private List<Double> trajectorySpeedIndexes = new LinkedList<>();
-	private List<Double> trajectoryAccelerationIndexes = new LinkedList<>();
-	//private List<Double> trajectoryDeccelerationIndexes = new LinkedList<>();
+	
+	private double maxAggressiveIndex = 0.0;
+	private int speedSegmentSize = 1;
+	private int accSegmentSize = 1;
 
 	private AccelerationEvaluator accEvaluator = new AccelerationEvaluator();
 
@@ -95,9 +99,22 @@ public class TrajectoryEvaluator {
 	private PenaltyAlert speedAlert = null;
 	private PenaltyAlert accAlert = null;
 	private int newAlertsCount = 0;
+	
+	private int speedUnderLimitCount = 0;
+	private int speed10To20LimitCount = 0;
+	private int speed21UpTo50LimitCount = 0;
+	private int speed51UpLimitCount = 0;
 
+	//tmp
+	public static int sequence = 1;
+	
+	public static synchronized int nextSequence() {
+		return ++sequence;
+	}
+	
 	public TrajectoryEvaluator(){
-		this._id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+		//this._id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+		this._id = "" + nextSequence();
 	}
 	
 	public TrajectoryEvaluator(DeviceId deviceId, DriverId driverId) {
@@ -241,8 +258,8 @@ public class TrajectoryEvaluator {
 		totalDistance += distanceFromPrevious;
 		speedSum += currentSpeed;
 
-		accEvaluator.evaluate(currentAcceleration);
-
+		countSpeedGroup(currentSpeed);
+		
 		if (currentSpeed > MAX_ALLOWED_SPEED) {
 			overMaxSpeedCount++;
 		}
@@ -294,17 +311,23 @@ public class TrajectoryEvaluator {
 			//}
 		}
 		previousCoordinate = currentCoordinate;
-
+		
 		segmentDistance.increase(distanceFromPrevious);
 		double aggressiveSpeedIndex = speedEvaluator.evaluate(currentSpeed); 
-		segmentSpeedIndexes.add(aggressiveSpeedIndex);
+		if (aggressiveSpeedIndex > 0) {
+			segmentSpeedIndexes.add(aggressiveSpeedIndex);
+		}
 
 		double aggressiveAccIndex = accEvaluator.evaluate(currentAcceleration);
-		segmentAccelerationIndexes.add(aggressiveAccIndex);
+		accEvaluator.count(currentAcceleration);
+		if (aggressiveAccIndex > 0) {
+			segmentAccelerationIndexes.add(aggressiveAccIndex);
+		}
 		if (segmentDistance.getKilometers() >= 1) {
 			updateAggressiveIndex();
 			clearSegment();
 		}
+		
 
 		Optional<PenaltyAlert> newSpeedAlert = evaluatePenalty(PenaltyType.SPEEDING, aggressiveSpeedIndex);
 		Optional<PenaltyAlert> optSpeedAlert = updateEvaluationPenalties(newSpeedAlert, Optional.ofNullable(speedAlert), coordinate, distanceFromPrevious, currentSpeed);
@@ -315,6 +338,22 @@ public class TrajectoryEvaluator {
 		accAlert = optAccAlert.isPresent() ? optAccAlert.get() : null;
 
 		return currentCoordinate;
+	}
+
+	private void countSpeedGroup(double currentSpeed) {
+		SpeedIndexEval speedEval = new SpeedIndexEval(new Speed(MAX_ALLOWED_SPEED));
+		double evaluation = speedEval.evaluate(currentSpeed);
+		
+		if (evaluation <= 20) {
+			speedUnderLimitCount++;
+		} else if(evaluation >= 10 && evaluation <= 20) {
+			speed10To20LimitCount++;
+		} else if (evaluation > 20 && evaluation <= 50) {
+			speed21UpTo50LimitCount++;
+		} else if (evaluation > 50) {
+			speed51UpLimitCount++;
+		}
+		
 	}
 
 	private Optional<PenaltyAlert> updateEvaluationPenalties(Optional<PenaltyAlert> newAlert, Optional<PenaltyAlert> currentAlert, Coordinate coordinate, double distanceFromPrevious, double value ) {
@@ -351,7 +390,10 @@ public class TrajectoryEvaluator {
 
 	private Optional<PenaltyAlert> evaluatePenalty(PenaltyType type, double index) {
 		PenaltyAlert newAlert = null;
-		if (index >= PenaltySeverity.SEVERE.getValue() && index <= PenaltySeverity.VERY_SEVERE.getValue()) {
+		if (index >= PenaltySeverity.MEDIUM.getValue() && index < PenaltySeverity.SEVERE.getValue()) {
+			newAlert = new PenaltyAlert(PenaltySeverity.MEDIUM, type);
+		}
+		if (index >= PenaltySeverity.SEVERE.getValue() && index < PenaltySeverity.VERY_SEVERE.getValue()) {
 			newAlert = new PenaltyAlert(PenaltySeverity.SEVERE, type);
 		}
 		if (index > PenaltySeverity.VERY_SEVERE.getValue()) {
@@ -370,10 +412,31 @@ public class TrajectoryEvaluator {
 	}
 
 	private void updateAggressiveIndex() {
-		trajectorySpeedIndexes.add(avgIndex(segmentSpeedIndexes));
-		trajectoryAccelerationIndexes.add(avgIndex(segmentAccelerationIndexes));
+		double speedIndex = avgIndex(segmentSpeedIndexes);
+		double accIndex = avgIndex(segmentAccelerationIndexes);
+		
+		if (speedIndex > 0) {
+			speedSegmentSize++;
+			speedIndexSum += speedIndex;
+		}
+		if (accIndex > 0) {
+			accSegmentSize++;
+			accIndexSum += accIndex;
+		}
+				
+		
+		double segmentIndex = (speedIndex + accIndex)/2;
+		maxAggressiveIndex = segmentIndex > maxAggressiveIndex ? segmentIndex : maxAggressiveIndex;
+	}
+	
+	public double getSpeedIndex() {
+		return speedIndexSum/speedSegmentSize;
 	}
 
+	public double getAccIndex() {
+		return accIndexSum/accSegmentSize;
+	}
+	
 	private void clearSegment() {
 		segmentDistance.reset();
 		segmentSpeedIndexes.clear();
@@ -552,8 +615,8 @@ public class TrajectoryEvaluator {
 	}
 
 	public double getAggressiveIndex() {
-		double speedIndex = avgIndex(trajectorySpeedIndexes);
-		double accIndex = avgIndex(trajectoryAccelerationIndexes);
+		double speedIndex = speedIndexSum/speedSegmentSize;
+		double accIndex = accIndexSum/accSegmentSize;
 		//double decIndex = avgIndex(trajectoryDeccelerationIndexes);
 		//return (speedIndex + accIndex + decIndex)/3;
 		return (speedIndex + accIndex)/2;
@@ -588,6 +651,25 @@ public class TrajectoryEvaluator {
 		evaluate(t.getCoordinates(), optWeather, optAddress);		
 	}
 
+	public Double getMaxAggressiveIndex() {
+		return maxAggressiveIndex;
+	}
+
+	public int getSpeed10To20LimitCount() {
+		return speed10To20LimitCount;
+	}
+
+	public int getSpeed21UpTo50LimitCount() {
+		return speed21UpTo50LimitCount;
+	}
+
+	public int getSpeed51UpLimitCount() {
+		return speed51UpLimitCount;
+	}
+
+	public Integer getSpeedUnderLimitCount() {
+		return speedUnderLimitCount;
+	}
 
 }
 

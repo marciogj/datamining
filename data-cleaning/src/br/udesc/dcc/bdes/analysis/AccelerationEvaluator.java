@@ -10,22 +10,50 @@ public class AccelerationEvaluator {
 	
 	public AccelerationEvaluator() {
 		//Definition according to Bagdadi and Varhelyi
-		limits.add(new AccelerationLimit(-3.0, "Very Secure Desacceleration", 1));
-		limits.add(new AccelerationLimit(-6.0, "Secure Desacceleration", 2.0));
-		limits.add(new AccelerationLimit(-9.0, "Dangerous Desacceleration", 3.5));
-		limits.add(new AccelerationLimit(-12.0, "Very dangerous Desacceleration", 4.5));
+		limits.add(new AccelerationLimit(-3.0, "a) Very Secure Desacceleration", 1));
+		limits.add(new AccelerationLimit(-6.0, "b) Secure Desacceleration", 2.0));
+		limits.add(new AccelerationLimit(-9.0, "c) Dangerous Desacceleration", 3.5));
+		limits.add(new AccelerationLimit(-12.0, "d) Very dangerous Desacceleration", 4.5));
 		
-		limits.add(new AccelerationLimit(2.5, "Very secure acceleration", 1));
-		limits.add(new AccelerationLimit(3.0, "Secure acceleration", 1.5));
-		limits.add(new AccelerationLimit(4.3, "Dangerous acceleration", 2));
-		limits.add(new AccelerationLimit(7.3, "Very dangerous acceleration", 3.5));
+		limits.add(new AccelerationLimit(2.5, "f) Very secure acceleration", 1));
+		limits.add(new AccelerationLimit(3.0, "g) Secure acceleration", 1.5));
+		limits.add(new AccelerationLimit(4.3, "h) Dangerous acceleration", 2));
+		limits.add(new AccelerationLimit(7.3, "i) Very dangerous acceleration", 3.5));
+	}
+	
+	public void count(double acceleration) {
+		if (acceleration < 0 && acceleration >= -3.0) {
+			limits.get(0).count++;
+			limits.get(0).sum += acceleration;
+		} else if (acceleration < -3.0 && acceleration >= -6.0) {
+			limits.get(1).count++;
+			limits.get(1).sum += acceleration;
+		} else if (acceleration < -6.0 && acceleration >= -9.0) {
+			limits.get(2).count++;
+			limits.get(2).sum += acceleration;
+		} else if (acceleration < -9.0) {
+			limits.get(3).count++;
+			limits.get(3).sum += acceleration;;
+		} else if (acceleration > 0 && acceleration <= 2.5) {
+			limits.get(4).count++;
+			limits.get(4).sum += acceleration;
+		} else if (acceleration > 2.5 && acceleration <= 3.0) {
+			limits.get(5).count++;
+			limits.get(5).sum += acceleration;
+		} else if (acceleration > 3.0 && acceleration <= 4.3) {
+			limits.get(6).count++;
+			limits.get(6).sum += acceleration;
+		} else if (acceleration >= 7.3){
+			limits.get(7).count++;
+			limits.get(7).sum += acceleration;
+		}
 	}
 	
 	public double evaluate(double acceleration) {
 		Pair<Double, Double> limits = getLimts(acceleration);
 		double maxValue = limits.getFirst();
 		double maxPercentage = limits.getSecond();
-		return (Math.abs(acceleration) * maxPercentage)/maxValue;
+		return  (Math.abs(acceleration) * maxPercentage)/maxValue;
 	}
 	
 	private Pair<Double, Double> getLimts(double acceleration) {

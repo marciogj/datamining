@@ -29,13 +29,14 @@ public class GPSReplay {
 
 	public static void main(String[] args) {
 		System.out.println("Simulating GPS coordinates from recorded files...");
-		String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\GPSTrackerDEBUG";
+		//String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\GPSTrackerDEBUG";
+		String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\AnaliseMestrado";
 		Locale.setDefault(Locale.US);
 		File dir = new File(baseDir);
 		
-		for (File subdir : dir.listFiles()) {
-			if (subdir.isDirectory()) {
-				Trajectory trajectory = readAllFiles(subdir.getAbsolutePath());
+		for (File file : dir.listFiles()) {
+			if (file.isDirectory()) {
+				Trajectory trajectory = readAllFiles(file.getAbsolutePath());
 				replayToService(trajectory);
 			}
 		}

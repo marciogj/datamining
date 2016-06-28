@@ -81,6 +81,7 @@ public class TrajectoryMapper {
 		dto.maxSpeed = telemetry.maxSpeed.getKmh();
 		dto.maxAcc = telemetry.maxAcc.getMPerSec2(); 
 		dto.maxDec = telemetry.maxDec.getMPerSec2();
+		dto.avgAcc = (Math.abs(telemetry.maxAcc.getMPerSec2()) + Math.abs(telemetry.maxDec.getMPerSec2()) )/2; 
 		dto.overtakeCount = "-";
 		dto.riskAlerts = evaluation.getAlerts().size();
 		dto.speedChanges = telemetry.accCount + telemetry.decCount;
@@ -91,8 +92,16 @@ public class TrajectoryMapper {
 		dto.coordinateCount = evaluation.getTrajectory().size();
 		dto.accEvaluation = toDto(evaluation.getAccEvaluator());
 		dto.agressiveIndex = evaluation.getAggressiveIndex(); 
+		dto.maxAgressiveIndex = evaluation.getMaxAggressiveIndex();
+		dto.speedAgressiveIndex = evaluation.getSpeedIndex();
+		dto.accAgressiveIndex = evaluation.getAccIndex();
 		dto.mainStreet = evaluation.getMainStreet();
 		dto.wheatherCondition = "-";
+		
+		dto.speedUnderLimitCount = evaluation.getSpeedUnderLimitCount();
+		dto.speed10To20LimitCount = evaluation.getSpeed10To20LimitCount();
+		dto.speed21UpTo50LimitCount = evaluation.getSpeed21UpTo50LimitCount();
+		dto.speed51UpLimitCount = evaluation.getSpeed51UpLimitCount();
 		
 		Optional<OpenWeatherConditionDTO> weatherData = evaluation.getCurrentWeather();
 		if(weatherData.isPresent()) {

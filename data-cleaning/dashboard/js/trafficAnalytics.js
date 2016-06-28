@@ -199,34 +199,21 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 		console.log("Loading Evaluation: " + evaluationId);
 		$http.get(DBP_API + '/summary/trajectory-evaluation/' + evaluationId)		
           .success(function(data) {
-          	var evaluation = {
-          		trajectoryId: data.trajectoryId,
-	          	evaluationId: data.evaluationId,
-				trajectoryTime: data.trajectoryTime,
-				startDateStr: weekDayMonth(new Date(data.startDateTime)),
-				startDateTime: new Date(data.startDateTime),
-				endDateTime: new Date(data.endDateTime),
-				timeInterval: hoursMins(new Date(data.startDateTime)) + ' - ' + hoursMins(new Date(data.endDateTime)),
-				hourClassification: data.hourClassification,
-				totalDistance: data.totalDistance,
-				avgSpeed: data.avgSpeed,
-				maxSpeed: data.maxSpeed,
-				maxDec: data.maxDec,
-				maxAcc: data.maxAcc,
-				wheatherCondition: data.wheatherCondition,
-				trafficCondition: data.trafficCondition,
-				riskAlerts: data.riskAlerts,//data.riskAlerts,
-				speedChanges: data.speedChanges,
-				agressiveIndex: data.agressiveIndex,
-				overtakeCount: data.overtakeCount,
-				accEvaluation: data.accEvaluation,
-				mainStreet: data.mainStreet
-			};
-
+          	
+          	var evaluation = data;
 			console.log(data.streets);
+			evaluation.startDateStr =  weekDayMonth(new Date(data.startDateTime));
+			evaluation.startDateTime = new Date(data.startDateTime);
 
+			evaluation.endDateTime = new Date(data.endDateTime);
+			evaluation.timeInterval = hoursMins(new Date(data.startDateTime)) + ' - ' + hoursMins(new Date(data.endDateTime));
+			evaluation.hourClassification = data.hourClassification;
+			if (evaluation.mainStreet.length == 0) {
+				evaluation.mainStreet = "-";
+			}
 
-			self.evaluation = evaluation;
+			//self.evaluation = evaluation;
+			self.evaluation = data;
           
           }).error(function(data, status, header, config) {thgtt
           	console.log('Error: ' + status);
