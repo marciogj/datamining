@@ -108,6 +108,11 @@ public class TrajectoryEvaluator {
 	//tmp
 	public static int sequence = 1;
 	
+	public Double previousAngle = null;
+	public int angleConsecutiveChange = 0;
+	
+	private GeocodeAddress currentAddress;
+	
 	public static synchronized int nextSequence() {
 		return ++sequence;
 	}
@@ -175,14 +180,20 @@ public class TrajectoryEvaluator {
 		double diffDistance = totalDistance - initialDistance;
 
 		if(optAddress.isPresent()) {
-			String streetName = optAddress.get().getStreetName();
+			currentAddress = optAddress.get();
+			String streetName = currentAddress.getStreetName();
 			Double previous = streets.get(streetName);
 			previous = previous == null ? 0 : previous;
 
 			streets.put(streetName, previous + diffDistance);
 			Speed currentSpeedLimit = SpeedLimit.getSpeedByAddress(streetName);
-			MAX_ALLOWED_SPEED = currentSpeedLimit.getMs();
+			double factor25 = currentSpeedLimit.getMs() * 0.25;
+			MAX_ALLOWED_SPEED = currentSpeedLimit.getMs() - factor25;
 			speedEvaluator.changeMax(new Speed(MAX_ALLOWED_SPEED));
+		} else if (currentAddress != null) {
+			String streetName = currentAddress.getStreetName();
+			Speed currentSpeedLimit = SpeedLimit.getSpeedByAddress(streetName);
+			MAX_ALLOWED_SPEED = currentSpeedLimit.getMs();
 		}
 	}
 
@@ -260,6 +271,26 @@ public class TrajectoryEvaluator {
 
 		countSpeedGroup(currentSpeed);
 		
+		double currentAngle = previousCoordinate.getBearing();
+		//System.out.println("Angle " + currentAngle + " vs " + currentCoordinate.getBearing());
+		if (previousAngle != null) {
+			double angleDiff = Math.abs(previousAngle - currentAngle);
+			if (angleDiff > 10) {
+				//System.out.println("Angle Diff" + angleDiff);
+				angleConsecutiveChange++;
+			} else {
+				angleConsecutiveChange = 0;
+			}
+			
+		}
+		//if (angleConsecutiveChange >= 5) {
+		//	System.err.println("Mudança de pista?");
+		//}
+		
+		//System.out.println(currentCoordinate.getDateTime().format(DateTimeFormatter.ISO_DATE_TIME) + ", " + currentCoordinate.getLatitude() + ", " + currentCoordinate.getLongitude() + ", " + currentAngle);
+		previousAngle = currentAngle;
+		
+		
 		if (currentSpeed > MAX_ALLOWED_SPEED) {
 			overMaxSpeedCount++;
 		}
@@ -268,9 +299,9 @@ public class TrajectoryEvaluator {
 			maxSpeed = currentSpeed;
 		}
 
-		if (maxSpeed > (120/3.6)) {
-			System.out.println("NOISE: " + currentSpeed*3.6 + " km/h");
-		}
+		//if (maxSpeed > (120/3.6)) {
+		//	System.out.println("NOISE: " + currentSpeed*3.6 + " km/h");
+		//}
 
 		//Update max acceleration/deceleration 
 		if (currentAcceleration > maxAccecelration) {
@@ -351,6 +382,8 @@ public class TrajectoryEvaluator {
 		} else if (evaluation > 20 && evaluation <= 50) {
 			speed21UpTo50LimitCount++;
 		} else if (evaluation > 50) {
+			String roadname = currentAddress == null ? "?" : currentAddress.getStreetName();
+			//System.out.println("Speed " + new Speed(currentSpeed).getKmh() + " over max(" + new Speed(MAX_ALLOWED_SPEED).getKmh() + ") on road " + roadname);
 			speed51UpLimitCount++;
 		}
 		
@@ -454,9 +487,9 @@ public class TrajectoryEvaluator {
 		speed = currentCoordinate.getSpeed().isPresent() ? currentCoordinate.getSpeed().get() : speed; 
 		double previousSpeed = previousCoordinate.getSpeed().isPresent() ? previousCoordinate.getSpeed().get() : 0; 
 		final double deltaV = speed - previousSpeed;
-		final double acceleration = deltaV/deltaTSeconds;
+		final double acceleration = deltaTSeconds == 0 ? 0 : deltaV/deltaTSeconds;
 
-		Coordinate coordinate = new Coordinate(currentCoordinate.getLatitude(), currentCoordinate.getLongitude(), currentCoordinate.getAltitude(), currentCoordinate.getDateTime());
+		Coordinate coordinate = new Coordinate(currentCoordinate);
 		coordinate.setAcceleration(acceleration);
 		coordinate.setSpeed(speed);
 
@@ -556,10 +589,11 @@ public class TrajectoryEvaluator {
 			if (timeDiff > fiveMinutesMiliSecs) {
 				subTrajectories.add(subTrajectory);
 				subTrajectory = Trajectory.sub(trajectory);
+				subTrajectory.add(coord);
 			} else {
 				subTrajectory.add(coord);
 			}
-
+			previous = coord;
 		}
 		if (!subTrajectory.isEmpty()) {
 			subTrajectories.add(subTrajectory);
@@ -581,10 +615,6 @@ public class TrajectoryEvaluator {
 				continue;
 			}
 
-			if (currentCoord.getDateTime().equals(LocalDateTime.of(2015, 11, 11, 10, 40,26)) ) {
-				System.out.println(currentCoord);
-				System.out.println(previousCoord);
-			}
 			long difference = currentCoord.getDateTimeInMillis() - previousCoord.getDateTimeInMillis();
 			if (difference <= timeToleranceMilis) {
 				subtrajectory.add(currentCoord);

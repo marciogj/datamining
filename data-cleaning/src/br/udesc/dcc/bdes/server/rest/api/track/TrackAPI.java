@@ -15,6 +15,7 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 
 import br.udesc.dcc.bdes.analysis.MeanTransportSplitter;
+import br.udesc.dcc.bdes.analysis.TrackEvaluator;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.google.geocoding.GeocodeAddress;
 import br.udesc.dcc.bdes.google.geocoding.InverseGeocodingClient;
@@ -44,6 +45,8 @@ public class TrackAPI {
 	private final Gson gson = new Gson();
 	private final MemoryRepository repository = MemoryRepository.get();
 	
+	private final TrackEvaluator trackEvaluator = new TrackEvaluator();
+	
 	/**
 	 * 
 	 * curl -X POST -H "Content-Type: application/json" http://localhost:9090/services/track -d 
@@ -57,7 +60,15 @@ public class TrackAPI {
 	@POST
 	@Path("/evaluate")
     public void evaluate(TrackDTO trackDto) {
-		System.out.println("Evaluate Source: " + trackDto.deviceId + "@" + trackDto.userId+ " - Coordinates: " + trackDto.coordinates.size());
+		trackEvaluator.evaluateAggressiveness(trackDto);			
+    }
+	
+	
+	@POST
+	@Path("/evaluate-legacy")
+	@Deprecated
+    public void evaluateLegacy(TrackDTO trackDto) {
+		//System.out.println("Evaluate Source: " + trackDto.deviceId + "@" + trackDto.userId+ " - Coordinates: " + trackDto.coordinates.size());
 		evaluateTrack(trackDto);
 		notifyWSClients(trackDto);			
     }
@@ -174,7 +185,7 @@ public class TrackAPI {
 		
 		List<Trajectory> subtrajectoriesByTime = trajectoryEval.subtrajectoriesByStop(receivedTrajectory);
 		//List<Trajectory> subtrajectoriesByTime = trajectoryEval.subtrajectoriesByTime(receivedTrajectory, timeTolerance);
-		System.out.println("Subtrajectories: " + subtrajectoriesByTime.size());
+		//System.out.println("Subtrajectories: " + subtrajectoriesByTime.size());
 		
 		//Map<Trajectory,TransportType> subtrajectoriesByTransport = new HashMap<>();
 		//for (Trajectory subTrajectory : subtrajectoriesByTime) {
@@ -204,14 +215,13 @@ public class TrackAPI {
 		
 		
 		//for (Trajectory subTrajectory : subtrajectoriesByTime) {
-		System.out.println("Subtrajectories by Transport:" + trajectoriesByMeans.size());
+		//System.out.println("Subtrajectories by Transport:" + trajectoriesByMeans.size());
 		for (Trajectory subTrajectory : trajectoriesByMeans) {
 			if (subTrajectory.getTransportType() == TransportType.NON_MOTORIZED) continue;
 			//boolean isSameMean = subTrajectory.getTransportMean().equals(previousTrajectory != null ? previousTrajectory.getTransportMean() : null);
 			boolean isMotorized = subTrajectory.getTransportType() == TransportType.MOTORIZED;
 			
 			
-			System.out.println(subTrajectory.getStart() + " - " + subTrajectory.getEnd());
 			boolean externalData = false; 
 			//boolean externalData = true;
 	

@@ -116,7 +116,7 @@ public class GPSReplay {
 		healthCheck();
 		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target(SERVER_URL);
-		int batchLimit = 50;
+		int batchLimit = 500000000;
 		int batchSize = 0;
 		TrackDTO track = new TrackDTO();
 		track.deviceId = trajectory.getDeviceId();

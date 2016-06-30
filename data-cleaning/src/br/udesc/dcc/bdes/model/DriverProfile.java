@@ -59,6 +59,7 @@ public class DriverProfile {
 	}
 	
 	public double getAggressiveIndex() {
+		if (aggressiveIndexCount == 0) return 0;
 		return aggressiveIndexSum/aggressiveIndexCount;
 	}
 

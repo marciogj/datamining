@@ -113,7 +113,7 @@ public class Main {
 	}
 	
 	public static void renameCSVFiles() {
-		String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\AnaliseMestrado";
+		String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\ALL_DATE";
 		renameTimestampToReadbleDate(new File(baseDir));
 	}
 	

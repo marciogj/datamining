@@ -102,5 +102,14 @@ public class MemoryRepository {
 		return Optional.empty();
 	}
 	
+	public DriverProfile loadOrCreate(DriverId driverId, DeviceId deviceId) {
+		Optional<DriverProfile> optDriverProfile = this.loadDriverProfile(driverId);
+		if (!optDriverProfile.isPresent()) {
+			this.save(new DriverProfile(driverId, deviceId));
+			optDriverProfile = this.loadDriverProfile(driverId);
+		}
+		return optDriverProfile.get();
+	}
+	
 }
 

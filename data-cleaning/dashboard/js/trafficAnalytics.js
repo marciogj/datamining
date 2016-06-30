@@ -62,7 +62,7 @@ app.config(function($locationProvider, $stateProvider, $urlRouterProvider) {
     })
 
     .state('trajectory-map', {
-      url: "/trajectory-map/{evaluationId}",
+      url: "/trajectory-map/{evaluationId}?{mode}",
       templateUrl: "views/trajectory-map.html",
       controller: 'trajectoryMapCtrl',
       controllerAs: 'vm'
@@ -102,17 +102,37 @@ app.controller('trajectoryCoordinatesCtrl',  ['$scope','$stateParams', '$http', 
 
 app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  function($scope , $stateParams, $http){
 	var self = this;
+	self.speedColors = {};
+	self.speedColors['underLimit'] = '#000000';
+	self.speedColors['from10to20Limit'] = '#ff6600';
+	self.speedColors['from20to50Limit'] = '#ff0000';
+	self.speedColors['over50Limit'] = '#6600cc';
 	
 	
 	function initialize(evaluationId) {
+
 		$http.get(DBP_API + '/summary/trajectory-evaluation/' + evaluationId + '/coordinates').success(function(data) {			
 			//http://stackoverflow.com/questions/29803045/how-to-clear-an-angular-array			
-			drawTrajectory(data.coordinates);
-        });		
+			var mapMode = $stateParams.mode;
+			if ( mapMode == "line" || mapMode == null) {
+				drawPolylineTrajectory(data.coordinates);
+			} else if (mapMode == "dots") {
+				drawDotsTrajectory(data.coordinates);
+			}
+			
+        });	
+
+       
     };
 
+    function drawDotsTrajectoryAsync(fn, coordinates) {
+	    setTimeout(function() {
+	        fn(coordinates);
+	    }, 0);
+	};
 
-    function drawTrajectory(coordinates) {
+
+    function drawPolylineTrajectory(coordinates) {
     	var googleCoordinates = [];
 
 		coordinates.forEach( function(coordinate) {
@@ -131,12 +151,202 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 			strokeWeight: 2
 		});
 
+		var map = createBasicMap(latCenter, lonCenter);
+		enableEdition(map);
+      	lineCoordinatesPath.setMap(map);
+	};
+
+	function drawDotsTrajectory(coordinates) {
+		var middle = Math.floor(coordinates.length / 2);
+		var latCenter = coordinates[middle].latitude;
+		var lonCenter = coordinates[middle].longitude;
+
+		
+		var map = createStyledMap(latCenter, lonCenter);
+		enableEdition(map);
+		
+		coordinates.forEach( function(coordinate) {
+          drawCoord(coordinate, map);
+        });
+	};
+
+	function drawCoord(coordinate, map) {
+		var speedLimit = 80;
+        var overLimitfactor = ( (coordinate.speed * 100)/speedLimit ) - 100;
+        var color = getColorBySpeedFactor(overLimitfactor);
+
+        if (coordinate.isNoise) {
+        	createMarker(coordinate, map, 'images/noise-red.png');
+        } else {
+        	createCircle(coordinate, map, color);
+        }
+
+	};
+
+	function jsonCoord2html(coordinate) {
+		var jsonStr = JSON.stringify(coordinate);
+		var tmp = jsonStr.replace(/\{/g, '');
+		tmp = tmp.replace(/\}/g, '');
+		//tmp = tmp.replace(/\"/g, '');
+		
+		var elements = tmp.split(',');
+		var html = '';
+		elements.forEach(function(element) {
+			var parts = element.split('":');
+			html += '<strong>' + parts[0].replace(/\"/g, '') + '</strong>:';
+			html += parts[1].replace(/\"/g, '') + '<br>';
+		});
+		return html;
+	};
+
+
+	function getColorBySpeedFactor(overLimitfactor) {
+		if (overLimitfactor <= 10) {
+			return self.speedColors['underLimit'];
+		} else if (overLimitfactor > 10 && overLimitfactor <= 20) {
+			return self.speedColors['from10to20Limit'];
+		} else if(overLimitfactor > 20 && overLimitfactor <= 50) {
+			return self.speedColors['from20to50Limit'];
+		} else if (overLimitfactor > 50) {
+			return self.speedColors['over50Limit'];
+		} 
+		return self.speedColors['underLimit'];
+	}
+
+	function createCircle(coordinate, map, hexColor) {
+		var googleCoord = new google.maps.LatLng(parseFloat(coordinate.latitude), parseFloat(coordinate.longitude));
+        
+		var circle = new google.maps.Circle({
+		      strokeColor: hexColor,
+		      strokeOpacity: 0.95,
+		      strokeWeight: 1,
+		      fillColor: hexColor,
+		      fillOpacity: 0.90,
+		      map: map,
+		      center: googleCoord,
+		      radius: 7
+		});
+
+		google.maps.event.addListener(circle, 'click', function(ev){
+			var infoWindow = new google.maps.InfoWindow;
+		    infoWindow.setPosition(circle.getCenter());
+		    //infoWindow.setContent(JSON.stringify(coordinate));
+		    infoWindow.setContent(jsonCoord2html(coordinate));
+
+		    infoWindow.open(map);
+		});
+
+		return circle;
+	};
+
+	function createMarker(coordinate, map, icon) {
+		var googleCoord = new google.maps.LatLng(parseFloat(coordinate.latitude), parseFloat(coordinate.longitude));
+        
+		var marker = new google.maps.Marker({
+		    position: googleCoord,
+		    icon: icon,
+		    map: map
+		  });
+
+		return marker;
+	};
+
+	function createStyledMap(latCenter, lonCenter) {
+		var styles = [
+		  {
+		  	stylers: [
+        		{ hue: "#00ffe6" },
+        		{ saturation: -20 }
+      		]
+    	  }, 
+    	  {
+      		featureType: "road",
+      		elementType: "geometry",
+      		stylers: [
+        		{ lightness: 100 },
+        		{ visibility: "simplified" }
+      		]
+    	},{
+      		featureType: "road",
+      		elementType: "labels",
+      		stylers: [
+        		{ visibility: "off" }
+      		]
+    	}
+  		];
+
+  		var styledMap = new google.maps.StyledMapType(styles, {name: "Styled Map"});
+		var map = new google.maps.Map(document.getElementById('map-canvas'), {
+			zoom: 12,
+			center: { lat: latCenter, lng : lonCenter, alt: 0 },
+			mapTypeControlOptions: {
+		      mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+		    }
+		});
+		map.mapTypes.set('map_style', styledMap);
+  		map.setMapTypeId('map_style');
+
+  		return map;
+	};
+
+	function createBasicMap(latCenter, lonCenter) {
 		var map = new google.maps.Map(document.getElementById('map-canvas'), {
 			zoom: 12,
 			center: { lat: latCenter, lng : lonCenter, alt: 0 }
 		});
+		
+		map.addListener('rightclick', function() {
+			map.set('disableDoubleClickZoom', true);
+		    updateMarkerTitle();
+		    console.log('New marker label: ' + MarkerTitle.text); 
+		});
 
-      	lineCoordinatesPath.setMap(map);
+		return map;
+	};
+
+	var MarkerTitle = { text: 'A'};
+	function updateMarkerTitle() {
+		MarkerTitle.text = nextChar(MarkerTitle.text);
+	};
+
+	//http://stackoverflow.com/questions/12504042/what-is-a-method-that-can-be-used-to-increment-letters
+	function nextChar(c) {
+    	return String.fromCharCode(c.charCodeAt(0) + 1);
+	}
+
+	function enableEdition(map) {
+		var drawingManager = new google.maps.drawing.DrawingManager({
+		    drawingMode: google.maps.drawing.OverlayType.MARKER,
+		    drawingControl: true,
+		    drawingControlOptions: {
+		      position: google.maps.ControlPosition.TOP_CENTER,
+		      drawingModes: [
+		        google.maps.drawing.OverlayType.MARKER,
+		        google.maps.drawing.OverlayType.CIRCLE,
+		        google.maps.drawing.OverlayType.POLYGON,
+		        google.maps.drawing.OverlayType.POLYLINE,
+		        google.maps.drawing.OverlayType.RECTANGLE
+		      ]
+		    },
+		    //markerOptions: {icon: 'images/beachflag.png'},
+
+		    markerOptions: { 
+		    	label: MarkerTitle,
+		    	clickable: true,
+		    	editable: true
+		    },
+
+		    circleOptions: {
+		      fillColor: '#ffff00',
+		      fillOpacity: 1,
+		      strokeWeight: 5,
+		      clickable: false,
+		      editable: true,
+		      zIndex: 1
+		    }
+		});
+
+  		drawingManager.setMap(map);
 	};
 
 
@@ -212,8 +422,8 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 				evaluation.mainStreet = "-";
 			}
 
-			//self.evaluation = evaluation;
-			self.evaluation = data;
+			console.log(evaluation);
+			self.evaluation = evaluation;
           
           }).error(function(data, status, header, config) {thgtt
           	console.log('Error: ' + status);

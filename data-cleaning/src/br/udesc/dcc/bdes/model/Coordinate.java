@@ -11,14 +11,26 @@ import java.util.Optional;
  * @author marciogj
  */
 public class Coordinate {
-	double latitude; 
-	double longitude; 
-	double altitude;
-	Double speed;
-	double acceleration;
-	double accuracy;
-	double bearing;
-	LocalDateTime dateTime;
+	protected double latitude; 
+	protected double longitude; 
+	protected double altitude;
+	protected Double speed;
+	protected double acceleration;
+	protected double accuracy;
+	protected double bearing;
+	protected LocalDateTime dateTime;
+	
+	//----
+	protected boolean isNoise;
+	protected boolean isNearImportantePlace;
+	protected boolean isOvertake;
+	//protected String weatherCondition;
+	
+	protected TransportType type;
+	
+	protected double maxSpeed;
+	protected SafetyClassification speedCategory;
+	protected SafetyClassification accCategory;
 	
 	public Coordinate() {
 		super();
@@ -34,6 +46,17 @@ public class Coordinate {
 
 	public Coordinate(Speed speed) {
 		this.speed = speed.getMs();
+	}
+
+	public Coordinate(Coordinate coord) {
+		this.acceleration = coord.getAcceleration();
+		this.accuracy = coord.accuracy;
+		this.altitude = coord.altitude;
+		this.bearing = coord.bearing;
+		this.dateTime = coord.dateTime;
+		this.latitude = coord.latitude;
+		this.longitude = coord.longitude;
+		this.speed = coord.speed;
 	}
 
 	public double getLatitude() {
@@ -156,5 +179,88 @@ public class Coordinate {
 		long time = Math.abs(getDateTimeInMillis() - previous.getDateTimeInMillis());
 		return distance/time;
 	}
+	
+/*
+	public double getAngle(Coordinate target) {
+		//http://www.movable-type.co.uk/scripts/latlong.html
+		//Formula:	θ = atan2( sin Δλ ⋅ cos φ2 , cos φ1 ⋅ sin φ2 − sin φ1 ⋅ cos φ2 ⋅ cos Δλ )
+		//where	φ1,λ1 is the start point, φ2,λ2 the end point (Δλ is the difference in longitude)
+		double φ1 = latitude;
+		double φ2 = target.getLatitude();
+		double λ1 = longitude;
+		double λ2 = target.getLongitude();
+		
+		double Δλ = λ2 - λ1;
+		double y = Math.sin(Δλ) * Math.cos(φ2);
+		double x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+		double θ = Math.atan2(y, x);
+		
+		double angle = Math.toDegrees(θ);
+		if(angle < 0){
+		    	angle += 360;
+		}
+		
+		return angle;
+	}
+	*/
+	
+	//---
+	
+	public boolean isNoise() {
+		return isNoise;
+	}
+	
+	public void setNoise(boolean isNoise) {
+		this.isNoise = isNoise;
+	}
+	
+	public boolean isNearImportantePlace() {
+		return isNearImportantePlace;
+	}
+	
+	public void setNearImportantePlace(boolean isNearImportantePlace) {
+		this.isNearImportantePlace = isNearImportantePlace;
+	}
+	
+	public boolean isOvertake() {
+		return isOvertake;
+	}
+	
+	public void setOvertake(boolean isOvertake) {
+		this.isOvertake = isOvertake;
+	}
+	
+	public TransportType getType() {
+		return type;
+	}
+	
+	public void setType(TransportType type) {
+		this.type = type;
+	}
+	
+	public double getMaxSpeed() {
+		return maxSpeed;
+	}
+	
+	public void setMaxSpeed(double maxSpeed) {
+		this.maxSpeed = maxSpeed;
+	}
+	
+	public SafetyClassification getSpeedCategory() {
+		return speedCategory;
+	}
+	
+	public void setSpeedCategory(SafetyClassification speedCategory) {
+		this.speedCategory = speedCategory;
+	}
+	
+	public SafetyClassification getAccCategory() {
+		return accCategory;
+	}
+	
+	public void setAccCategory(SafetyClassification accCategory) {
+		this.accCategory = accCategory;
+	}
+
 	
 }

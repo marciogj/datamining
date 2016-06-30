@@ -13,10 +13,20 @@ public class SpeedLimit {
 		if (address.contains("BR-470")){
 			return Speed.fromKmh(80);
 		}
-
+		
+		if(address.contains("Rod. Gov. Mário Covas")) {
+			return Speed.fromKmh(110);
+		}
+		
 		if (address.contains("BR-101")){
 			return Speed.fromKmh(110);
 		}
+		
+		if(address.contains("Rod.")){
+			return Speed.fromKmh(80);
+		}
+
+		
 	
 		//Rua ...
 		if (address.contains("R. ") || address.contains("Rua ")){
