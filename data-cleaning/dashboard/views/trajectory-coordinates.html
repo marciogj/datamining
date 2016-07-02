@@ -23,12 +23,12 @@
 		<tr ng-repeat="coordinate in vm.trajectory.coordinates">
 			<td>{{coordinate.dateTime | date:'yyyy-MM-dd' }}</td>
 			<td>{{coordinate.dateTime | date:'HH:mm:ss'}}</td>
-			<td>{{coordinate.latitude}}</td>
-			<td>{{coordinate.longitude}}</td>
-			<td>{{coordinate.speed}}</td>
-			<td>{{coordinate.acceleration}}</td>
-			<td>{{coordinate.accuracy}}</td>
-			<td>{{coordinate.bearing}}</td>
+			<td>{{coordinate.latitude | number: 5}}</td>
+			<td>{{coordinate.longitude | number: 5}}</td>
+			<td>{{coordinate.speed | number: 2}}</td>
+			<td>{{coordinate.acceleration | number: 2}}</td>
+			<td>{{coordinate.accuracy | number: 2}}</td>
+			<td>{{coordinate.bearing | number: 2}}</td>
 		</tr>
 	</table>
 </div>

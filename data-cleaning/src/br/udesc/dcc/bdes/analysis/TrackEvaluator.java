@@ -1,5 +1,6 @@
 package br.udesc.dcc.bdes.analysis;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -62,7 +63,9 @@ public class TrackEvaluator {
 		TrajectoryEvaluator trajectoryEval = new TrajectoryEvaluator(deviceId, driverId);
 		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
 		System.out.println("Received Trajectory Size: " + receivedTrajectory.size());
-		Trajectory cleanedTrajectory = removeNoise(receivedTrajectory);
+		
+		//Trajectory cleanedTrajectory = removeNoise(receivedTrajectory);
+		Trajectory cleanedTrajectory = receivedTrajectory;
 		
 
 		DriverProfile driverProfile = repository.loadOrCreate(driverId, deviceId);
@@ -73,21 +76,35 @@ public class TrackEvaluator {
 		repository.save(deviceId, trajectoryEval);	
 		
 		List<Trajectory> subtrajectoriesByTime = trajectoryEval.subtrajectoriesByStop(receivedTrajectory);
-		for (Trajectory trajectory : subtrajectoriesByTime) {
-			TrajectoryEvaluator evalSub = new TrajectoryEvaluator(deviceId, driverId);
-			evalSub.evaluate(trajectory);
-			repository.save(deviceId, evalSub);
-		}
+		//for (Trajectory trajectory : subtrajectoriesByTime) {
+			//TrajectoryEvaluator evalSub = new TrajectoryEvaluator(deviceId, driverId);
+			//evalSub.evaluate(trajectory);
+			//repository.save(deviceId, evalSub);
+		//}
 		
-		/*
+		
 		
 		List<Trajectory> trajectoriesByMeans = new ArrayList<>();
 		for (Trajectory subTrajectory : subtrajectoriesByTime) {
 			if (subTrajectory.isEmpty()) continue;
-			trajectoriesByMeans.addAll(MeanTransportSplitter.subBySpeed(subTrajectory));
+			List<Trajectory> byMeans = MeanTransportSplitter.subBySpeed(subTrajectory);
+			System.out.println("Means Size: " + byMeans.size());
+			int i = 1;
+			for(Trajectory t : byMeans) {
+				System.out.println(t.getTransportType().name() + " - " + t.getFirstCoordintae().get().getDateTime() + " - " + t.getLastestCoordinate().get().getDateTime());
+				System.out.println();
+				i++;
+			}
+			trajectoriesByMeans.addAll(byMeans);
 		}
 		
+		for (Trajectory subTrajectory : trajectoriesByMeans) {
+			TrajectoryEvaluator evalSub = new TrajectoryEvaluator(deviceId, driverId);
+			evalSub.evaluate(subTrajectory);
+			repository.save(deviceId, evalSub);
+		}
 		
+		/*
 		for (Trajectory subTrajectory : trajectoriesByMeans) {
 			if (subTrajectory.getTransportType() == TransportType.NON_MOTORIZED) continue;
 			boolean isMotorized = subTrajectory.getTransportType() == TransportType.MOTORIZED;

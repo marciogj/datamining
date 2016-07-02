@@ -22,6 +22,7 @@ import br.udesc.dcc.bdes.model.Speed;
 import br.udesc.dcc.bdes.model.Time;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
+import br.udesc.dcc.bdes.model.TransportType;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.openweather.dto.WeatherDTO;
 
@@ -59,6 +60,7 @@ public class TrajectoryMapper {
 		dto.bearing = entity.getBearing();
 		dto.isNoise = entity.isNoise();
 		dto.maxSpeed = entity.getMaxSpeed();
+		dto.meanType = entity.getTransportType() == null ? "?" : (entity.getTransportType() == TransportType.MOTORIZED ? "M" : "W");
 		return dto;
 	}
 	

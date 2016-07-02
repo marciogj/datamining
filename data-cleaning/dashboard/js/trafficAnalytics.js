@@ -175,7 +175,9 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
         var overLimitfactor = ( (coordinate.speed * 100)/speedLimit ) - 100;
         var color = getColorBySpeedFactor(overLimitfactor);
 
-        if (coordinate.isNoise) {
+        if (coordinate.meanType === 'W') { 
+        	createMarker(coordinate, map, 'images/walking-icon-orange-small.png');
+		} else if (coordinate.isNoise) {
         	createMarker(coordinate, map, 'images/noise-red.png');
         } else {
         	createCircle(coordinate, map, color);
@@ -224,7 +226,7 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 		      fillOpacity: 0.90,
 		      map: map,
 		      center: googleCoord,
-		      radius: 7
+		      radius: 3
 		});
 
 		google.maps.event.addListener(circle, 'click', function(ev){
@@ -336,14 +338,6 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 		    	editable: true
 		    },
 
-		    circleOptions: {
-		      fillColor: '#ffff00',
-		      fillOpacity: 1,
-		      strokeWeight: 5,
-		      clickable: false,
-		      editable: true,
-		      zIndex: 1
-		    }
 		});
 
   		drawingManager.setMap(map);

@@ -18,4 +18,5 @@ public class CoordinateDTO {
 	//----
 	public boolean isNoise;
 	protected double maxSpeed;
+	public String meanType;
 }

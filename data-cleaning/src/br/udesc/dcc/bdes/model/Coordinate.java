@@ -57,6 +57,13 @@ public class Coordinate {
 		this.latitude = coord.latitude;
 		this.longitude = coord.longitude;
 		this.speed = coord.speed;
+		this.isNoise = coord.isNoise;
+		this.isNearImportantePlace = coord.isNearImportantePlace;
+		this.isOvertake = coord.isOvertake;
+		this.type = coord.type;
+		this.maxSpeed = coord.maxSpeed;
+		this.speedCategory = coord.speedCategory;
+		this.accCategory = coord.accCategory;
 	}
 
 	public double getLatitude() {
@@ -230,11 +237,11 @@ public class Coordinate {
 		this.isOvertake = isOvertake;
 	}
 	
-	public TransportType getType() {
+	public TransportType getTransportType() {
 		return type;
 	}
 	
-	public void setType(TransportType type) {
+	public void setTransportType(TransportType type) {
 		this.type = type;
 	}
 	
@@ -262,5 +269,6 @@ public class Coordinate {
 		this.accCategory = accCategory;
 	}
 
+	
 	
 }
