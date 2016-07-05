@@ -59,7 +59,7 @@ public class TrajectoryMapper {
 		dto.accuracy = entity.getAccuracy();
 		dto.bearing = entity.getBearing();
 		dto.isNoise = entity.isNoise();
-		dto.maxSpeed = entity.getMaxSpeed();
+		dto.speedLimit = (int) new Speed(entity.getSpeedLimit()).getKmh();
 		dto.meanType = entity.getTransportType() == null ? "?" : (entity.getTransportType() == TransportType.MOTORIZED ? "M" : "W");
 		return dto;
 	}

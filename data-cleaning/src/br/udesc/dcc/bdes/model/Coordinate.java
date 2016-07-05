@@ -28,7 +28,7 @@ public class Coordinate {
 	
 	protected TransportType type;
 	
-	protected double maxSpeed;
+	protected double speedLimit;
 	protected SafetyClassification speedCategory;
 	protected SafetyClassification accCategory;
 	
@@ -61,7 +61,7 @@ public class Coordinate {
 		this.isNearImportantePlace = coord.isNearImportantePlace;
 		this.isOvertake = coord.isOvertake;
 		this.type = coord.type;
-		this.maxSpeed = coord.maxSpeed;
+		this.speedLimit = coord.speedLimit;
 		this.speedCategory = coord.speedCategory;
 		this.accCategory = coord.accCategory;
 	}
@@ -245,12 +245,12 @@ public class Coordinate {
 		this.type = type;
 	}
 	
-	public double getMaxSpeed() {
-		return maxSpeed;
+	public double getSpeedLimit() {
+		return speedLimit;
 	}
 	
-	public void setMaxSpeed(double maxSpeed) {
-		this.maxSpeed = maxSpeed;
+	public void setSpeedLimit(double maxSpeed) {
+		this.speedLimit = maxSpeed;
 	}
 	
 	public SafetyClassification getSpeedCategory() {

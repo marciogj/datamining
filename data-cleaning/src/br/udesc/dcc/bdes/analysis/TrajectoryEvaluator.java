@@ -247,7 +247,7 @@ public class TrajectoryEvaluator {
 		return accEvaluator;
 	}
 
-	public Coordinate evaluate(final Coordinate coordinate, Optional<OpenWeatherConditionDTO> weather) {
+	public Coordinate evaluate(Coordinate coordinate, Optional<OpenWeatherConditionDTO> weather) {
 		trajectory.add(coordinate);
 		currentWeather = weather.isPresent() ? weather.get() : null;
 		latestTimestamp = coordinate.getDateTimeInMillis();
@@ -341,6 +341,9 @@ public class TrajectoryEvaluator {
 			//	decelerationCount++;
 			//}
 		}
+		
+		coordinate.setSpeedLimit(MAX_ALLOWED_SPEED);
+		
 		previousCoordinate = currentCoordinate;
 		
 		segmentDistance.increase(distanceFromPrevious);
@@ -359,7 +362,9 @@ public class TrajectoryEvaluator {
 			clearSegment();
 		}
 		
-
+		
+		
+		
 		Optional<PenaltyAlert> newSpeedAlert = evaluatePenalty(PenaltyType.SPEEDING, aggressiveSpeedIndex);
 		Optional<PenaltyAlert> optSpeedAlert = updateEvaluationPenalties(newSpeedAlert, Optional.ofNullable(speedAlert), coordinate, distanceFromPrevious, currentSpeed);
 		speedAlert = optSpeedAlert.isPresent() ? optSpeedAlert.get() : null;

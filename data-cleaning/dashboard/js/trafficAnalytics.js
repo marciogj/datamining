@@ -171,7 +171,7 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 	};
 
 	function drawCoord(coordinate, map) {
-		var speedLimit = 80;
+		var speedLimit = coordinate.speedLimit
         var overLimitfactor = ( (coordinate.speed * 100)/speedLimit ) - 100;
         var color = getColorBySpeedFactor(overLimitfactor);
 
@@ -185,21 +185,25 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 
 	};
 
-	function jsonCoord2html(coordinate) {
-		var jsonStr = JSON.stringify(coordinate);
-		var tmp = jsonStr.replace(/\{/g, '');
-		tmp = tmp.replace(/\}/g, '');
-		//tmp = tmp.replace(/\"/g, '');
-		
-		var elements = tmp.split(',');
+	function coord2html(coordinate) {
 		var html = '';
-		elements.forEach(function(element) {
-			var parts = element.split('":');
-			html += '<strong>' + parts[0].replace(/\"/g, '') + '</strong>:';
-			html += parts[1].replace(/\"/g, '') + '<br>';
-		});
+		for (var key in coordinate) {
+			var value = coordinate[key];
+			if (key === 'speed' || key === 'speedLimit') {	
+				html += '<strong>' + key + "</strong>: " + formatDouble(value) + ' km/h<br>';
+			} else if (key == 'acceleration') {	
+				html += '<strong>' + key + "</strong>: " + formatDouble(value) + ' m/s²<br>';
+			} else {
+				html += '<strong>' + key + "</strong>: " + value + '<br>';
+			}
+				
+		}
 		return html;
 	};
+
+	function formatDouble(value) {
+		return parseFloat(Math.round(value * 100) / 100).toFixed(2);
+	}
 
 
 	function getColorBySpeedFactor(overLimitfactor) {
@@ -233,8 +237,8 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 			var infoWindow = new google.maps.InfoWindow;
 		    infoWindow.setPosition(circle.getCenter());
 		    //infoWindow.setContent(JSON.stringify(coordinate));
-		    infoWindow.setContent(jsonCoord2html(coordinate));
-
+			infoWindow.setContent(coord2html(coordinate));
+		    
 		    infoWindow.open(map);
 		});
 
