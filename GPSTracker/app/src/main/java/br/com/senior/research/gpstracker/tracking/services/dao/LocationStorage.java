@@ -85,6 +85,29 @@ public class LocationStorage extends SQLiteOpenHelper {
         }
     }
 
+    public Location loadLatest() {
+        Log.d(TAG, "load");
+        Location record = null;
+        SQLiteDatabase database = this.getWritableDatabase();
+        Cursor cursor = null;
+
+        try {
+            String groupBy = null, having = null, orderBy = null, strLimit = null ;
+            String[] columnNames = null; //null is used for SELECT * FROM
+            String[] whereArgs = null;
+            String whereClause = "datetime=(SELECT MAX(datetime) FROM location_history)";
+            cursor = database.query(TABLE_NAME, columnNames, whereClause, whereArgs, groupBy, having, orderBy, strLimit);
+            if (cursor.moveToFirst()) {
+                record = cursorToLocation(cursor);
+            }
+
+        } finally {
+            close(cursor);
+            close(database);
+        }
+        return record;
+    }
+
     public Collection<Location> load(int skip, int count) {
         Log.d(TAG, "load");
         Collection<Location> records = new LinkedList<>();

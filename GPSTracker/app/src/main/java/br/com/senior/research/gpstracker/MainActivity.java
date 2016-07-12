@@ -17,6 +17,8 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +39,7 @@ import br.com.senior.research.gpstracker.tracking.services.dao.LocationStorage;
 import br.com.senior.research.gpstracker.tracking.services.model.TrackedIdentity;
 
 public class MainActivity extends AppCompatActivity {
+    public static final int PERMISSION_LOCATION_REQUEST_CODE = 121;
     private LocationManager locationManager;
 
     @Override
@@ -49,20 +52,23 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
-
+        requestPermissionsIfNotAllowed();
         registerIdentity();
         Log.e("MAIN", "Initializing my intent....");
         Intent i = new Intent(this.getApplicationContext(), LocationSensorTrackService.class);
         bindService(i, myConnection, Context.BIND_AUTO_CREATE);
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+
+        /*
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationListener locationListener = new MyLocationListener();
         boolean hasPermissionFineLocation = checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         if (hasPermissionFineLocation) {
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
         }
+        */
 
         runThread();
     }
@@ -103,7 +109,10 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 LocationStorage storage = LocationStorage.getInstance(getApplicationContext());
                                 TextView title = (TextView) findViewById(R.id.pendingDataLabel);
-                                title.setText("Pending Data " + LocationStorage.getInstance(getApplicationContext()).count());
+                                title.setText("Dados: " + storage.count());
+
+                                Location latestLocation = storage.loadLatest();
+                                updateUI(latestLocation);
 
                                 TextView statusTxt = (TextView) findViewById(R.id.status);
                                 statusTxt.setText("Status: Procurando Satélites");
@@ -118,6 +127,93 @@ public class MainActivity extends AppCompatActivity {
         }.start();
     }
 
+    private Location lastLocation;
+    private double distance;
+    private long FIVE_MIN_MILIS = 5 * 60 * 1000;
+    private void updateUI(Location loc) {
+        String longitude = "Longitude: ";
+        String latitude = "Latitude: ";
+        String speed = "Velocidade: ";
+        String status = "Status: ";
+        String accuracy = "Precisão: ";
+        String strDistance = "Distância: ";
+        long currentTime = System.currentTimeMillis();
+        long updateInterval = currentTime - ( loc == null ? 0 : loc.getTime());
+        if (loc != null && updateInterval < FIVE_MIN_MILIS) {
+            longitude += loc.getLongitude();
+            latitude +=  loc.getLatitude();
+
+            float speedKmh = loc.getSpeed() * 3.6f;
+            status += loc.getExtras().get("satellites") + " Satélites";
+            accuracy +=  loc.getAccuracy() + " m";
+
+            long timeDifference = loc.getTime() - ( lastLocation == null ? 0 : lastLocation.getTime());
+            if (timeDifference > FIVE_MIN_MILIS) {
+                distance = 0;
+            }
+
+            float distanceFromLast = lastLocation == null ? 0 : loc.distanceTo(lastLocation);
+            distance += distanceFromLast;
+
+            strDistance += String.format(Locale.ENGLISH,"%.2f", distance) + " m";
+            if ( distance >= 1000 ) {
+                strDistance += String.format(Locale.ENGLISH, "%.2f", distance/1000) + " km";
+            }
+
+            lastLocation = loc;
+        }
+
+        TextView latitudeTxt = (TextView) findViewById(R.id.latitude);
+        latitudeTxt.setText(latitude);
+
+        TextView longitudeTxt = (TextView) findViewById(R.id.longitude);
+        longitudeTxt.setText(longitude);
+
+        TextView speedTxt = (TextView) findViewById(R.id.speed);
+        speedTxt.setText(speed);
+
+        TextView distanceTxt = (TextView) findViewById(R.id.distance);
+        distanceTxt.setText(strDistance);
+
+        //TextView localeTxt = (TextView) findViewById(R.id.locale);
+        //localeTxt.setText("Local: " + getLocale(loc));
+
+        TextView statusTxt = (TextView) findViewById(R.id.status);
+        statusTxt.setText(status);
+
+        TextView accuracyTxt = (TextView) findViewById(R.id.accuracy);
+        accuracyTxt.setText(accuracy);
+    }
+
+    //https://developer.android.com/training/permissions/requesting.html
+    private boolean checkPermission(String permission) {
+        int permissionCheck = ContextCompat.checkSelfPermission(this, permission);
+        return PackageManager.PERMISSION_GRANTED == permissionCheck;
+    }
+
+    private boolean isPermissionsAllowed() {
+        boolean isCoarseLocationAllowed = checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
+        boolean isFineLocationAllowed = checkPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+        boolean isAccountAllowed = checkPermission(Manifest.permission.GET_ACCOUNTS);
+        return isCoarseLocationAllowed && isFineLocationAllowed && isAccountAllowed;
+    }
+
+    private void requestPermissionsIfNotAllowed() {
+        if (!isPermissionsAllowed()) {
+            String[] locationPermissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.GET_ACCOUNTS};
+            ActivityCompat.requestPermissions(this, locationPermissions, PERMISSION_LOCATION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -145,8 +241,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public static class PlaceholderFragment extends Fragment {
 
-        public PlaceholderFragment() {
-        }
+        public PlaceholderFragment() {}
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -155,9 +250,6 @@ public class MainActivity extends AppCompatActivity {
             return rootView;
         }
     }
-
-
-
 
     Messenger myService = null;
     boolean isBound;
