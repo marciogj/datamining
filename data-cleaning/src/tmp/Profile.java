@@ -1,0 +1,9 @@
+package tmp;
+
+enum Profile {
+	SAFE,
+	SLOW_DANGEROUS,
+	LITTLE_AGGRESSIVE,
+	AGGRESSIVE,
+	VERY_AGGRESSIVE
+}

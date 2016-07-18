@@ -22,7 +22,7 @@ public class AccelerationEvaluator {
 	}
 	
 	public void count(double acceleration) {
-		if (acceleration < 0 && acceleration >= -3.0) {
+		if (acceleration <= 0 && acceleration >= -3.0) {
 			limits.get(0).count++;
 			limits.get(0).sum += acceleration;
 		} else if (acceleration < -3.0 && acceleration >= -6.0) {
@@ -46,14 +46,15 @@ public class AccelerationEvaluator {
 		} else if (acceleration >= 7.3){
 			limits.get(7).count++;
 			limits.get(7).sum += acceleration;
-		}
+		} 
 	}
 	
 	public double evaluate(double acceleration) {
 		Pair<Double, Double> limits = getLimts(acceleration);
 		double maxValue = limits.getFirst();
 		double maxPercentage = limits.getSecond();
-		return  (Math.abs(acceleration) * maxPercentage)/maxValue;
+		double value = (Math.abs(acceleration) * maxPercentage)/maxValue;
+		return value > 100 ? 100 : value;
 	}
 	
 	private Pair<Double, Double> getLimts(double acceleration) {

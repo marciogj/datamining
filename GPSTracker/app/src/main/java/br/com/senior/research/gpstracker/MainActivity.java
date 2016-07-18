@@ -114,8 +114,7 @@ public class MainActivity extends AppCompatActivity {
                                 Location latestLocation = storage.loadLatest();
                                 updateUI(latestLocation);
 
-                                TextView statusTxt = (TextView) findViewById(R.id.status);
-                                statusTxt.setText("Status: Procurando Satélites");
+
                             }
                         });
                         Thread.sleep(5000);
@@ -134,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
         String longitude = "Longitude: ";
         String latitude = "Latitude: ";
         String speed = "Velocidade: ";
-        String status = "Status: ";
+        String status = "Status: Procurando Satélites";
         String accuracy = "Precisão: ";
         String strDistance = "Distância: ";
         long currentTime = System.currentTimeMillis();

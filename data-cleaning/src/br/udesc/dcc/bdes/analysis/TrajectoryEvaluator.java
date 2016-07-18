@@ -8,10 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jongo.marshall.jackson.oid.MongoId;
 
 import br.udesc.dcc.bdes.google.geocoding.GeocodeAddress;
+import br.udesc.dcc.bdes.google.geocoding.InverseGeocodingClient;
+import br.udesc.dcc.bdes.google.places.ImportantPlace;
 import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.DeviceId;
@@ -25,6 +29,7 @@ import br.udesc.dcc.bdes.model.Time;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TrajectoryEvaluation;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
+import br.udesc.dcc.bdes.server.JettyServer;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.PenaltySeverity;
 
 
@@ -112,6 +117,8 @@ public class TrajectoryEvaluator {
 	public int angleConsecutiveChange = 0;
 	
 	private GeocodeAddress currentAddress;
+	private Map<String, ImportantPlace> importantPlaces = new HashMap<>(); 
+	
 	
 	public static synchronized int nextSequence() {
 		return ++sequence;
@@ -152,6 +159,10 @@ public class TrajectoryEvaluator {
 		return latestTimestamp;
 	}
 	
+	public List<String> getStreets() {
+		return streets.keySet().stream().collect(Collectors.toList());
+	}
+	
 	public String getMainStreet() {
 		double max = 0;
 		String mainStreet = "";
@@ -170,30 +181,9 @@ public class TrajectoryEvaluator {
 		MAX_ALLOWED_SPEED = maxAllowedSpeed;
 	}
 
-	public void evaluate(Collection<Coordinate> coordinates, Optional<OpenWeatherConditionDTO> weather, Optional<GeocodeAddress> optAddress) {
-
-		double initialDistance = totalDistance;
+	public void evaluate(Collection<Coordinate> coordinates) {
 		for (Coordinate coordinate : coordinates) {
-			evaluate(coordinate, weather);
-		}
-
-		double diffDistance = totalDistance - initialDistance;
-
-		if(optAddress.isPresent()) {
-			currentAddress = optAddress.get();
-			String streetName = currentAddress.getStreetName();
-			Double previous = streets.get(streetName);
-			previous = previous == null ? 0 : previous;
-
-			streets.put(streetName, previous + diffDistance);
-			Speed currentSpeedLimit = SpeedLimit.getSpeedByAddress(streetName);
-			double factor25 = currentSpeedLimit.getMs() * 0.25;
-			MAX_ALLOWED_SPEED = currentSpeedLimit.getMs() - factor25;
-			speedEvaluator.changeMax(new Speed(MAX_ALLOWED_SPEED));
-		} else if (currentAddress != null) {
-			String streetName = currentAddress.getStreetName();
-			Speed currentSpeedLimit = SpeedLimit.getSpeedByAddress(streetName);
-			MAX_ALLOWED_SPEED = currentSpeedLimit.getMs();
+			evaluate(coordinate);
 		}
 	}
 
@@ -227,29 +217,12 @@ public class TrajectoryEvaluator {
 		return "Trânsito Tranquilo"; 
 	}
 
-	public void evaluate(Collection<Coordinate> coordinates) {
-
-		for (Coordinate coordinate : coordinates) {
-			//update coordinate with values from speed
-			Coordinate updatedCoordinate = evaluate(coordinate, Optional.empty());
-			coordinate.setAcceleration(updatedCoordinate.getAcceleration());
-
-			//TODO: This update creates noise on Data with provided speed
-			//coordinate.setSpeed(updatedCoordinate.getSpeed());
-		}
-	}
-
-	public void evaluate(final Coordinate coordinate) {
-		evaluate(coordinate, Optional.empty());
-	}
-
 	public AccelerationEvaluator getAccEvaluator() {
 		return accEvaluator;
 	}
 
-	public Coordinate evaluate(Coordinate coordinate, Optional<OpenWeatherConditionDTO> weather) {
+	public Coordinate evaluate(Coordinate coordinate) {
 		trajectory.add(coordinate);
-		currentWeather = weather.isPresent() ? weather.get() : null;
 		latestTimestamp = coordinate.getDateTimeInMillis();
 		accCoordinateCount++;
 		if (previousCoordinate == null) {
@@ -283,11 +256,11 @@ public class TrajectoryEvaluator {
 			}
 			
 		}
-		//if (angleConsecutiveChange >= 5) {
-		//	System.err.println("Mudança de pista?");
-		//}
 		
-		//System.out.println(currentCoordinate.getDateTime().format(DateTimeFormatter.ISO_DATE_TIME) + ", " + currentCoordinate.getLatitude() + ", " + currentCoordinate.getLongitude() + ", " + currentAngle);
+		if (angleConsecutiveChange >= 5) {
+			System.err.println("Mudança de pista?");
+		}
+		
 		previousAngle = currentAngle;
 		
 		
@@ -299,10 +272,7 @@ public class TrajectoryEvaluator {
 			maxSpeed = currentSpeed;
 		}
 
-		//if (maxSpeed > (120/3.6)) {
-		//	System.out.println("NOISE: " + currentSpeed*3.6 + " km/h");
-		//}
-
+		
 		//Update max acceleration/deceleration 
 		if (currentAcceleration > maxAccecelration) {
 			maxAccecelration = currentAcceleration;
@@ -358,12 +328,43 @@ public class TrajectoryEvaluator {
 			segmentAccelerationIndexes.add(aggressiveAccIndex);
 		}
 		if (segmentDistance.getKilometers() >= 1) {
+			
+			
+			Optional<GeocodeAddress> optCurrentAddress = Optional.empty();
+			boolean externalData = false;
+			if (externalData) {
+				List<ImportantPlace> places = TrackEvaluator.getImportantPlaces(coordinate.getLatitude(), coordinate.getLongitude());
+				optCurrentAddress = getAddress(coordinate.getLatitude(), coordinate.getLongitude());
+				//TODO: Update
+				//Optional<OpenWeatherConditionDTO> optWeather = TrackEvaluator.getWeather(coord.getLatitude(), coord.getLongitude());
+				this.addAll(places);
+			}
+			
+			
+			
+			if (optCurrentAddress.isPresent()) {
+				currentAddress = optCurrentAddress.get();
+				String streetName = currentAddress.getStreetName();
+				Double previous = streets.get(streetName);
+				previous = previous == null ? 0 : previous;
+
+				streets.put(streetName, previous + segmentDistance.getMeters());
+				Speed currentSpeedLimit = SpeedLimit.getSpeedByAddress(streetName);
+				//double factor25 = currentSpeedLimit.getMs() * 0.25;
+				//MAX_ALLOWED_SPEED = currentSpeedLimit.getMs() - factor25;
+				MAX_ALLOWED_SPEED = currentSpeedLimit.getMs();
+				speedEvaluator.changeMax(new Speed(MAX_ALLOWED_SPEED));
+			} else if (currentAddress != null) {
+				String streetName = currentAddress.getStreetName();
+				Speed currentSpeedLimit = SpeedLimit.getSpeedByAddress(streetName);
+				MAX_ALLOWED_SPEED = currentSpeedLimit.getMs();
+			}
+				 
+			
+			
 			updateAggressiveIndex();
 			clearSegment();
 		}
-		
-		
-		
 		
 		Optional<PenaltyAlert> newSpeedAlert = evaluatePenalty(PenaltyType.SPEEDING, aggressiveSpeedIndex);
 		Optional<PenaltyAlert> optSpeedAlert = updateEvaluationPenalties(newSpeedAlert, Optional.ofNullable(speedAlert), coordinate, distanceFromPrevious, currentSpeed);
@@ -375,6 +376,19 @@ public class TrajectoryEvaluator {
 
 		return currentCoordinate;
 	}
+	
+	public static Optional<GeocodeAddress> getAddress(double latitude, double longitude) {
+		try {
+			Optional<String> googleKey =  JettyServer.get().getGoogleMapsKey();
+			if (googleKey.isPresent()) {
+				return InverseGeocodingClient.getAddresses(latitude, longitude, JettyServer.get().getGoogleMapsKey().get());
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return Optional.empty();
+	}
+	
 
 	private void countSpeedGroup(double currentSpeed) {
 		SpeedIndexEval speedEval = new SpeedIndexEval(new Speed(MAX_ALLOWED_SPEED));
@@ -678,14 +692,6 @@ public class TrajectoryEvaluator {
 		evaluate(t.getCoordinates());
 	}
 
-	public void evaluate(Trajectory t, Optional<OpenWeatherConditionDTO> optWeather, Optional<GeocodeAddress> optAddress) {
-		trajectory.setSourceProvider(t.getSourceProvider());
-		trajectory.setDeviceId(t.getDeviceId());
-		trajectory.setTransportMean(t.getTransportMean());
-		trajectory.setUserId(t.getUserId());
-		evaluate(t.getCoordinates(), optWeather, optAddress);		
-	}
-
 	public Double getMaxAggressiveIndex() {
 		return maxAggressiveIndex;
 	}
@@ -704,6 +710,16 @@ public class TrajectoryEvaluator {
 
 	public Integer getSpeedUnderLimitCount() {
 		return speedUnderLimitCount;
+	}
+
+	public void addAll(List<ImportantPlace> places) {
+		for (ImportantPlace place : places) {
+			importantPlaces.put(place.getName(), place);
+		}
+	}
+
+	public List<ImportantPlace> getImportantPlaces() {
+		return importantPlaces.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
 	}
 
 }

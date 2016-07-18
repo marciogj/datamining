@@ -124,12 +124,12 @@ public class TrackAPI {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.submit(() -> {
 			try {
-				Optional<OpenWeatherConditionDTO> optWheather = getWeather(latitude, longitude);
+				Optional<OpenWeatherConditionDTO> optWheather = TrackEvaluator.getWeather(latitude, longitude);
 				if (optWheather.isPresent()) {
 					OpenWheatherDTOFileWriter.write(optWheather.get(), fileprefix + "_weather.json");
 				}
 				
-				Optional<GeocodeAddress> optAddress = getAddress(latitude, longitude);
+				Optional<GeocodeAddress> optAddress = TrackEvaluator.getAddress(latitude, longitude);
 				if (optAddress.isPresent()) {
 					GeocodeAddressDTOFileWriter.write(optAddress.get(), fileprefix + "_address.json");
 				}
@@ -169,7 +169,7 @@ public class TrackAPI {
 			//TODO: Break trajectories considering contextual information: stops and place
 			previousTrajectory = dbTrajectory.get().getTrajectory();
 			Optional<Coordinate> latestCoodrinate = previousTrajectory.getLastestCoordinate();
-			Optional<Coordinate> receivedCoordinate = receivedTrajectory.getFirstCoordintae();
+			Optional<Coordinate> receivedCoordinate = receivedTrajectory.getFirstCoordinate();
 			
 			long lastTimePreviousCoord = receivedCoordinate.isPresent() ? receivedCoordinate.get().getDateTimeInMillis() : 0;
 			long firstTimeCurrentCoord = latestCoodrinate.isPresent() ? latestCoodrinate.get().getDateTimeInMillis() : 0;
@@ -226,12 +226,12 @@ public class TrackAPI {
 			//boolean externalData = true;
 	
 			if (externalData) {
-				Optional<Coordinate> optCoord = subTrajectory.getFirstCoordintae();
+				Optional<Coordinate> optCoord = subTrajectory.getFirstCoordinate();
 				if (optCoord.isPresent()) {
 					Coordinate coord = optCoord.get();
-					Optional<OpenWeatherConditionDTO> optWeather = getWeather(coord.getLatitude(), coord.getLongitude());
-					Optional<GeocodeAddress> optAddress = getAddress(coord.getLatitude(), coord.getLongitude());
-					trajectoryEval.evaluate(subTrajectory, optWeather, optAddress);
+					
+					//Optional<GeocodeAddress> optAddress = TrackEvaluator.getAddress(coord.getLatitude(), coord.getLongitude());
+					trajectoryEval.evaluate(subTrajectory);
 				}
 			} else if (isMotorized) {
 				trajectoryEval.evaluate(subTrajectory);
@@ -264,27 +264,6 @@ public class TrackAPI {
 			trajectoryEval =new TrajectoryEvaluator(new DeviceId(trackDto.deviceId), new DriverId(trackDto.userId));
 		}
 		
-	}
-	
-	private  Optional<GeocodeAddress> getAddress(double latitude, double longitude) {
-		try {
-			return InverseGeocodingClient.getAddresses(latitude, longitude, JettyServer.get().getGoogleMapsKey().get());
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		return Optional.empty();
-	}
-	
-	private Optional<OpenWeatherConditionDTO> getWeather(double latitude, double longitude) {
-		try {
-			Optional<String> openWetaherKey = JettyServer.get().getOpenWeatherKey();
-			if (openWetaherKey.isPresent()) {
-				return OpenWeatherClient.weatherByCooordinate(latitude, longitude, openWetaherKey.get());
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		}	
-		return Optional.empty();
 	}
 	
 	private void notifyWSClients(TrackDTO trackDto) {

@@ -9,14 +9,19 @@ import java.util.Optional;
 import br.udesc.dcc.bdes.datamining.cluster.density.DBScan;
 import br.udesc.dcc.bdes.datamining.cluster.density.DBScanResult;
 import br.udesc.dcc.bdes.google.geocoding.GeocodeAddress;
+import br.udesc.dcc.bdes.google.geocoding.InverseGeocodingClient;
+import br.udesc.dcc.bdes.google.places.ImportantPlace;
+import br.udesc.dcc.bdes.google.places.ImportantPlacesClient;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.DriverId;
 import br.udesc.dcc.bdes.model.DriverProfile;
 import br.udesc.dcc.bdes.model.Trajectory;
 import br.udesc.dcc.bdes.model.TransportType;
+import br.udesc.dcc.bdes.openweather.OpenWeatherClient;
 import br.udesc.dcc.bdes.openweather.dto.OpenWeatherConditionDTO;
 import br.udesc.dcc.bdes.repository.memory.MemoryRepository;
+import br.udesc.dcc.bdes.server.JettyServer;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrackDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryMapper;
 
@@ -106,21 +111,24 @@ public class TrackEvaluator {
 			boolean externalData = false; 
 			//boolean externalData = true;
 
-			/*
+			
 			if (externalData) {
-				Optional<Coordinate> optCoord = subTrajectory.getFirstCoordintae();
+				Optional<Coordinate> optCoord = subTrajectory.getFirstCoordinate();
 				if (optCoord.isPresent()) {
-					Coordinate coord = optCoord.get();
-					Optional<OpenWeatherConditionDTO> optWeather = getWeather(coord.getLatitude(), coord.getLongitude());
-					Optional<GeocodeAddress> optAddress = getAddress(coord.getLatitude(), coord.getLongitude());
-					trajectoryEval.evaluate(subTrajectory, optWeather, optAddress);
+					//Coordinate coord = optCoord.get();
+					
+					//Optional<OpenWeatherConditionDTO> optWeather = TrackEvaluator.getWeather(coord.getLatitude(), coord.getLongitude());
+					//Optional<GeocodeAddress> optAddress = TrackEvaluator.getAddress(coord.getLatitude(), coord.getLongitude());
+										
+					trajectoryEval.evaluate(subTrajectory);
+					repository.save(deviceId, trajectoryEval);
 				}
-			} else if (isMotorized) {
-				
+			} else {
+				//	trajectoryEval.evaluate(subTrajectory);
+				evaluateAndSave(deviceId, driverId, subTrajectory);
 			}
-			*/
-
-			evaluateAndSave(deviceId, driverId, subTrajectory);
+				
+			
 		
 			driverProfile.increaseTraveledDistance(trajectoryEval.getTotalDistance());
 			driverProfile.increaseTraveledTime(trajectoryEval.getTotalTime());
@@ -130,6 +138,18 @@ public class TrackEvaluator {
 			
 		}
 		 
+	}
+	
+	public static Optional<GeocodeAddress> getAddress(double latitude, double longitude) {
+		try {
+			Optional<String> googleKey =  JettyServer.get().getGoogleMapsKey();
+			if (googleKey.isPresent()) {
+				return InverseGeocodingClient.getAddresses(latitude, longitude, JettyServer.get().getGoogleMapsKey().get());
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return Optional.empty();
 	}
 
 	private void evaluateAndSave(DeviceId deviceId, DriverId driverId, List<Trajectory> trajectories) {
@@ -142,6 +162,31 @@ public class TrackEvaluator {
 		TrajectoryEvaluator evalSub = new TrajectoryEvaluator(deviceId, driverId);
 		evalSub.evaluate(trajectory);
 		repository.save(deviceId, evalSub);
+	}
+	
+	public static Optional<OpenWeatherConditionDTO> getWeather(double latitude, double longitude) {
+		try {
+			Optional<String> openWeatherKey = JettyServer.get().getOpenWeatherKey();
+			if (openWeatherKey.isPresent()) {
+				return OpenWeatherClient.weatherByCooordinate(latitude, longitude, openWeatherKey.get());
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}	
+		return Optional.empty();
+	}
+	
+	public static List<ImportantPlace> getImportantPlaces(double latitude, double longitude) {
+		try {
+			Optional<String> googleKey =  JettyServer.get().getGoogleMapsKey();
+			if (googleKey.isPresent()) {
+				int radius = 500; 
+				return ImportantPlacesClient.getPlaces(latitude, longitude, radius, googleKey.get());
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}	
+		return new ArrayList<>();
 	}
 
 }

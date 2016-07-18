@@ -1,5 +1,6 @@
 package br.udesc.dcc.bdes.server.rest.api.track;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -13,11 +14,13 @@ import javax.ws.rs.core.MediaType;
 
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluatorId;
+import br.udesc.dcc.bdes.google.places.ImportantPlace;
 import br.udesc.dcc.bdes.model.DeviceId;
 import br.udesc.dcc.bdes.model.Distance;
 import br.udesc.dcc.bdes.model.Time;
 import br.udesc.dcc.bdes.repository.memory.MemoryRepository;
 import br.udesc.dcc.bdes.server.rest.APIPath;
+import br.udesc.dcc.bdes.server.rest.api.track.dto.ImportantPlaceDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.PenaltyAlertDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.SpeedTelemetryDTO;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.TrajectoryDTO;
@@ -56,6 +59,53 @@ public class TrajectorySummaryAPI {
 		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(new TrajectoryEvaluatorId(evaluationId)).orElseThrow( () -> new NotFoundException());
 		return TrajectoryMapper.toDto(evaluation.getTrajectory());
 	}
+	
+	@GET
+	@Path("trajectory-evaluation/{evaluationId}/important-places")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<ImportantPlaceDTO> getImportantPlaces(@PathParam("evaluationId") String evaluationId) {
+		logger.info("getTrajectoryImportantPlaces " + evaluationId);
+		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(new TrajectoryEvaluatorId(evaluationId)).orElseThrow( () -> new NotFoundException());
+		return TrajectoryMapper.toPlaceDto(evaluation.getImportantPlaces());
+	}
+	
+	@GET
+	@Path("trajectory-evaluation/{evaluationId}/important-places-traveled")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<ImportantPlaceDTO> getTrajectoryImportantPlaces(@PathParam("evaluationId") String evaluationId) {
+		logger.info("getTrajectoryImportantPlaces " + evaluationId);
+		TrajectoryEvaluator evaluation = repository.loadTrajectoryEvaluationById(new TrajectoryEvaluatorId(evaluationId)).orElseThrow( () -> new NotFoundException());
+		List<ImportantPlaceDTO> nearByPlaces =TrajectoryMapper.toPlaceDto(evaluation.getImportantPlaces());
+		List<String> streets = evaluation.getStreets().stream().map( street -> cleanAddress(street)).collect(Collectors.toList());
+		
+		System.out.println("====================");
+		for (String string : streets) {
+			System.out.println(cleanAddress(string));
+		}
+		System.out.println("====================");
+		
+		//---
+		
+		System.out.println("*****************");
+		for(ImportantPlaceDTO place : nearByPlaces) {
+			String placeStreet = cleanAddress(place.address);
+			place.isTravelled = streets.contains(placeStreet);
+			System.out.println(cleanAddress(place.address));
+		}
+		System.out.println("*****************");
+		return nearByPlaces;
+	}
+	
+	private String cleanAddress(String address) {
+		String streetName = address.split(",")[0];
+		streetName = streetName.replaceAll("Rua ", "");
+		streetName = streetName.replaceAll("R. ", "");
+		streetName = streetName.replaceAll("R ", "");
+		streetName = streetName.replaceAll("Doutor", "Dr.");
+		
+		return streetName;
+	}
+	
 	
 	@GET
 	@Path("trajectory-evaluation/{evaluationId}/alerts")

@@ -107,32 +107,76 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 	self.speedColors['from10to20Limit'] = '#ff6600';
 	self.speedColors['from20to50Limit'] = '#ff0000';
 	self.speedColors['over50Limit'] = '#6600cc';
+	self.map = undefined;
 	
 	
 	function initialize(evaluationId) {
 
-		$http.get(DBP_API + '/summary/trajectory-evaluation/' + evaluationId + '/coordinates').success(function(data) {			
-			//http://stackoverflow.com/questions/29803045/how-to-clear-an-angular-array			
-			var mapMode = $stateParams.mode;
-			if ( mapMode == "line" || mapMode == null) {
-				drawPolylineTrajectory(data.coordinates);
-			} else if (mapMode == "dots") {
-				drawDotsTrajectory(data.coordinates);
-			}
-			
-        });	
-
+		var mapStyle = $stateParams.mapStyle;
+		if(mapStyle === 'styled') {
+			//self.map = createStyledMap(latCenter, lonCenter);
+			self.map = createStyledMap();
+		} else {
+			//self.map = createBasicMap(latCenter, lonCenter);	
+			self.map = createBasicMap();	
+		}
+		
+		//var mapEditable = $stateParams.editable;
+		//if(mapEditable === 'true') {
+		//	enableEdition(self.map);
+		//}
+		
+		requestAndDrawCoordinates(evaluationId, self.map);
+		requestAndDrawImportantPlaces(evaluationId, self.map);
        
     };
 
-    function drawDotsTrajectoryAsync(fn, coordinates) {
-	    setTimeout(function() {
-	        fn(coordinates);
-	    }, 0);
+    function requestAndDrawCoordinates(evaluationId, map) {
+    	$http.get(DBP_API + '/summary/trajectory-evaluation/' + evaluationId + '/coordinates').success(function(data) {			
+			var trajectoryMode = $stateParams.mode;
+			if ( trajectoryMode == "line" || trajectoryMode == null) {
+				drawPolylineTrajectory(data.coordinates, map);
+			} else if (trajectoryMode == "dots") {
+				drawDotsTrajectory(data.coordinates, map);
+			}
+
+			setMapCenter(data.coordinates, map);
+        });	
+    };
+
+    function setMapCenter(coordinates, map) {
+    	var middle = Math.floor(coordinates.length / 2);
+		var latCenter = coordinates[middle].latitude;
+		var lonCenter = coordinates[middle].longitude;
+		map.setCenter({ lat: latCenter, lng : lonCenter, alt: 0 });
+    }
+
+    function requestAndDrawImportantPlaces(evaluationId, map) {
+    	$http.get(DBP_API + '/summary/trajectory-evaluation/' + evaluationId + '/important-places-traveled').success(function(data) {
+    		drawImportantPlaces(data, map);
+        }).error(function(data, status, header, config) {
+        	console.log('Error! Status: ' + status);
+        });
+
+    };
+
+	function drawImportantPlaces(placeList, map) {
+		placeList.forEach(function(place){
+			console.log(place);
+			var coordinate = { latitude: place.lat, longitude: place.lon };
+			
+			createMarker(coordinate, map);
+			if (place.isTravelled) {
+				createImportantPlaceCircle(place, map, '#f4f0c8', 100);		
+			} else {
+				createImportantPlaceCircle(place, map, '#bababa', 10);	
+			}
+			
+		});
 	};
 
 
-    function drawPolylineTrajectory(coordinates) {
+    function drawPolylineTrajectory(coordinates, map) {
     	var googleCoordinates = [];
 
 		coordinates.forEach( function(coordinate) {
@@ -151,20 +195,14 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 			strokeWeight: 2
 		});
 
-		var map = createBasicMap(latCenter, lonCenter);
-		enableEdition(map);
       	lineCoordinatesPath.setMap(map);
 	};
 
-	function drawDotsTrajectory(coordinates) {
+	function drawDotsTrajectory(coordinates, map) {
 		var middle = Math.floor(coordinates.length / 2);
 		var latCenter = coordinates[middle].latitude;
 		var lonCenter = coordinates[middle].longitude;
 
-		
-		var map = createStyledMap(latCenter, lonCenter);
-		enableEdition(map);
-		
 		coordinates.forEach( function(coordinate) {
           drawCoord(coordinate, map);
         });
@@ -180,7 +218,7 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 		} else if (coordinate.isNoise) {
         	createMarker(coordinate, map, 'images/noise-red.png');
         } else {
-        	createCircle(coordinate, map, color);
+        	createCoordinateCircle(coordinate, map, color);
         }
 
 	};
@@ -219,26 +257,44 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 		return self.speedColors['underLimit'];
 	}
 
-	function createCircle(coordinate, map, hexColor) {
+	function obj2html(obj) {
+		var html = '';
+		for (var key in obj) {
+			var value = obj[key];
+			html += '<strong>' + key + "</strong>: " + value + '<br>';
+		}
+		return html;
+	}
+
+	function createCoordinateCircle(coordinate, map, hexColor) {
+		var coordHtmlDetails = coord2html(coordinate);
+		createInfoCircle(coordinate, map, 0.90, 0.95, 1, hexColor, 3, coordHtmlDetails);
+	}
+
+	function createImportantPlaceCircle(place, map, hexColor, radius) {
+		var coordinate = { latitude: place.lat, longitude: place.lon };
+		var placeHtml = obj2html(place);
+		createInfoCircle(coordinate, map, 0.6, 0.08, 1, hexColor, radius, placeHtml);
+	}
+
+	function createInfoCircle(coordinate, map, fillOpacity, strokeOpacity, strokeWeight, hexColor, radius, infoMessage) {
 		var googleCoord = new google.maps.LatLng(parseFloat(coordinate.latitude), parseFloat(coordinate.longitude));
         
 		var circle = new google.maps.Circle({
 		      strokeColor: hexColor,
-		      strokeOpacity: 0.95,
-		      strokeWeight: 1,
+		      strokeOpacity: strokeOpacity,
+		      strokeWeight: strokeWeight,
 		      fillColor: hexColor,
-		      fillOpacity: 0.90,
+		      fillOpacity: fillOpacity,
 		      map: map,
 		      center: googleCoord,
-		      radius: 3
+		      radius: radius
 		});
 
 		google.maps.event.addListener(circle, 'click', function(ev){
 			var infoWindow = new google.maps.InfoWindow;
 		    infoWindow.setPosition(circle.getCenter());
-		    //infoWindow.setContent(JSON.stringify(coordinate));
-			infoWindow.setContent(coord2html(coordinate));
-		    
+			infoWindow.setContent(infoMessage);
 		    infoWindow.open(map);
 		});
 
@@ -284,7 +340,7 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
   		var styledMap = new google.maps.StyledMapType(styles, {name: "Styled Map"});
 		var map = new google.maps.Map(document.getElementById('map-canvas'), {
 			zoom: 12,
-			center: { lat: latCenter, lng : lonCenter, alt: 0 },
+			//center: { lat: latCenter, lng : lonCenter, alt: 0 },
 			mapTypeControlOptions: {
 		      mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
 		    }
@@ -297,8 +353,9 @@ app.controller('trajectoryMapCtrl',  ['$scope','$stateParams', '$http',  functio
 
 	function createBasicMap(latCenter, lonCenter) {
 		var map = new google.maps.Map(document.getElementById('map-canvas'), {
-			zoom: 12,
-			center: { lat: latCenter, lng : lonCenter, alt: 0 }
+			zoom: 12
+			//,
+			//center: { lat: latCenter, lng : lonCenter, alt: 0 }
 		});
 		
 		map.addListener('rightclick', function() {
@@ -423,8 +480,8 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 			console.log(evaluation);
 			self.evaluation = evaluation;
           
-          }).error(function(data, status, header, config) {thgtt
-          	console.log('Error: ' + status);
+          }).error(function(data, status, header, config) {
+          	console.log('Error! Status: ' + status + ' Header: ');
           });
 	};
 

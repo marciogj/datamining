@@ -12,9 +12,13 @@ public class SpeedIndexEval {
 		this.max = 40/3.6;
 	}
 	
+	public SpeedIndexEval(double maxSpeedMs) {
+		max = maxSpeedMs;
+	}
+	
 	public SpeedIndexEval(Speed maxSpeed) {
 		super();
-		if (maxSpeed.getMs() <= 0 ) throw new IllegalArgumentException("Max Speed cannot be equal or lessa than zero");
+		if (maxSpeed.getMs() <= 0 ) throw new IllegalArgumentException("Max Speed cannot be equal or less than zero");
 		this.max = maxSpeed.getMs();
 	}
 	

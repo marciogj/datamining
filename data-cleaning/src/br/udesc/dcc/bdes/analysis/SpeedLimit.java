@@ -33,6 +33,9 @@ public class SpeedLimit {
 			return Speed.fromKmh(50);
 		}
 		
+		if (address.contains("Alameda Rio Branco")) {
+			return Speed.fromKmh(50);
+		}
 		
 		System.out.println("Unmapped " + address + " will be assumed for  40km/h");
 		

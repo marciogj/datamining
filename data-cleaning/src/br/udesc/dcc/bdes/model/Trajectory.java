@@ -100,7 +100,7 @@ public class Trajectory {
 		return Optional.of(coordinates.get(coordinates.size() -1));
 	}
 
-	public Optional<Coordinate> getFirstCoordintae() {
+	public Optional<Coordinate> getFirstCoordinate() {
 		if (coordinates.isEmpty()) {
 			return Optional.empty();
 		}

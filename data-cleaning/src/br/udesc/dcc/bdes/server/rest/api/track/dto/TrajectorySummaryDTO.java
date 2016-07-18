@@ -1,5 +1,8 @@
 package br.udesc.dcc.bdes.server.rest.api.track.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class TrajectorySummaryDTO {
 	public String evaluationId;
@@ -16,7 +19,7 @@ public class TrajectorySummaryDTO {
 	public Double maxDec; //= "2 m/s²";
 	public Double maxAcc; //= "4 m/s²";
 	
-	//public List<String> streets = new ArrayList<>();
+	public List<String> streets = new ArrayList<>();
 	public String mainStreet;
 	
 	

@@ -21,7 +21,13 @@ public class ImportantPlacesClient {
 		}
 		Collection<PlaceResultDTO> results = dto.get().results;
 		results.forEach( placeDto -> {
-			places.add(new ImportantPlace(placeDto.name, placeDto.vicinity, placeDto.types.stream().findFirst().orElse("unknown")));
+			places.add(new ImportantPlace(
+					placeDto.name, 
+					placeDto.vicinity, 
+					placeDto.types.stream().findFirst().orElse("unknown"), 
+					placeDto.geometry.location.lat,
+					placeDto.geometry.location.lng
+			));
 		});
 		return places;
 	}

@@ -8,10 +8,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import br.udesc.dcc.bdes.analysis.AccelerationEvaluator;
 import br.udesc.dcc.bdes.analysis.AccelerationLimit;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.google.places.ImportantPlace;
 import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
 import br.udesc.dcc.bdes.model.Distance;
@@ -100,6 +102,7 @@ public class TrajectoryMapper {
 		dto.speedAgressiveIndex = evaluation.getSpeedIndex();
 		dto.accAgressiveIndex = evaluation.getAccIndex();
 		dto.mainStreet = evaluation.getMainStreet();
+		dto.streets = evaluation.getStreets();
 		dto.wheatherCondition = "-";
 		
 		dto.speedUnderLimitCount = evaluation.getSpeedUnderLimitCount();
@@ -208,6 +211,20 @@ public class TrajectoryMapper {
 		}
 		
 		return dto;
+	}
+
+	public static List<ImportantPlaceDTO> toPlaceDto(List<ImportantPlace> entityList) {
+		List<ImportantPlaceDTO> dtoList = new ArrayList<>(entityList.size());
+		for (ImportantPlace entity : entityList) {
+			ImportantPlaceDTO dto = new ImportantPlaceDTO();
+			dto.address = entity.getAddress();
+			dto.name = entity.getName();
+			dto.type = entity.getType();
+			dto.lat = entity.getLat();
+			dto.lon = entity.getLon();
+			dtoList.add(dto);
+		}
+		return dtoList;
 	}
 
 }
