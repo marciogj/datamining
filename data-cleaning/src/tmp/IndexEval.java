@@ -28,14 +28,14 @@ public class IndexEval {
 		int finalSpeed = 90;
 		
 		//100%
-		blah(speedLimit, initialSpeed, finalSpeed, 100);
+		createConstantTrajectory(speedLimit, initialSpeed, finalSpeed, 100);
 		System.out.println();
 		//50%
-		blah(speedLimit, initialSpeed, finalSpeed, 50);
+		createConstantTrajectory(speedLimit, initialSpeed, finalSpeed, 50);
 		
 		System.out.println();
 		//25%
-		blah(speedLimit, initialSpeed, finalSpeed, 25);
+		createConstantTrajectory(speedLimit, initialSpeed, finalSpeed, 25);
 	}
 	
 	/*
@@ -49,7 +49,7 @@ public class IndexEval {
 	90km/h & 25\% & 100.00
 	*/
 	
-	public static void blah(int speedLimitKmh, int initialSpeedKmh, int finalSpeedkmh, int proporcao) {
+	public static void createConstantTrajectory(int speedLimitKmh, int initialSpeedKmh, int finalSpeedkmh, int proporcao) {
 		Speed speedLimit = Speed.fromKmh(speedLimitKmh);
 		System.out.println("Velocidade (km/h) & \\% do limite (50 km/h) & \\% Trajetória & IVA");
 		for (int i=55; i <= 90; i+= 5) {

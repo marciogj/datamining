@@ -23,7 +23,7 @@ public class Coordinate {
 	//----
 	protected boolean isNoise;
 	protected boolean isNearImportantePlace;
-	protected boolean isOvertake;
+	protected boolean isLaneChange;
 	//protected String weatherCondition;
 	
 	protected TransportType type;
@@ -59,7 +59,7 @@ public class Coordinate {
 		this.speed = coord.speed;
 		this.isNoise = coord.isNoise;
 		this.isNearImportantePlace = coord.isNearImportantePlace;
-		this.isOvertake = coord.isOvertake;
+		this.isLaneChange = coord.isLaneChange;
 		this.type = coord.type;
 		this.speedLimit = coord.speedLimit;
 		this.speedCategory = coord.speedCategory;
@@ -229,12 +229,12 @@ public class Coordinate {
 		this.isNearImportantePlace = isNearImportantePlace;
 	}
 	
-	public boolean isOvertake() {
-		return isOvertake;
+	public boolean isLaneChange() {
+		return isLaneChange;
 	}
 	
-	public void setOvertake(boolean isOvertake) {
-		this.isOvertake = isOvertake;
+	public void setLaneChange(boolean isOvertake) {
+		this.isLaneChange = isOvertake;
 	}
 	
 	public TransportType getTransportType() {

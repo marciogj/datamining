@@ -3,6 +3,7 @@ package br.udesc.dcc.bdes.analysis;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +65,17 @@ public class TrackEvaluator {
 
 		return cleanTrajectory;
 	}
+	
+	private void removeBadAccuracy(Trajectory trajectory) {
+		List<Coordinate> toRemove = new LinkedList<Coordinate>();
+		for (Coordinate coord : trajectory.getCoordinates()) {
+			if (coord.getAccuracy() > 15) {
+				toRemove.add(coord);
+			}
+		}
+		
+		trajectory.getCoordinates().removeAll(toRemove);
+	}
 
 	public void evaluateAggressiveness(TrackDTO trackDto) {
 		DriverId driverId = new DriverId(trackDto.userId);
@@ -73,6 +85,7 @@ public class TrackEvaluator {
 		
 		TrajectoryEvaluator trajectoryEval = new TrajectoryEvaluator(deviceId, driverId);
 		Trajectory receivedTrajectory = TrajectoryMapper.fromDto(trackDto);
+		//removeBadAccuracy(receivedTrajectory);
 		System.out.println("Received Trajectory Size: " + receivedTrajectory.size());
 
 		//Trajectory cleanedTrajectory = removeNoise(receivedTrajectory);

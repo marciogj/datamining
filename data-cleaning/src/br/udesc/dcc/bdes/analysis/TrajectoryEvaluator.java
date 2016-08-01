@@ -8,11 +8,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jongo.marshall.jackson.oid.MongoId;
 
+import br.udesc.dcc.bdes.analysis.AccInterval;
+import br.udesc.dcc.bdes.analysis.AccelerationEvaluator;
+import br.udesc.dcc.bdes.analysis.SpeedLimit;
+import br.udesc.dcc.bdes.analysis.TrackEvaluator;
+import br.udesc.dcc.bdes.analysis.TrajectoryEvaluatorId;
+import br.udesc.dcc.bdes.analysis.newapp.AccDist;
+import br.udesc.dcc.bdes.analysis.newapp.Index;
+import br.udesc.dcc.bdes.analysis.newapp.SpeedDist;
 import br.udesc.dcc.bdes.google.geocoding.GeocodeAddress;
 import br.udesc.dcc.bdes.google.geocoding.InverseGeocodingClient;
 import br.udesc.dcc.bdes.google.places.ImportantPlace;
@@ -33,16 +40,6 @@ import br.udesc.dcc.bdes.server.JettyServer;
 import br.udesc.dcc.bdes.server.rest.api.track.dto.PenaltySeverity;
 
 
-/**
- * 
- * 
- * Speed always return m/s (meter per second)
- * Distance is stored as meters
- * Time is stored in seconds
- * 
- * @author marciogj
- *
- */
 public class TrajectoryEvaluator {
 	@MongoId
 	private String _id;
@@ -80,6 +77,8 @@ public class TrajectoryEvaluator {
 	private Map<String, Double> streets = new HashMap<>();
 	private List<PenaltyAlert> alerts = new LinkedList<>();
 
+	private SpeedDist speedDist = null;
+	private AccDist accDist = new AccDist();
 
 	private SpeedIndexEval speedEvaluator = new SpeedIndexEval();
 
@@ -89,6 +88,9 @@ public class TrajectoryEvaluator {
 	
 	private double speedIndexSum = 0.0;
 	private double accIndexSum = 0.0;
+	
+	
+	private Index accIndex = new Index();
 	
 	//private List<Double> segmentDeccelerationIndexes = new LinkedList<>();
 
@@ -106,6 +108,7 @@ public class TrajectoryEvaluator {
 	private int newAlertsCount = 0;
 	
 	private int speedUnderLimitCount = 0;
+	private int speedUnder10LimitCount = 0;
 	private int speed10To20LimitCount = 0;
 	private int speed21UpTo50LimitCount = 0;
 	private int speed51UpLimitCount = 0;
@@ -127,6 +130,7 @@ public class TrajectoryEvaluator {
 	public TrajectoryEvaluator(){
 		//this._id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
 		this._id = "" + nextSequence();
+		speedDist = new SpeedDist(MAX_ALLOWED_SPEED);
 	}
 	
 	public TrajectoryEvaluator(DeviceId deviceId, DriverId driverId) {
@@ -135,90 +139,16 @@ public class TrajectoryEvaluator {
 		this.driverId = driverId.getValue();
 	}
 	
-	public DeviceId getDeviceId() {
-		return new DeviceId(deviceId);
-	}
-
-	public void setDeviceId(DeviceId deviceId) {
-		this.deviceId = deviceId.getValue();
-	}
-
-	public DriverId getDriverId() {
-		return new DriverId(driverId);
-	}
-
-	public void setDriverId(DriverId driverId) {
-		this.driverId = driverId.getValue();
-	}
-
-	public TrajectoryEvaluatorId getId() {
-		return new TrajectoryEvaluatorId(_id);
-	}
-
-	public long getLatestTimestamp() {
-		return latestTimestamp;
-	}
-	
-	public List<String> getStreets() {
-		return streets.keySet().stream().collect(Collectors.toList());
-	}
-	
-	public String getMainStreet() {
-		double max = 0;
-		String mainStreet = "";
-		for(Entry<String, Double> entry : streets.entrySet()) {
-			if (entry.getValue() > max) {
-				mainStreet = entry.getKey();
-				max = entry.getValue();
-			}
-		}
-
-		return mainStreet;
-	}
-
 	public TrajectoryEvaluator(double maxAllowedSpeed, double maxAcceleration, double maxDeceleration) {
 		super();
 		MAX_ALLOWED_SPEED = maxAllowedSpeed;
+		speedDist = new SpeedDist(MAX_ALLOWED_SPEED);
 	}
-
+	
 	public void evaluate(Collection<Coordinate> coordinates) {
 		for (Coordinate coordinate : coordinates) {
 			evaluate(coordinate);
 		}
-	}
-
-	public String getTimeInfo() {
-		if (trajectory.isEmpty()) return "-";
-		LocalDateTime startTime = trajectory.getStart().get();
-		int hour = startTime.getHour();
-		if (hour > 7 && hour < 19 ) {
-			return "Horário Comercial";
-		}
-
-		if (hour > 0 && hour < 5 ) {
-			return "Madrugada";
-		}
-
-		return "Noite"; 
-	}
-
-	public String getTrafficInfo() {
-		if (trajectory.isEmpty()) return "-";
-		LocalDateTime startTime = trajectory.getStart().get();
-		int hour = startTime.getHour();
-		if (hour > 7 && hour < 19 ) {
-			return "Trânsito Intenso";
-		}
-
-		if (hour > 0 && hour < 5 ) {
-			return "Trânsito Livre";
-		}
-
-		return "Trânsito Tranquilo"; 
-	}
-
-	public AccelerationEvaluator getAccEvaluator() {
-		return accEvaluator;
 	}
 
 	public Coordinate evaluate(Coordinate coordinate) {
@@ -237,11 +167,24 @@ public class TrajectoryEvaluator {
 		double currentSpeed = currentCoordinate.getSpeed().isPresent() ? currentCoordinate.getSpeed().get() : 0;
 		double currentAcceleration = currentCoordinate.getAcceleration();
 		double previousAcceleration = previousCoordinate.getAcceleration();
+
+		
+		//double currentAccIndex = accEvaluator.evaluate(currentAcceleration);
+		double currentAccIndex = accDist.getAccIndex(currentAcceleration); //accEvaluator.evaluate(currentAcceleration);
+		if (currentAccIndex >= 10) {
+			accIndex.add(currentAccIndex);
+		}
+		
+		
+		coordinate.setAcceleration(currentCoordinate.getAcceleration());
 		
 		totalTime += elapsedTime;
 		totalDistance += distanceFromPrevious;
 		speedSum += currentSpeed;
 
+		//new way
+		speedDist.countSpeed(currentSpeed);
+		//old way
 		countSpeedGroup(currentSpeed);
 		
 		double currentAngle = previousCoordinate.getBearing();
@@ -259,6 +202,7 @@ public class TrajectoryEvaluator {
 		
 		if (angleConsecutiveChange >= 5) {
 			System.err.println("Mudança de pista?");
+			coordinate.setLaneChange(true);
 		}
 		
 		previousAngle = currentAngle;
@@ -300,6 +244,7 @@ public class TrajectoryEvaluator {
 			accDistance = 0;
 			accSpeedSum = 0;
 			accTime = 0;
+			
 		} else {
 			accDistance += distanceFromPrevious;
 			accSpeedSum += currentAcceleration;
@@ -328,8 +273,6 @@ public class TrajectoryEvaluator {
 			segmentAccelerationIndexes.add(aggressiveAccIndex);
 		}
 		if (segmentDistance.getKilometers() >= 1) {
-			
-			
 			Optional<GeocodeAddress> optCurrentAddress = Optional.empty();
 			boolean externalData = false;
 			if (externalData) {
@@ -354,6 +297,8 @@ public class TrajectoryEvaluator {
 				//MAX_ALLOWED_SPEED = currentSpeedLimit.getMs() - factor25;
 				MAX_ALLOWED_SPEED = currentSpeedLimit.getMs();
 				speedEvaluator.changeMax(new Speed(MAX_ALLOWED_SPEED));
+				
+				speedDist.setMaxSpeed(MAX_ALLOWED_SPEED);
 			} else if (currentAddress != null) {
 				String streetName = currentAddress.getStreetName();
 				Speed currentSpeedLimit = SpeedLimit.getSpeedByAddress(streetName);
@@ -394,8 +339,10 @@ public class TrajectoryEvaluator {
 		SpeedIndexEval speedEval = new SpeedIndexEval(new Speed(MAX_ALLOWED_SPEED));
 		double evaluation = speedEval.evaluate(currentSpeed);
 		
-		if (evaluation <= 20) {
+		if (evaluation <= 0) {
 			speedUnderLimitCount++;
+		} else if (evaluation > 0 && evaluation <= 10) {
+			speedUnder10LimitCount++;
 		} else if(evaluation >= 10 && evaluation <= 20) {
 			speed10To20LimitCount++;
 		} else if (evaluation > 20 && evaluation <= 50) {
@@ -481,13 +428,45 @@ public class TrajectoryEvaluator {
 		maxAggressiveIndex = segmentIndex > maxAggressiveIndex ? segmentIndex : maxAggressiveIndex;
 	}
 	
+//	public double getAggressiveIndex() {
+//		double speedIndex = speedIndexSum/speedSegmentSize;
+//		double accIndex = accIndexSum/accSegmentSize;
+//		//double decIndex = avgIndex(trajectoryDeccelerationIndexes);
+//		//return (speedIndex + accIndex + decIndex)/3;
+//		return (speedIndex + accIndex)/2;
+//	}
+	public double getAggressiveIndex() {
+		double speedIndex = getSpeedAgressiveIndex() + getSpeedIndex();
+		double accIndex =  getAccIndex() + getAccAggressiveIndex();
+		//double accIndex = accIndexSum/accSegmentSize;
+		//double decIndex = avgIndex(trajectoryDeccelerationIndexes);
+		//return (speedIndex + accIndex + decIndex)/3;
+		return (speedIndex + accIndex)/4;
+	}
+	
+//	public double getSpeedIndex() {
+//		return speedIndexSum/speedSegmentSize;
+//	}
+	
 	public double getSpeedIndex() {
-		return speedIndexSum/speedSegmentSize;
+		return speedDist.getWeightEval2();
+	}
+	
+	public double getSpeedAgressiveIndex() {
+		return speedDist.getWeightAgressiveEval2();
+	}
+	
+	public Double getAccAggressiveIndex() {
+		// TODO Auto-generated method stub
+		return accIndex.get();
 	}
 
-	public double getAccIndex() {
+	
+	public double getAccIndex() {	
 		return accIndexSum/accSegmentSize;
 	}
+	
+	
 	
 	private void clearSegment() {
 		segmentDistance.reset();
@@ -663,13 +642,7 @@ public class TrajectoryEvaluator {
 		return totalTime;
 	}
 
-	public double getAggressiveIndex() {
-		double speedIndex = speedIndexSum/speedSegmentSize;
-		double accIndex = accIndexSum/accSegmentSize;
-		//double decIndex = avgIndex(trajectoryDeccelerationIndexes);
-		//return (speedIndex + accIndex + decIndex)/3;
-		return (speedIndex + accIndex)/2;
-	}
+	
 
 	public List<PenaltyAlert> getAlerts() {
 		return alerts;
@@ -711,6 +684,10 @@ public class TrajectoryEvaluator {
 	public Integer getSpeedUnderLimitCount() {
 		return speedUnderLimitCount;
 	}
+	
+	public Integer getSpeed0To10LimitCount() {
+		return speedUnder10LimitCount;
+	}
 
 	public void addAll(List<ImportantPlace> places) {
 		for (ImportantPlace place : places) {
@@ -721,59 +698,84 @@ public class TrajectoryEvaluator {
 	public List<ImportantPlace> getImportantPlaces() {
 		return importantPlaces.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
 	}
-
-}
-
-class AccInterval {
-	private Coordinate start;
-	private Coordinate end;
-	private double speedAvg;
-	private double distance;
-	private long time;
-
-	public AccInterval(Coordinate accelerationStart, Coordinate accelerationEnd) {
-		start = accelerationStart;
-		end = accelerationEnd;
+	
+	public DeviceId getDeviceId() {
+		return new DeviceId(deviceId);
 	}
 
-	public Coordinate getStart() {
-		return start;
+	public void setDeviceId(DeviceId deviceId) {
+		this.deviceId = deviceId.getValue();
 	}
 
-	public void setStart(Coordinate start) {
-		this.start = start;
+	public DriverId getDriverId() {
+		return new DriverId(driverId);
 	}
 
-	public Coordinate getEnd() {
-		return end;
+	public void setDriverId(DriverId driverId) {
+		this.driverId = driverId.getValue();
 	}
 
-	public void setEnd(Coordinate end) {
-		this.end = end;
+	public TrajectoryEvaluatorId getId() {
+		return new TrajectoryEvaluatorId(_id);
 	}
 
-	public double getSpeedAvg() {
-		return speedAvg;
+	public long getLatestTimestamp() {
+		return latestTimestamp;
+	}
+	
+	public List<String> getStreets() {
+		return streets.keySet().stream().collect(Collectors.toList());
+	}
+	
+	public String getMainStreet() {
+		double max = 0;
+		String mainStreet = "";
+		for(Entry<String, Double> entry : streets.entrySet()) {
+			if (entry.getValue() > max) {
+				mainStreet = entry.getKey();
+				max = entry.getValue();
+			}
+		}
+
+		return mainStreet;
+	}
+	
+	public String getTimeInfo() {
+		if (trajectory.isEmpty()) return "-";
+		LocalDateTime startTime = trajectory.getStart().get();
+		int hour = startTime.getHour();
+		if (hour > 7 && hour < 19 ) {
+			return "Horário Comercial";
+		}
+
+		if (hour > 0 && hour < 5 ) {
+			return "Madrugada";
+		}
+
+		return "Noite"; 
 	}
 
-	public void setSpeedAvg(double speedAvg) {
-		this.speedAvg = speedAvg;
+	public String getTrafficInfo() {
+		if (trajectory.isEmpty()) return "-";
+		LocalDateTime startTime = trajectory.getStart().get();
+		int hour = startTime.getHour();
+		if (hour > 7 && hour < 19 ) {
+			return "Trânsito Intenso";
+		}
+
+		if (hour > 0 && hour < 5 ) {
+			return "Trânsito Livre";
+		}
+
+		return "Trânsito Tranquilo"; 
 	}
 
-	public double getDistance() {
-		return distance;
+	public AccelerationEvaluator getAccEvaluator() {
+		return accEvaluator;
 	}
 
-	public void setDistance(double distance) {
-		this.distance = distance;
-	}
+	
 
-	public long getTime() {
-		return time;
-	}
-
-	public void setTime(long time) {
-		this.time = time;
-	}
+	
 
 }

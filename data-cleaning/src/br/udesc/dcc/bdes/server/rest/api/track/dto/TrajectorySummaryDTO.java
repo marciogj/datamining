@@ -30,8 +30,12 @@ public class TrajectorySummaryDTO {
 	public Integer speedChanges; //= "455";
 	
 	public Double agressiveIndex; //= "62";
-	public Double speedAgressiveIndex;
+	public Double speedAgressiveIndex; //indice apenas da agressividade
+	public Double speedAvgIndex; //indice amortizado pelos momentos não agressivos
+	
 	public Double accAgressiveIndex;
+	public Double accAvgIndex;
+	
 	public Double maxAgressiveIndex; //= "62";
 	public String overtakeCount; // = "15";
 	public Integer coordinateCount;
@@ -43,6 +47,7 @@ public class TrajectorySummaryDTO {
 	public Integer speed10To20LimitCount = 0;
 	public Integer speed21UpTo50LimitCount = 0;
 	public Integer speed51UpLimitCount = 0;
+	public Integer speed0To10LimitCount = 0;
 	
 
 }

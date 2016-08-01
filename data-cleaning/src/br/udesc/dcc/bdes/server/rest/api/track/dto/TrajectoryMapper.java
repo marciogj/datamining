@@ -97,15 +97,23 @@ public class TrajectoryMapper {
 		dto.trajectoryTime = telemetry.trajectoryTime.getTime();
 		dto.coordinateCount = evaluation.getTrajectory().size();
 		dto.accEvaluation = toDto(evaluation.getAccEvaluator());
+		
+		
 		dto.agressiveIndex = evaluation.getAggressiveIndex(); 
 		dto.maxAgressiveIndex = evaluation.getMaxAggressiveIndex();
-		dto.speedAgressiveIndex = evaluation.getSpeedIndex();
-		dto.accAgressiveIndex = evaluation.getAccIndex();
+		
+		dto.speedAgressiveIndex = evaluation.getSpeedAgressiveIndex();
+		dto.speedAvgIndex = evaluation.getSpeedIndex();
+		
+		dto.accAgressiveIndex = evaluation.getAccAggressiveIndex();
+		dto.accAvgIndex = evaluation.getAccIndex();
+		
 		dto.mainStreet = evaluation.getMainStreet();
 		dto.streets = evaluation.getStreets();
 		dto.wheatherCondition = "-";
 		
 		dto.speedUnderLimitCount = evaluation.getSpeedUnderLimitCount();
+		dto.speed0To10LimitCount = evaluation.getSpeed0To10LimitCount();
 		dto.speed10To20LimitCount = evaluation.getSpeed10To20LimitCount();
 		dto.speed21UpTo50LimitCount = evaluation.getSpeed21UpTo50LimitCount();
 		dto.speed51UpLimitCount = evaluation.getSpeed51UpLimitCount();

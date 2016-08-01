@@ -51,6 +51,7 @@ public class AccelerationEvaluator {
 	
 	public double evaluate(double acceleration) {
 		Pair<Double, Double> limits = getLimts(acceleration);
+		
 		double maxValue = limits.getFirst();
 		double maxPercentage = limits.getSecond();
 		double value = (Math.abs(acceleration) * maxPercentage)/maxValue;
@@ -61,7 +62,7 @@ public class AccelerationEvaluator {
 		double maxValue = 0;
 		double maxPercentage = 0;
 		if (acceleration < 0 && acceleration >= -3.0) {
-			maxPercentage = 10;
+			maxPercentage = 0;
 			maxValue = 3.0;
 		} else if (acceleration <= -3.1 && acceleration >= -4.0) {
 			maxPercentage = 20;
@@ -76,7 +77,7 @@ public class AccelerationEvaluator {
 			maxPercentage = 100;
 			maxValue = 12;
 		} else if (acceleration > 0 && acceleration <= 2.5) {
-			maxPercentage = 10;
+			maxPercentage = 0;
 			maxValue = 2.5;
 		} else if (acceleration >= 2.6 && acceleration <= 3.0) {
 			maxPercentage = 20;
