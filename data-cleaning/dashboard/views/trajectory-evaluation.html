@@ -119,9 +119,11 @@
 	    <div class="inner">
 	      <h3></h3>
 	      <p>{{vm.evaluation.wheatherCondition}}</p>
-		  <p>{{vm.evaluation.trafficCondition}}</p>
-		  <h4>{{vm.evaluation.speedAgressiveIndex | number:2}} | {{vm.evaluation.accAgressiveIndex | number:2}}</h4>
-	      <p>Speed Index | Acc Index</p>
+		  <h4>{{vm.evaluation.speedAgressiveIndex | number:2}} | {{vm.evaluation.speedAvgIndex | number:2}}</h4>
+	      <p>Speed Indexes</p>
+
+	      <h4>{{vm.evaluation.accAvgIndex | number:2}} | {{vm.evaluation.accAgressiveIndex | number:2}}</h4>
+	      <p>Acc Indexes</p>
 	    </div>
 	    <div class="icon">
 	      <i class="ion ion-ios-cloudy-night"></i>
@@ -131,17 +133,61 @@
 	</div><!-- ./col -->
 </div><!-- /.row -->
 
-<strong>Distribuição da Velocidade:</strong>
-Dentro do limite: {{vm.evaluation.speedUnderLimitCount}}<br/>
+<strong>Distribuição da Velocidade:</strong><br/>
+<!-- Dentro do limite: {{vm.evaluation.speedUnderLimitCount}}<br/>
 De 10% até 20%: {{vm.evaluation.speed10To20LimitCount}}<br/>
 De 20% até 50%: {{vm.evaluation.speed21UpTo50LimitCount}}<br/>
 Acima de 50%: {{vm.evaluation.speed51UpLimitCount}}<br/><br/>
+-->
+<table class="table table-striped">
+	<tr>
+		<th>Limite</td>
+		<th>Total</td>
+		<th>Percentual</td>
+	</tr>
+	<tr>
+		<td>Dentro do limite</td>
+		<td>{{vm.evalSpeed[0].count}}</td>
+		<td>{{vm.evalSpeed[0].percent | number:2}}%</td>
+	</tr>
+	<tr>
+		<td>De 10% até 20%</td>
+		<td>{{vm.evalSpeed[1].count}}</td>
+		<td>{{vm.evalSpeed[1].percent | number:2}}%</td>
+	</tr>
+	<tr>
+		<td>De 20% até 50%</td>
+		<td>{{vm.evalSpeed[2].count}}</td>
+		<td>{{vm.evalSpeed[2].percent | number:2}}%</td>
+	</tr>
+	<tr>
+		<td>Acima de 50%</td>
+		<td>{{vm.evalSpeed[3].count}}</td>
+		<td>{{vm.evalSpeed[3].percent | number:2}}%</td>
+	</tr>
+</table>
+
 
 <strong>Distribuição da Aceleração (Avg: {{vm.evaluation.accEvaluation.fullAvg | number: 2}} | Acc Avg: {{vm.evaluation.accEvaluation.accAvg | number: 2}} | Dec Avg: {{vm.evaluation.accEvaluation.desaccAvg | number: 2}}):</strong>
 
+<table class="table table-striped">
+	<tr>
+		<th>Limite</td>
+		<th>Total</td>
+		<th>Média</td>
+	</tr>
+	<tr ng-repeat="accLimit in vm.evaluation.accEvaluation.limitCount">
+		<td>{{accLimit.description}}</td>
+		<td>{{accLimit.count}}</td>
+		<td>{{accLimit.avg | number: 2}}</td>
+	</tr>
+</table>
+
+<!--
 <ul class="list-unstyled" ng-repeat="accLimit in vm.evaluation.accEvaluation.limitCount">
 <li>{{accLimit.description}}: {{accLimit.count}} - AVG({{accLimit.avg | number: 2}})</li>
 </ul>
+-->
 
 
 <hr>

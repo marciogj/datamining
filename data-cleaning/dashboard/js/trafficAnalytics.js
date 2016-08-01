@@ -458,6 +458,8 @@ app.controller('driverProfileCtrl',  ['$scope','$stateParams', '$http',  functio
 app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', function($scope , $stateParams, $http){
 	var self = this;
 	console.log('trajectoryEvaluationCtrl initialized ' +  $stateParams.id);
+	self.evaluation = undefined;
+	self.evalSpeed = undefined;
 
 
 	var loadEvaluation = function(evaluationId) {
@@ -478,11 +480,23 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 			}
 
 			console.log(evaluation);
+
 			self.evaluation = evaluation;
-          
+          	self.evalSpeed = speedPercentage(evaluation);
+          	
           }).error(function(data, status, header, config) {
           	console.log('Error! Status: ' + status + ' Header: ');
           });
+	};
+
+	var speedPercentage = function(evaluation) {
+		var total = evaluation.speedUnderLimitCount + evaluation.speed10To20LimitCount + evaluation.speed21UpTo50LimitCount + evaluation.speed51UpLimitCount;
+		var speedDist = [];
+		speedDist[0] = { count: evaluation.speedUnderLimitCount, percent: (evaluation.speedUnderLimitCount*100)/total };
+		speedDist[1] = { count: evaluation.speed10To20LimitCount, percent: (evaluation.speed10To20LimitCount*100)/total };
+		speedDist[2] = { count: evaluation.speed21UpTo50LimitCount, percent: (evaluation.speed21UpTo50LimitCount*100)/total };
+		speedDist[3] = { count: evaluation.speed51UpLimitCount, percent: (evaluation.speed51UpLimitCount*100)/total };
+		return speedDist;
 	};
 
 	loadEvaluation($stateParams.id);
