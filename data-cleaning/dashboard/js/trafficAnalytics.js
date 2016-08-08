@@ -483,21 +483,28 @@ app.controller('trajectoryEvaluationCtrl',  ['$scope','$stateParams', '$http', f
 
 			self.evaluation = evaluation;
           	self.evalSpeed = speedPercentage(evaluation);
-          	
+
           }).error(function(data, status, header, config) {
           	console.log('Error! Status: ' + status + ' Header: ');
           });
 	};
 
+
 	var speedPercentage = function(evaluation) {
-		var total = evaluation.speedUnderLimitCount + evaluation.speed10To20LimitCount + evaluation.speed21UpTo50LimitCount + evaluation.speed51UpLimitCount;
+		var dist = evaluation.speedDist;
+		console.log(dist);
+		var total = dist.totalCount;
+
 		var speedDist = [];
-		speedDist[0] = { count: evaluation.speedUnderLimitCount, percent: (evaluation.speedUnderLimitCount*100)/total };
-		speedDist[1] = { count: evaluation.speed10To20LimitCount, percent: (evaluation.speed10To20LimitCount*100)/total };
-		speedDist[2] = { count: evaluation.speed21UpTo50LimitCount, percent: (evaluation.speed21UpTo50LimitCount*100)/total };
-		speedDist[3] = { count: evaluation.speed51UpLimitCount, percent: (evaluation.speed51UpLimitCount*100)/total };
+		speedDist[0] = { count: dist.underLimit,    percent: dist.underLimitPerc,    avg: dist.underLimitAvg };
+		speedDist[1] = { count: dist.fromLimitTo10, percent: dist.fromLimitTo10Perc, avg: dist.fromLimitTo10Avg  };
+		speedDist[2] = { count: dist.from10to20,    percent: dist.from10to20Perc,    avg: dist.from10to20Avg  };
+		speedDist[3] = { count: dist.from20to50,    percent: dist.from20to50Perc,    avg: dist.from20to50Avg  };
+		speedDist[4] = { count: dist.over50,        percent: dist.over50Perc,        avg: dist.over50Avg  };
+		console.log('Coordenadas: ' + total);
 		return speedDist;
 	};
+
 
 	loadEvaluation($stateParams.id);
 

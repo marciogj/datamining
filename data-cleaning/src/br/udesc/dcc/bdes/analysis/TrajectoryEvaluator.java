@@ -51,7 +51,7 @@ public class TrajectoryEvaluator {
 	private final Trajectory trajectory = new Trajectory();
 	private Coordinate previousCoordinate = null;
 	
-	private double MAX_ALLOWED_SPEED = 13.89; //50 km/h
+	private double MAX_ALLOWED_SPEED = 80/3.6; //80 km/h
 
 	private double totalDistance;
 	private long totalTime;
@@ -59,6 +59,7 @@ public class TrajectoryEvaluator {
 	private double maxSpeed;
 	private double maxAccecelration;
 	private double maxDeceleration;
+	private double accecelerationSum;
 	private int accecelerationCount;
 	private int decelerationCount;
 	private Collection<AccInterval> accelerations = new LinkedList<>();
@@ -107,11 +108,7 @@ public class TrajectoryEvaluator {
 	private PenaltyAlert accAlert = null;
 	private int newAlertsCount = 0;
 	
-	private int speedUnderLimitCount = 0;
-	private int speedUnder10LimitCount = 0;
-	private int speed10To20LimitCount = 0;
-	private int speed21UpTo50LimitCount = 0;
-	private int speed51UpLimitCount = 0;
+
 
 	//tmp
 	public static int sequence = 1;
@@ -184,8 +181,7 @@ public class TrajectoryEvaluator {
 
 		//new way
 		speedDist.countSpeed(currentSpeed);
-		//old way
-		countSpeedGroup(currentSpeed);
+		
 		
 		double currentAngle = previousCoordinate.getBearing();
 		//System.out.println("Angle " + currentAngle + " vs " + currentCoordinate.getBearing());
@@ -227,6 +223,7 @@ public class TrajectoryEvaluator {
 		boolean isAccelerationInverted = (previousAcceleration > 0) && (currentAcceleration < 0);
 		boolean isDecelerationInverted = (previousAcceleration < 0) && (currentAcceleration > 0);
 
+		accecelerationSum += Math.abs(currentAcceleration);
 		if (isAccelerationInverted) {
 			decelerationCount++;
 		} else if (isDecelerationInverted) {
@@ -334,26 +331,10 @@ public class TrajectoryEvaluator {
 		return Optional.empty();
 	}
 	
-
-	private void countSpeedGroup(double currentSpeed) {
-		SpeedIndexEval speedEval = new SpeedIndexEval(new Speed(MAX_ALLOWED_SPEED));
-		double evaluation = speedEval.evaluate(currentSpeed);
-		
-		if (evaluation <= 0) {
-			speedUnderLimitCount++;
-		} else if (evaluation > 0 && evaluation <= 10) {
-			speedUnder10LimitCount++;
-		} else if(evaluation >= 10 && evaluation <= 20) {
-			speed10To20LimitCount++;
-		} else if (evaluation > 20 && evaluation <= 50) {
-			speed21UpTo50LimitCount++;
-		} else if (evaluation > 50) {
-			String roadname = currentAddress == null ? "?" : currentAddress.getStreetName();
-			//System.out.println("Speed " + new Speed(currentSpeed).getKmh() + " over max(" + new Speed(MAX_ALLOWED_SPEED).getKmh() + ") on road " + roadname);
-			speed51UpLimitCount++;
-		}
-		
+	public double getAccelerationAvg() {
+		return accecelerationSum/accCoordinateCount;
 	}
+		
 
 	private Optional<PenaltyAlert> updateEvaluationPenalties(Optional<PenaltyAlert> newAlert, Optional<PenaltyAlert> currentAlert, Coordinate coordinate, double distanceFromPrevious, double value ) {
 		//case 1. The alert is continuous from previous coordinate
@@ -669,26 +650,6 @@ public class TrajectoryEvaluator {
 		return maxAggressiveIndex;
 	}
 
-	public int getSpeed10To20LimitCount() {
-		return speed10To20LimitCount;
-	}
-
-	public int getSpeed21UpTo50LimitCount() {
-		return speed21UpTo50LimitCount;
-	}
-
-	public int getSpeed51UpLimitCount() {
-		return speed51UpLimitCount;
-	}
-
-	public Integer getSpeedUnderLimitCount() {
-		return speedUnderLimitCount;
-	}
-	
-	public Integer getSpeed0To10LimitCount() {
-		return speedUnder10LimitCount;
-	}
-
 	public void addAll(List<ImportantPlace> places) {
 		for (ImportantPlace place : places) {
 			importantPlaces.put(place.getName(), place);
@@ -774,8 +735,8 @@ public class TrajectoryEvaluator {
 		return accEvaluator;
 	}
 
-	
-
-	
+	public SpeedDist getSpeedDist() {
+		return speedDist;
+	}	
 
 }

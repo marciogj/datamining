@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import br.udesc.dcc.bdes.analysis.AccelerationEvaluator;
 import br.udesc.dcc.bdes.analysis.AccelerationLimit;
 import br.udesc.dcc.bdes.analysis.TrajectoryEvaluator;
+import br.udesc.dcc.bdes.analysis.newapp.SpeedDist;
 import br.udesc.dcc.bdes.google.places.ImportantPlace;
 import br.udesc.dcc.bdes.model.Acceleration;
 import br.udesc.dcc.bdes.model.Coordinate;
@@ -87,7 +88,7 @@ public class TrajectoryMapper {
 		dto.maxSpeed = telemetry.maxSpeed.getKmh();
 		dto.maxAcc = telemetry.maxAcc.getMPerSec2(); 
 		dto.maxDec = telemetry.maxDec.getMPerSec2();
-		dto.avgAcc = (Math.abs(telemetry.maxAcc.getMPerSec2()) + Math.abs(telemetry.maxDec.getMPerSec2()) )/2; 
+		dto.avgAcc = evaluation.getAccelerationAvg();
 		dto.overtakeCount = "-";
 		dto.riskAlerts = evaluation.getAlerts().size();
 		dto.speedChanges = telemetry.accCount + telemetry.decCount;
@@ -112,11 +113,7 @@ public class TrajectoryMapper {
 		dto.streets = evaluation.getStreets();
 		dto.wheatherCondition = "-";
 		
-		dto.speedUnderLimitCount = evaluation.getSpeedUnderLimitCount();
-		dto.speed0To10LimitCount = evaluation.getSpeed0To10LimitCount();
-		dto.speed10To20LimitCount = evaluation.getSpeed10To20LimitCount();
-		dto.speed21UpTo50LimitCount = evaluation.getSpeed21UpTo50LimitCount();
-		dto.speed51UpLimitCount = evaluation.getSpeed51UpLimitCount();
+		dto.speedDist = toDTO(evaluation.getSpeedDist());
 		
 		Optional<OpenWeatherConditionDTO> weatherData = evaluation.getCurrentWeather();
 		if(weatherData.isPresent()) {
@@ -126,6 +123,33 @@ public class TrajectoryMapper {
 			}
 		}
 	
+		return dto;
+	}
+	
+	public static SpeedDistDTO toDTO(SpeedDist entity) {
+		SpeedDistDTO dto = new SpeedDistDTO();
+		
+		dto.underLimit= entity.getUnderLimit();
+		dto.fromLimitTo10= entity.getFromLimitTo10();
+		dto.from10to20= entity.getFrom10to20();
+		dto.from20to50= entity.getFrom20to50();
+		dto.over50= entity.getOver50();
+		
+		dto.totalCount= entity.getTotal();
+		
+		dto.underLimitAvg= entity.getUnderLimitAvg() ;
+		dto.fromLimitTo10Avg= entity.getFromLimitTo10Avg();
+		dto.from10to20Avg= entity.getFrom10to20Avg();
+		dto.from20to50Avg= entity.getFrom20to50Avg();
+		dto.over50Avg= entity.getOver50Avg();
+		
+		
+		dto.underLimitPerc= (entity.getUnderLimit()*100)/entity.getTotal();
+		dto.fromLimitTo10Perc= (entity.getFromLimitTo10()*100)/entity.getTotal();
+		dto.from10to20Perc= (entity.getFrom10to20()*100)/entity.getTotal();
+		dto.from20to50Perc= (entity.getFrom20to50()*100)/entity.getTotal();
+		dto.over50Perc= (entity.getOver50()*100)/entity.getTotal();
+		
 		return dto;
 	}
 

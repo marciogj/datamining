@@ -24,6 +24,14 @@ public class AccDist {
 	double accFromMinus43toMinus73Sum;
 	double accFromMinus73toInfinitySum;
 	
+	public static final double DEC_LIMIT_1= -3.0; 
+	public static final double DEC_LIMIT_2= -6.0;
+	public static final double DEC_LIMIT_3= -9.0;
+	
+	public static final double ACC_LIMIT_1= 2.5; 
+	public static final double ACC_LIMIT_2= 4.3;
+	public static final double ACC_LIMIT_3= -9.0;
+	
 	
 	
 	public AccDist() {}
@@ -39,6 +47,7 @@ public class AccDist {
 			return Interval.of(50, 100);
 		} else if (accMss > 0 && accMss <= 2.5) {
 			return Interval.of(0, 10);
+			
 		} else if (accMss > 2.5 && accMss <= 4.3) {
 			return Interval.of(10, 20);
 		} else if (accMss > 4.3 && accMss <= 7.3) {

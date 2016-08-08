@@ -17,9 +17,10 @@ public class TrackDTOv2CSVFileWriter {
 						coordinate.dateTime + ", " +
 						coordinate.longitude + ", " + 
 						coordinate.latitude + ", " + 
+						coordinate.altitude + ", " +
 						coordinate.accuracy + ", " +
 						coordinate.bearing + ", " + 
-						coordinate.speed + ", "
+						coordinate.speed 
 				);
 			}
 			writer.close();

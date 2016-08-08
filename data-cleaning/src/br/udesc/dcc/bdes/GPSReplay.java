@@ -30,7 +30,7 @@ public class GPSReplay {
 	public static void main(String[] args) {
 		System.out.println("Simulating GPS coordinates from recorded files...");
 		//String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\GPSTrackerDEBUG";
-		String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\AnaliseMestrado";
+		String baseDir = "C:\\Users\\marciogj\\SkyDrive\\GPS_DATA\\AnaliseMestrado2";
 		Locale.setDefault(Locale.US);
 		File dir = new File(baseDir);
 		

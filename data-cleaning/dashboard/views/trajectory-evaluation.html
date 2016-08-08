@@ -119,10 +119,21 @@
 	    <div class="inner">
 	      <h3></h3>
 	      <p>{{vm.evaluation.wheatherCondition}}</p>
-		  <h4>{{vm.evaluation.speedAgressiveIndex | number:2}} | {{vm.evaluation.speedAvgIndex | number:2}}</h4>
+		  <h4>{{vm.evaluation.speedAgressiveIndex | number:2}} | 
+		  	{{vm.evaluation.speedAvgIndex | number:2}} |
+		  	{{(vm.evaluation.speedAgressiveIndex * 0.6) + (vm.evaluation.speedAvgIndex * 0.4)  | number:2}}
+		  </h4>
 	      <p>Speed Indexes</p>
 
-	      <h4>{{vm.evaluation.accAvgIndex | number:2}} | {{vm.evaluation.accAgressiveIndex | number:2}}</h4>
+	      <h4>{{vm.evaluation.accAvgIndex | number:2}} |
+	       {{vm.evaluation.accAgressiveIndex | number:2}} |
+	       {{ (vm.evaluation.accAgressiveIndex * 0.6) + (vm.evaluation.accAvgIndex * 0.4) | number:2}}
+	   	  </h4>
+
+	   	  <h4></h4>
+		{{  ( ((vm.evaluation.accAgressiveIndex * 0.6) + (vm.evaluation.accAvgIndex * 0.4)) 
+		  +  ((vm.evaluation.speedAgressiveIndex * 0.6) + (vm.evaluation.speedAvgIndex * 0.4)) ) /2 | number:2 }}
+
 	      <p>Acc Indexes</p>
 	    </div>
 	    <div class="icon">
@@ -144,26 +155,37 @@ Acima de 50%: {{vm.evaluation.speed51UpLimitCount}}<br/><br/>
 		<th>Limite</td>
 		<th>Total</td>
 		<th>Percentual</td>
+		<th>Média</td>
 	</tr>
 	<tr>
 		<td>Dentro do limite</td>
 		<td>{{vm.evalSpeed[0].count}}</td>
 		<td>{{vm.evalSpeed[0].percent | number:2}}%</td>
+		<td>{{vm.evalSpeed[0].avg | number:2}}</td>
+	</tr>
+	<tr>
+		<td>Até 10% do limite</td>
+		<td>{{vm.evalSpeed[1].count}}</td>
+		<td>{{vm.evalSpeed[1].percent | number:2}}%</td>
+		<td>{{vm.evalSpeed[1].avg | number:2}}</td>
 	</tr>
 	<tr>
 		<td>De 10% até 20%</td>
-		<td>{{vm.evalSpeed[1].count}}</td>
-		<td>{{vm.evalSpeed[1].percent | number:2}}%</td>
+		<td>{{vm.evalSpeed[2].count}}</td>
+		<td>{{vm.evalSpeed[2].percent | number:2}}%</td>
+		<td>{{vm.evalSpeed[2].avg | number:2}}</td>
 	</tr>
 	<tr>
 		<td>De 20% até 50%</td>
-		<td>{{vm.evalSpeed[2].count}}</td>
-		<td>{{vm.evalSpeed[2].percent | number:2}}%</td>
+		<td>{{vm.evalSpeed[3].count}}</td>
+		<td>{{vm.evalSpeed[3].percent | number:2}}%</td>
+		<td>{{vm.evalSpeed[3].avg | number:2}}</td>
 	</tr>
 	<tr>
 		<td>Acima de 50%</td>
-		<td>{{vm.evalSpeed[3].count}}</td>
-		<td>{{vm.evalSpeed[3].percent | number:2}}%</td>
+		<td>{{vm.evalSpeed[4].count}}</td>
+		<td>{{vm.evalSpeed[4].percent | number:2}}%</td>
+		<td>{{vm.evalSpeed[4].avg | number:2}}</td>
 	</tr>
 </table>
 

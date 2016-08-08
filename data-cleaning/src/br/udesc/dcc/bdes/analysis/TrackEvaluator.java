@@ -78,9 +78,11 @@ public class TrackEvaluator {
 	}
 
 	public void evaluateAggressiveness(TrackDTO trackDto) {
-		DriverId driverId = new DriverId(trackDto.userId);
-		DeviceId deviceId = new DeviceId(trackDto.deviceId);
-
+		//DriverId driverId = new DriverId(trackDto.userId);
+		//DeviceId deviceId = new DeviceId(trackDto.deviceId);
+		DriverId driverId = new DriverId("marcio.jasinski");
+		DeviceId deviceId = new DeviceId("moto-x");
+		
 		DriverProfile driverProfile = repository.loadOrCreate(driverId, deviceId);
 		
 		TrajectoryEvaluator trajectoryEval = new TrajectoryEvaluator(deviceId, driverId);

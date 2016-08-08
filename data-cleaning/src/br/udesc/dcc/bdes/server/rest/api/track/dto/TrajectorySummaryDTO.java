@@ -43,11 +43,8 @@ public class TrajectorySummaryDTO {
 	public AccelerationCountDTO accEvaluation;
 	public Double avgAcc; 
 	
-	public Integer speedUnderLimitCount = 0;
-	public Integer speed10To20LimitCount = 0;
-	public Integer speed21UpTo50LimitCount = 0;
-	public Integer speed51UpLimitCount = 0;
-	public Integer speed0To10LimitCount = 0;
+	public SpeedDistDTO speedDist;
+	
 	
 
 }

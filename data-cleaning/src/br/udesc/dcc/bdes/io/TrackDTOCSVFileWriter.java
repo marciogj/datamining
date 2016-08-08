@@ -17,9 +17,10 @@ public class TrackDTOCSVFileWriter {
 						coordinate.timestamp + ", " +
 						coordinate.longitude + ", " + 
 						coordinate.latitude + ", " + 
+						coordinate.altitude + ", " +
 						coordinate.accuracy + ", " +
 						coordinate.bearing + ", " + 
-						coordinate.speed + ", "
+						coordinate.speed
 				);
 			}
 			writer.close();

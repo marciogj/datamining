@@ -1,7 +1,6 @@
 package br.udesc.dcc.bdes.analysis.newapp;
 
 public class SpeedDist {
-	private int under50Limit;
 	private int underLimit;
 	private int fromLimitTo10;
 	private int from10to20;
@@ -10,7 +9,6 @@ public class SpeedDist {
 	
 	private int totalCount;
 	
-	private double under50LimitWSum;
 	private double underLimitWSum;
 	private double fromLimitTo10WSum;
 	private double from10to20WSum;
@@ -23,7 +21,6 @@ public class SpeedDist {
 	static double WEIGHT_UPTO10_LIMIT = 1; // Seguro
 	static double WEIGHT_10TO20_LIMIT = 1.5; //agressivo moderado
 	static double WEIGHT_20TO50_LIMIT = 3.0; //agressivo impulsivo
-	//static double WEIGHT_OVER50_LIMIT = 1.75;	
 	static double WEIGHT_OVER50_LIMIT = 5.00; //perigoso
 	
 	public SpeedDist(double maxSpeed) {
@@ -73,9 +70,7 @@ public class SpeedDist {
 		double diffMinMax = speedInterval.diff();
 		double valueProp = limitPercentage - speedInterval.min;
 		double weightPerc = (valueProp * 100)/diffMinMax; 
-		
 		double diffMinMaxWeight = weightInterval.diff();
-		
 		double value = (weightPerc * diffMinMaxWeight)/100; 
 		
 		return weightInterval.min + value;
@@ -83,11 +78,8 @@ public class SpeedDist {
 	
 	public void countSpeed(double speedMs) {
 		double limitPercentage = this.eval(speedMs);
-		//double speedWeight = this.getSpeedWeight(speedMs);
 		totalCount++;
-		//if (limitPercentage > -50 && limitPercentage < 0) {
-		//	under50Limit++;
-		//} else 
+		
 		if (limitPercentage <= 0) {
 			underLimit++;
 			underLimitWSum += limitPercentage;
@@ -116,14 +108,12 @@ public class SpeedDist {
 	}	
 	
 	public double getWeightEval() {
-		//double a = under50Limit <= 0 ? 0 : under50LimitWSum/under50Limit;
 		double b = underLimit <= 0 ? 0 : underLimitWSum/underLimit;
 		double c = fromLimitTo10 <=  0 ? 0 : fromLimitTo10WSum/fromLimitTo10;
 		double d = from10to20 <= 0 ? 0 : from10to20WSum/from10to20;
 		double e = from20to50 <= 0 ? 0 : from20to50WSum/from20to50;
 		double f = over50 <= 0 ? 0 : over50WSum/over50;
 		
-		//double ap = proportion(under50Limit, totalCount);
 		double bp = proportion(underLimit, totalCount)/100;
 		double cp = proportion(fromLimitTo10, totalCount)/100;
 		double dp = proportion(from10to20, totalCount)/100;
@@ -131,19 +121,16 @@ public class SpeedDist {
 		double fp = proportion(over50, totalCount)/100;
 		
 		double index = b*bp + c*cp + d*dp + e*ep + f*fp;
-		
 		return index > 100 ? 100 : index;
 	}
 	
 	public double getWeightEval2() {
-		//double a = under50Limit <= 0 ? 0 : under50LimitWSum/under50Limit;
 		double b = underLimit <= 0 ? 0 : underLimitWSum/underLimit;
 		double c = fromLimitTo10 <=  0 ? 0 : fromLimitTo10WSum/fromLimitTo10;
 		double d = from10to20 <= 0 ? 0 : from10to20WSum/from10to20;
 		double e = from20to50 <= 0 ? 0 : from20to50WSum/from20to50;
 		double f = over50 <= 0 ? 0 : over50WSum/over50;
 		
-		//double ap = proportion(under50Limit, totalCount);
 		double bp = proportion(underLimit, totalCount)/100;
 		double cp = proportion(fromLimitTo10, totalCount)/100;
 		double dp = proportion(from10to20, totalCount)/100;
@@ -158,20 +145,14 @@ public class SpeedDist {
 		fp = fp * WEIGHT_OVER50_LIMIT;
 		
 		double index =b*bp + c*cp + d*dp + e*ep + f*fp;
-		
 		return index > 100 ? 100 : index;
-		
 	}
 	
 	public double getWeightEval3() {
-		//double a = under50Limit <= 0 ? 0 : under50LimitWSum/under50Limit;
-		double b = underLimit <= 0 ? 0 : underLimitWSum/underLimit;
 		double c = fromLimitTo10 <=  0 ? 0 : fromLimitTo10WSum/fromLimitTo10;
 		double d = from10to20 <= 0 ? 0 : from10to20WSum/from10to20;
 		double e = from20to50 <= 0 ? 0 : from20to50WSum/from20to50;
 		double f = over50 <= 0 ? 0 : over50WSum/over50;
-		
-		
 		
 		return (c+d+e+f)/4;
 		
@@ -179,15 +160,12 @@ public class SpeedDist {
 	
 	
 	public double getWeightAgressiveEval2() {
-		//double a = under50Limit <= 0 ? 0 : under50LimitWSum/under50Limit;
 		int aggressiveCount = fromLimitTo10 + from10to20 + from20to50 + over50;
 		
 		double c = fromLimitTo10 <=  0 ? 0 : fromLimitTo10WSum/fromLimitTo10;
 		double d = from10to20 <= 0 ? 0 : from10to20WSum/from10to20;
 		double e = from20to50 <= 0 ? 0 : from20to50WSum/from20to50;
 		double f = over50 <= 0 ? 0 : over50WSum/over50;
-		
-		//double ap = proportion(under50Limit, totalCount);
 		
 		double cp = proportion(fromLimitTo10, aggressiveCount)/100;
 		double dp = proportion(from10to20, aggressiveCount)/100;
@@ -200,9 +178,56 @@ public class SpeedDist {
 		fp = fp * WEIGHT_OVER50_LIMIT;
 		
 		double index = c*cp + d*dp + e*ep + f*fp;
-		
 		return index > 100 ? 100 : index;
-		
+	}
+
+	public int getFromLimitTo10() {
+		return fromLimitTo10;
+	}
+
+	public int getFrom10to20() {
+		return from10to20;
+	}
+
+	public int getFrom20to50() {
+		return from20to50;
+	}
+
+	public int getOver50() {
+		return over50;
+	}
+
+	public int getUnderLimit() {
+		return underLimit;
+	}
+
+	public int getTotal() {
+		return totalCount;
+	}
+
+	public double getUnderLimitAvg() {
+		if (underLimit == 0) return 0;
+		return underLimitWSum/underLimit;
+	}
+
+	public double getFrom10to20Avg() {
+		if (from10to20 == 0) return 0;
+		return from10to20WSum/from10to20;
+	}
+
+	public double getFromLimitTo10Avg() {
+		if (fromLimitTo10 == 0) return 0;
+		return fromLimitTo10WSum/fromLimitTo10;
+	}
+
+	public double getFrom20to50Avg() {
+		if (from20to50 == 0) return 0;
+		return from20to50WSum/from20to50;
+	}
+
+	public double getOver50Avg() {
+		if (over50 == 0) return 0;
+		return over50WSum/over50;
 	}
 	
 }
